@@ -12,6 +12,7 @@ public class Main : MonoBehaviour
   GameObject portal_disk;
   GameObject portal_border;
   GameObject portal_camera;
+  Material portal_material;
 
   GameObject[,] debug_cubes;
 
@@ -34,6 +35,7 @@ public class Main : MonoBehaviour
     portal_disk   = GameObject.Find("Disk");
     portal_border = GameObject.Find("Border");
     portal_camera = GameObject.Find("Portal Camera");
+    portal_material = portal_disk.GetComponent<Renderer>().material;
 
     n_layers = 5;
     layers = new int[n_layers];
@@ -105,7 +107,10 @@ public class Main : MonoBehaviour
       portal_border.layer = layers[cur_layer_i];
     }
 
-    portal.transform.localPosition = new Vector3(0,0,Mathf.Lerp(10,1,portal_motion/100.0f));
+    float t = portal_motion/100.0f;
+    portal.transform.localPosition = new Vector3(0,0,Mathf.Lerp(10,1,t));
+    portal_material.mainTextureScale = new Vector2(1+t,1+t);
+    portal_material.mainTextureOffset = new Vector2(-t/2,-t/2);
 
     if(mouse_captured)
     {
