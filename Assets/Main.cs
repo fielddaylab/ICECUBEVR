@@ -7,9 +7,16 @@ public class Main : MonoBehaviour
   public GameObject debug_cube_prefab;
 
   GameObject camera_house;
-  new GameObject camera;
+  GameObject main_camera;
+  GameObject portal;
+  GameObject portal_camera;
 
-  GameObject[] debug_cubes;
+  GameObject[,] debug_cubes;
+
+  int cur_layer_i;
+  int next_layer_i;
+  int n_layers;
+  int[] layers;
 
   bool mouse_captured;
   float mouse_x;
@@ -18,16 +25,35 @@ public class Main : MonoBehaviour
   void Start()
   {
     camera_house  = GameObject.Find("CameraHouse");
-    camera        = GameObject.Find("Main Camera");
+    main_camera   = GameObject.Find("Main Camera");
+    portal        = GameObject.Find("Portal");
+    portal_camera = GameObject.Find("Portal Camera");
 
-    debug_cubes = new GameObject[3*3*3];
+    n_layers = 5;
+    layers = new int[n_layers];
+    for(int i = 0; i < n_layers; i++)
+      layers[i] = LayerMask.NameToLayer("Set_"+i);
+    cur_layer_i = 0;
+    next_layer_i = 1;
+
+    debug_cubes = new GameObject[n_layers,3*3*3];
+    for(int l = 0; l < n_layers; l++)
     for(int x = -1; x <= 1; x++)
     for(int y = -1; y <= 1; y++)
     for(int z = -1; z <= 1; z++)
     {
       int i = ((x+1)*9+(y+1)*3+(z+1)*1);
-      debug_cubes[i] = (GameObject)Instantiate(debug_cube_prefab);
-      debug_cubes[i].transform.position = new Vector3(x*10,y*10,z*10);
+      debug_cubes[l,i] = (GameObject)Instantiate(debug_cube_prefab);
+      debug_cubes[l,i].transform.position = new Vector3(x*10,y*10,z*10);
+      debug_cubes[l,i].layer = layers[l];
+      switch(l)
+      {
+        case 0: debug_cubes[l,i].GetComponent<Renderer>().material.SetColor("_Color", Color.red); break;
+        case 1: debug_cubes[l,i].GetComponent<Renderer>().material.SetColor("_Color", Color.white); break;
+        case 2: debug_cubes[l,i].GetComponent<Renderer>().material.SetColor("_Color", Color.yellow); break;
+        case 3: debug_cubes[l,i].GetComponent<Renderer>().material.SetColor("_Color", Color.green); break;
+        case 4: debug_cubes[l,i].GetComponent<Renderer>().material.SetColor("_Color", Color.blue); break;
+      }
     }
 
     mouse_captured = false;
@@ -50,6 +76,16 @@ public class Main : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
       }
+    }
+
+    if(Input.GetKeyDown("space"))
+    {
+      cur_layer_i = next_layer_i;
+      next_layer_i = (next_layer_i+1)%n_layers;
+
+      main_camera.GetComponent<Camera>().cullingMask = 1 << layers[cur_layer_i];
+      portal_camera.GetComponent<Camera>().cullingMask = 1 << layers[next_layer_i];
+      portal.layer = layers[cur_layer_i];
     }
 
     if(mouse_captured)
