@@ -9,6 +9,8 @@ public class Main : MonoBehaviour
   GameObject camera_house;
   GameObject main_camera;
   GameObject portal;
+  GameObject portal_disk;
+  GameObject portal_border;
   GameObject portal_camera;
 
   GameObject[,] debug_cubes;
@@ -29,6 +31,8 @@ public class Main : MonoBehaviour
     camera_house  = GameObject.Find("CameraHouse");
     main_camera   = GameObject.Find("Main Camera");
     portal        = GameObject.Find("Portal");
+    portal_disk   = GameObject.Find("Disk");
+    portal_border = GameObject.Find("Border");
     portal_camera = GameObject.Find("Portal Camera");
 
     n_layers = 5;
@@ -97,6 +101,8 @@ public class Main : MonoBehaviour
       main_camera.GetComponent<Camera>().cullingMask = 1 << layers[cur_layer_i];
       portal_camera.GetComponent<Camera>().cullingMask = 1 << layers[next_layer_i];
       portal.layer = layers[cur_layer_i];
+      portal_disk.layer = layers[cur_layer_i];
+      portal_border.layer = layers[cur_layer_i];
     }
 
     portal.transform.localPosition = new Vector3(0,0,Mathf.Lerp(10,1,portal_motion/100.0f));
