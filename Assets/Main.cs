@@ -22,6 +22,8 @@ public class Main : MonoBehaviour
   float mouse_x;
   float mouse_y;
 
+  int portal_motion;
+
   void Start()
   {
     camera_house  = GameObject.Find("CameraHouse");
@@ -59,6 +61,8 @@ public class Main : MonoBehaviour
     mouse_captured = false;
     mouse_x = 0;
     mouse_y = 0;
+
+    portal_motion = 0;
   }
 
   void Update()
@@ -80,6 +84,13 @@ public class Main : MonoBehaviour
 
     if(Input.GetKeyDown("space"))
     {
+      if(portal_motion == 0) portal_motion = 1;
+    }
+
+    if(portal_motion > 0) portal_motion++;
+    if(portal_motion > 100)
+    {
+      portal_motion = 0;
       cur_layer_i = next_layer_i;
       next_layer_i = (next_layer_i+1)%n_layers;
 
@@ -87,6 +98,8 @@ public class Main : MonoBehaviour
       portal_camera.GetComponent<Camera>().cullingMask = 1 << layers[next_layer_i];
       portal.layer = layers[cur_layer_i];
     }
+
+    portal.transform.localPosition = new Vector3(0,0,Mathf.Lerp(10,1,portal_motion/100.0f));
 
     if(mouse_captured)
     {
