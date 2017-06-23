@@ -12,6 +12,8 @@ public class Main : MonoBehaviour
   GameObject portal_disk;
   GameObject portal_border;
   GameObject portal_camera;
+  Vector3 portal_scale;
+  Vector3 portal_translate;
   Material portal_material;
 
   GameObject[,] debug_cubes;
@@ -29,13 +31,15 @@ public class Main : MonoBehaviour
 
   void Start()
   {
-    camera_house  = GameObject.Find("CameraHouse");
-    main_camera   = GameObject.Find("Main Camera");
-    portal        = GameObject.Find("Portal");
-    portal_disk   = GameObject.Find("Disk");
-    portal_border = GameObject.Find("Border");
-    portal_camera = GameObject.Find("Portal Camera");
-    portal_material = portal_disk.GetComponent<Renderer>().material;
+    camera_house     = GameObject.Find("CameraHouse");
+    main_camera      = GameObject.Find("Main Camera");
+    portal           = GameObject.Find("Portal");
+    portal_disk      = GameObject.Find("Disk");
+    portal_border    = GameObject.Find("Border");
+    portal_camera    = GameObject.Find("Portal Camera");
+    portal_material  = portal_disk.GetComponent<Renderer>().material;
+    portal_scale = portal.transform.localScale;
+    portal_translate = portal.transform.position;
 
     n_layers = 5;
     layers = new int[n_layers];
@@ -108,7 +112,8 @@ public class Main : MonoBehaviour
     }
 
     float t = portal_motion/100.0f;
-    portal.transform.localPosition = new Vector3(0,0,Mathf.Lerp(10,1,t));
+    portal.transform.localPosition = new Vector3(portal_translate.x,portal_translate.y,Mathf.Lerp(10,1,t));
+    portal.transform.localScale = new Vector3(portal_scale.x*(1+t),portal_scale.y*(1+t),portal_scale.z*(1+t));
     portal_material.mainTextureScale = new Vector2(1+t,1+t);
     portal_material.mainTextureOffset = new Vector2(-t/2,-t/2);
 
