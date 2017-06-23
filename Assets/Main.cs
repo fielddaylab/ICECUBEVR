@@ -114,8 +114,6 @@ public class Main : MonoBehaviour
     float t = portal_motion/100.0f;
     portal.transform.localPosition = new Vector3(portal_translate.x,portal_translate.y,Mathf.Lerp(10,1,t));
     portal.transform.localScale = new Vector3(portal_scale.x*(1+t),portal_scale.y*(1+t),portal_scale.z*(1+t));
-    portal_material.mainTextureScale = new Vector2(1+t,1+t);
-    portal_material.mainTextureOffset = new Vector2(-t/2,-t/2);
 
     if(mouse_captured)
     {
