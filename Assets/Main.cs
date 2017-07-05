@@ -22,6 +22,7 @@ public class Main : MonoBehaviour
   int next_layer_i;
   int n_layers;
   int[] layers;
+  int all_layer;
 
   bool mouse_captured;
   float mouse_x;
@@ -45,6 +46,7 @@ public class Main : MonoBehaviour
     layers = new int[n_layers];
     for(int i = 0; i < n_layers; i++)
       layers[i] = LayerMask.NameToLayer("Set_"+i);
+    all_layer = LayerMask.NameToLayer("Set_ALL");
     cur_layer_i = 0;
     next_layer_i = 1;
 
@@ -104,8 +106,8 @@ public class Main : MonoBehaviour
       cur_layer_i = next_layer_i;
       next_layer_i = (next_layer_i+1)%n_layers;
 
-      main_camera.GetComponent<Camera>().cullingMask = 1 << layers[cur_layer_i];
-      portal_camera.GetComponent<Camera>().cullingMask = 1 << layers[next_layer_i];
+      main_camera.GetComponent<Camera>().cullingMask = (1 << layers[cur_layer_i]) | (1 << all_layer);
+      portal_camera.GetComponent<Camera>().cullingMask = (1 << layers[next_layer_i]) | (1 << all_layer);
       portal.layer = layers[cur_layer_i];
       portal_disk.layer = layers[cur_layer_i];
       portal_border.layer = layers[cur_layer_i];
