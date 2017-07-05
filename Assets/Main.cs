@@ -12,9 +12,15 @@ public class Main : MonoBehaviour
   GameObject portal_disk;
   GameObject portal_border;
   GameObject portal_camera;
+  GameObject helmet;
+
+  Material portal_material;
+
   Vector3 portal_scale;
   Vector3 portal_translate;
-  Material portal_material;
+  Vector3 default_look_ahead;
+  Vector3 look_ahead;
+  Vector3 lazy_look_ahead;
 
   GameObject[,] debug_cubes;
 
@@ -30,6 +36,16 @@ public class Main : MonoBehaviour
 
   int portal_motion;
 
+  Vector2 getEuler(Vector3 v)
+  {
+    float plane_dist = new Vector2(v.x,v.z).magnitude;
+    return new Vector2(Mathf.Atan2(v.y,plane_dist),-1*(Mathf.Atan2(v.z,v.x)-Mathf.PI/2));
+  }
+  Quaternion rotationFromEuler(Vector2 euler)
+  {
+    return Quaternion.Euler(-Mathf.Rad2Deg*euler.x, Mathf.Rad2Deg*euler.y, 0);
+  }
+
   void Start()
   {
     camera_house     = GameObject.Find("CameraHouse");
@@ -38,9 +54,13 @@ public class Main : MonoBehaviour
     portal_disk      = GameObject.Find("Disk");
     portal_border    = GameObject.Find("Border");
     portal_camera    = GameObject.Find("Portal Camera");
+    helmet           = GameObject.Find("Helmet");
     portal_material  = portal_disk.GetComponent<Renderer>().material;
     portal_scale = portal.transform.localScale;
     portal_translate = portal.transform.position;
+    default_look_ahead = new Vector3(0,0,1);
+    look_ahead = default_look_ahead;
+    lazy_look_ahead = default_look_ahead;
 
     n_layers = 5;
     layers = new int[n_layers];
@@ -128,6 +148,11 @@ public class Main : MonoBehaviour
       mouse_x = 0;
       mouse_y = 0;
     }
+
+    look_ahead = main_camera.transform.rotation*default_look_ahead;
+    lazy_look_ahead = Vector3.Lerp(lazy_look_ahead,look_ahead,0.1f);
+    helmet.transform.position = main_camera.transform.position;
+    helmet.transform.rotation = rotationFromEuler(getEuler(lazy_look_ahead));
   }
 
 }
