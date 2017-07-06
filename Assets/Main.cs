@@ -210,8 +210,8 @@ public class Main : MonoBehaviour
     helmet.transform.rotation = rotationFromEuler(getEuler(lazy_look_ahead));
 
     satellite_position += satellite_velocity;
+    if(cur_layer_i != 1) satellite_position = default_satellite_position;
     satellite.transform.position = satellite_position;
-    if(cur_layer_i != 1) satellite.transform.position = default_satellite_position;
 
     if(in_portal_motion > 0)
       flash_alpha = (float)in_portal_motion/max_portal_motion;
