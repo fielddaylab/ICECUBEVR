@@ -30,6 +30,9 @@ public class Main : MonoBehaviour
   int alpha_id;
   float flash_alpha;
 
+  public AudioClip sound;
+  AudioSource source;
+
   GameObject[,] debug_cubes;
 
   int cur_layer_i;
@@ -72,6 +75,7 @@ public class Main : MonoBehaviour
 
     alpha_id = Shader.PropertyToID("alpha");
     flash_alpha = 0;
+    source = GetComponent<AudioSource>();
 
     default_portal_scale = portal.transform.localScale;
     default_portal_position = portal.transform.position;
@@ -143,6 +147,7 @@ public class Main : MonoBehaviour
     if(Input.GetKeyDown("space"))
     {
       if(in_portal_motion == 0 && out_portal_motion == 0) in_portal_motion = 1;
+      source.PlayOneShot(sound,1);
     }
 
     if(in_portal_motion > 0) in_portal_motion++;
