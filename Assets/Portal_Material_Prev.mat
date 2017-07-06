@@ -6,7 +6,7 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: PortalMaterial
+  m_Name: Portal_Material_Prev
   m_Shader: {fileID: 4800000, guid: c30558a6639d54bb685b4350dde628c4, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
@@ -39,7 +39,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 8400000, guid: 691a5b5efc69d46f29697ebf9c9edda8, type: 2}
+        m_Texture: {fileID: 8400000, guid: f37354cab1de243afb467e4db8f8f5f5, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:

@@ -39,7 +39,8 @@ public class Main : MonoBehaviour
   float mouse_x;
   float mouse_y;
 
-  int portal_motion;
+  int in_portal_motion;
+  int out_portal_motion;
   int max_portal_motion;
 
   Vector2 getEuler(Vector3 v)
@@ -98,8 +99,8 @@ public class Main : MonoBehaviour
       debug_cubes[l,i].layer = layers[l];
       switch(l)
       {
-        case 0: debug_cubes[l,i].GetComponent<Renderer>().material.SetColor("_Color", Color.red); break;
-        case 1: debug_cubes[l,i].GetComponent<Renderer>().material.SetColor("_Color", Color.white); break;
+        case 0: debug_cubes[l,i].GetComponent<Renderer>().material.SetColor("_Color", Color.white); break;
+        case 1: debug_cubes[l,i].GetComponent<Renderer>().material.SetColor("_Color", Color.red); break;
         case 2: debug_cubes[l,i].GetComponent<Renderer>().material.SetColor("_Color", Color.yellow); break;
         case 3: debug_cubes[l,i].GetComponent<Renderer>().material.SetColor("_Color", Color.green); break;
         case 4: debug_cubes[l,i].GetComponent<Renderer>().material.SetColor("_Color", Color.blue); break;
@@ -110,7 +111,8 @@ public class Main : MonoBehaviour
     mouse_x = 0;
     mouse_y = 0;
 
-    portal_motion = 0;
+    in_portal_motion = 0;
+    out_portal_motion = 0;
     max_portal_motion = 100;
   }
 
@@ -133,13 +135,14 @@ public class Main : MonoBehaviour
 
     if(Input.GetKeyDown("space"))
     {
-      if(portal_motion == 0) portal_motion = 1;
+      if(in_portal_motion == 0 && out_portal_motion == 0) in_portal_motion = 1;
     }
 
-    if(portal_motion > 0) portal_motion++;
-    if(portal_motion > max_portal_motion)
+    if(in_portal_motion > 0) in_portal_motion++;
+    if(in_portal_motion > max_portal_motion)
     {
-      portal_motion = 0;
+      in_portal_motion = 0;
+      out_portal_motion = 1;
       prev_layer_i = cur_layer_i;
       cur_layer_i = next_layer_i;
       next_layer_i = (next_layer_i+1)%n_layers;
@@ -152,13 +155,35 @@ public class Main : MonoBehaviour
       portal_disk_prev.layer = layers[cur_layer_i];
       portal_border.layer = layers[cur_layer_i];
     }
+    if(out_portal_motion > 0) out_portal_motion++;
+    if(out_portal_motion > max_portal_motion)
+    {
+      out_portal_motion = 0;
+    }
 
-    float t = portal_motion/(float)max_portal_motion;
-    portal.transform.localPosition = new Vector3(default_portal_position.x,default_portal_position.y,Mathf.Lerp(default_portal_position.z,-default_portal_position.z,t));
-    float engulf = (t-0.5f)*2;
-    engulf *= -engulf;
-    engulf += 1;
-    portal.transform.localScale = new Vector3(default_portal_scale.x*engulf,default_portal_scale.y*engulf,default_portal_scale.z*engulf);
+    if(in_portal_motion > 0)
+    {
+      float t = in_portal_motion/(float)max_portal_motion;
+      portal.transform.localPosition = new Vector3(default_portal_position.x,default_portal_position.y,Mathf.Lerp(default_portal_position.z,0,t));
+      float engulf = t-1;
+      engulf *= -engulf;
+      engulf += 1;
+      portal.transform.localScale = new Vector3(default_portal_scale.x*engulf,default_portal_scale.y*engulf,default_portal_scale.z*engulf);
+    }
+    else if(out_portal_motion > 0)
+    {
+      float t = out_portal_motion/(float)max_portal_motion;
+      portal.transform.localPosition = new Vector3(default_portal_position.x,default_portal_position.y,Mathf.Lerp(0,-default_portal_position.z,t));
+      float engulf = t;
+      engulf *= -engulf;
+      engulf += 1;
+      portal.transform.localScale = new Vector3(default_portal_scale.x*engulf,default_portal_scale.y*engulf,default_portal_scale.z*engulf);
+    }
+    else
+    {
+      portal.transform.localPosition = default_portal_position;
+      portal.transform.localScale = new Vector3(0,0,0);
+    }
 
     if(mouse_captured)
     {
