@@ -9,23 +9,28 @@ public class Main : MonoBehaviour
   GameObject camera_house;
   GameObject main_camera;
   GameObject portal;
-  GameObject portal_disk;
+  GameObject portal_disk_prev;
+  GameObject portal_disk_next;
   GameObject portal_border;
-  GameObject portal_camera;
+  GameObject portal_camera_next;
+  GameObject portal_camera_prev;
   GameObject helmet;
+  GameObject satellite;
 
-  Material portal_material;
-
-  Vector3 portal_scale;
-  Vector3 portal_translate;
+  Vector3 default_portal_scale;
+  Vector3 default_portal_position;
   Vector3 default_look_ahead;
   Vector3 look_ahead;
   Vector3 lazy_look_ahead;
+  Vector3 default_satellite_position;
+  Vector3 satellite_position;
+  Vector3 satellite_velocity;
 
   GameObject[,] debug_cubes;
 
   int cur_layer_i;
   int next_layer_i;
+  int prev_layer_i;
   int n_layers;
   int[] layers;
   int all_layer;
@@ -35,6 +40,7 @@ public class Main : MonoBehaviour
   float mouse_y;
 
   int portal_motion;
+  int max_portal_motion;
 
   Vector2 getEuler(Vector3 v)
   {
@@ -48,16 +54,25 @@ public class Main : MonoBehaviour
 
   void Start()
   {
-    camera_house     = GameObject.Find("CameraHouse");
-    main_camera      = GameObject.Find("Main Camera");
-    portal           = GameObject.Find("Portal");
-    portal_disk      = GameObject.Find("Disk");
-    portal_border    = GameObject.Find("Border");
-    portal_camera    = GameObject.Find("Portal Camera");
-    helmet           = GameObject.Find("Helmet");
-    portal_material  = portal_disk.GetComponent<Renderer>().material;
-    portal_scale = portal.transform.localScale;
-    portal_translate = portal.transform.position;
+    camera_house       = GameObject.Find("CameraHouse");
+    main_camera        = GameObject.Find("Main Camera");
+    portal             = GameObject.Find("Portal");
+    portal_disk_next   = GameObject.Find("Disk_Next");
+    portal_disk_prev   = GameObject.Find("Disk_Prev");
+    portal_border      = GameObject.Find("Border");
+    portal_camera_next = GameObject.Find("Portal_Camera_Next");
+    portal_camera_prev = GameObject.Find("Portal_Camera_Prev");
+    helmet             = GameObject.Find("Helmet");
+    satellite          = GameObject.Find("Satellite");
+
+    default_portal_scale = portal.transform.localScale;
+    default_portal_position = portal.transform.position;
+
+    default_satellite_position = new Vector3(1.5f,1.5f,10);
+    satellite_position = default_satellite_position;
+    satellite_velocity = new Vector3(0,0,-0.01f);
+    satellite.transform.position = satellite_position;
+
     default_look_ahead = new Vector3(0,0,1);
     look_ahead = default_look_ahead;
     lazy_look_ahead = default_look_ahead;
@@ -68,6 +83,7 @@ public class Main : MonoBehaviour
       layers[i] = LayerMask.NameToLayer("Set_"+i);
     all_layer = LayerMask.NameToLayer("Set_ALL");
     cur_layer_i = 0;
+    prev_layer_i = 0;
     next_layer_i = 1;
 
     debug_cubes = new GameObject[n_layers,3*3*3];
@@ -95,6 +111,7 @@ public class Main : MonoBehaviour
     mouse_y = 0;
 
     portal_motion = 0;
+    max_portal_motion = 100;
   }
 
   void Update()
@@ -120,22 +137,28 @@ public class Main : MonoBehaviour
     }
 
     if(portal_motion > 0) portal_motion++;
-    if(portal_motion > 100)
+    if(portal_motion > max_portal_motion)
     {
       portal_motion = 0;
+      prev_layer_i = cur_layer_i;
       cur_layer_i = next_layer_i;
       next_layer_i = (next_layer_i+1)%n_layers;
 
       main_camera.GetComponent<Camera>().cullingMask = (1 << layers[cur_layer_i]) | (1 << all_layer);
-      portal_camera.GetComponent<Camera>().cullingMask = (1 << layers[next_layer_i]) | (1 << all_layer);
+      portal_camera_next.GetComponent<Camera>().cullingMask = (1 << layers[next_layer_i]) | (1 << all_layer);
+      portal_camera_prev.GetComponent<Camera>().cullingMask = (1 << layers[prev_layer_i]) | (1 << all_layer);
       portal.layer = layers[cur_layer_i];
-      portal_disk.layer = layers[cur_layer_i];
+      portal_disk_next.layer = layers[cur_layer_i];
+      portal_disk_prev.layer = layers[cur_layer_i];
       portal_border.layer = layers[cur_layer_i];
     }
 
-    float t = portal_motion/100.0f;
-    portal.transform.localPosition = new Vector3(portal_translate.x,portal_translate.y,Mathf.Lerp(10,1,t));
-    portal.transform.localScale = new Vector3(portal_scale.x*(1+t),portal_scale.y*(1+t),portal_scale.z*(1+t));
+    float t = portal_motion/(float)max_portal_motion;
+    portal.transform.localPosition = new Vector3(default_portal_position.x,default_portal_position.y,Mathf.Lerp(default_portal_position.z,-default_portal_position.z,t));
+    float engulf = (t-0.5f)*2;
+    engulf *= -engulf;
+    engulf += 1;
+    portal.transform.localScale = new Vector3(default_portal_scale.x*engulf,default_portal_scale.y*engulf,default_portal_scale.z*engulf);
 
     if(mouse_captured)
     {
@@ -153,6 +176,10 @@ public class Main : MonoBehaviour
     lazy_look_ahead = Vector3.Lerp(lazy_look_ahead,look_ahead,0.1f);
     helmet.transform.position = main_camera.transform.position;
     helmet.transform.rotation = rotationFromEuler(getEuler(lazy_look_ahead));
+
+    satellite_position += satellite_velocity;
+    satellite.transform.position = satellite_position;
+    if(cur_layer_i != 1) satellite.transform.position = default_satellite_position;
   }
 
 }
