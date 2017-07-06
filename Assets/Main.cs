@@ -26,6 +26,10 @@ public class Main : MonoBehaviour
   Vector3 satellite_position;
   Vector3 satellite_velocity;
 
+  public Material alpha_material;
+  int alpha_id;
+  float flash_alpha;
+
   GameObject[,] debug_cubes;
 
   int cur_layer_i;
@@ -65,6 +69,9 @@ public class Main : MonoBehaviour
     portal_camera_prev = GameObject.Find("Portal_Camera_Prev");
     helmet             = GameObject.Find("Helmet");
     satellite          = GameObject.Find("Satellite");
+
+    alpha_id = Shader.PropertyToID("alpha");
+    flash_alpha = 0;
 
     default_portal_scale = portal.transform.localScale;
     default_portal_position = portal.transform.position;
@@ -205,6 +212,18 @@ public class Main : MonoBehaviour
     satellite_position += satellite_velocity;
     satellite.transform.position = satellite_position;
     if(cur_layer_i != 1) satellite.transform.position = default_satellite_position;
+
+    if(in_portal_motion > 0)
+      flash_alpha = (float)in_portal_motion/max_portal_motion;
+    else if(out_portal_motion > 0)
+      flash_alpha = 1.0f-((float)out_portal_motion/max_portal_motion);
+    else
+      flash_alpha = 0;
+    flash_alpha *= 1.1f;
+    if(flash_alpha > 1) flash_alpha = 1;
+    flash_alpha = flash_alpha*flash_alpha;
+    flash_alpha = flash_alpha*flash_alpha;
+    alpha_material.SetFloat(alpha_id,flash_alpha);
   }
 
 }
