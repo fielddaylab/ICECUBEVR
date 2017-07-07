@@ -16,6 +16,10 @@ public class Main : MonoBehaviour
   GameObject portal_camera_prev;
   GameObject helmet;
   GameObject satellite;
+  GameObject cam_spinner;
+  GameObject gaze;
+  GameObject gaze_reticle;
+  GameObject gaze_spinner;
 
   Vector3 default_portal_scale;
   Vector3 default_portal_position;
@@ -50,6 +54,17 @@ public class Main : MonoBehaviour
   int out_portal_motion;
   int max_portal_motion;
 
+  int SPIN_STATE_IDLE;
+  int SPIN_STATE_START;
+  int SPIN_STATE_RUN;
+  int SPIN_STATE_STOPPING;
+  int SPIN_STATE_STOP;
+  int gaze_spin_state;
+  int gaze_spin;
+  int cam_spin_state;
+  int cam_spin;
+  int max_spin;
+
   Vector2 getEuler(Vector3 v)
   {
     float plane_dist = new Vector2(v.x,v.z).magnitude;
@@ -72,6 +87,10 @@ public class Main : MonoBehaviour
     portal_camera_prev = GameObject.Find("Portal_Camera_Prev");
     helmet             = GameObject.Find("Helmet");
     satellite          = GameObject.Find("Satellite");
+    cam_spinner        = GameObject.Find("Cam_Spinner");
+    gaze               = GameObject.Find("Gaze");
+    gaze_reticle       = GameObject.Find("Gaze_Reticle");
+    gaze_spinner       = GameObject.Find("Gaze_Spinner");
 
     alpha_id = Shader.PropertyToID("alpha");
     flash_alpha = 0;
@@ -125,6 +144,18 @@ public class Main : MonoBehaviour
     in_portal_motion = 0;
     out_portal_motion = 0;
     max_portal_motion = 100;
+
+    SPIN_STATE_IDLE     = 0;
+    SPIN_STATE_START    = 1;
+    SPIN_STATE_RUN      = 2;
+    SPIN_STATE_STOPPING = 3;
+    SPIN_STATE_STOP     = 4;
+
+    gaze_spin_state = SPIN_STATE_IDLE;
+    gaze_spin = 0;
+    cam_spin_state = SPIN_STATE_IDLE;
+    cam_spin = 0;
+    max_spin = 40;
   }
 
   void Update()
@@ -148,6 +179,8 @@ public class Main : MonoBehaviour
     {
       if(in_portal_motion == 0 && out_portal_motion == 0) in_portal_motion = 1;
       source.PlayOneShot(sound,1);
+      if(gaze_spin_state == SPIN_STATE_IDLE || gaze_spin_state == SPIN_STATE_RUN) gaze_spin_state++;
+      if(cam_spin_state  == SPIN_STATE_IDLE || cam_spin_state  == SPIN_STATE_RUN) cam_spin_state++;
     }
 
     if(in_portal_motion > 0) in_portal_motion++;
@@ -229,6 +262,49 @@ public class Main : MonoBehaviour
     flash_alpha = flash_alpha*flash_alpha;
     flash_alpha = flash_alpha*flash_alpha;
     alpha_material.SetFloat(alpha_id,flash_alpha);
+
+    if(gaze_spin_state > SPIN_STATE_IDLE)
+    {
+      gaze_spin++;
+      if(gaze_spin > max_spin)
+      {
+        gaze_spin = 0;
+        if(gaze_spin_state != SPIN_STATE_RUN) gaze_spin_state = (gaze_spin_state+1)%(SPIN_STATE_STOP+1);
+      }
+    }
+
+    if(cam_spin_state > SPIN_STATE_IDLE)
+    {
+      cam_spin++;
+      if(cam_spin > max_spin)
+      {
+        cam_spin = 0;
+        if(cam_spin_state != SPIN_STATE_RUN) cam_spin_state = (cam_spin_state+1)%(SPIN_STATE_STOP+1);
+      }
+    }
+
+    float shrink;
+    float rot;
+
+    shrink = 0.0f;
+    rot = 0.0f;
+         if(gaze_spin_state == SPIN_STATE_START)    shrink =       (float)gaze_spin/max_spin;
+    else if(gaze_spin_state == SPIN_STATE_RUN)      shrink = 1.0f;
+    else if(gaze_spin_state == SPIN_STATE_STOPPING) shrink = 1.0f;
+    else if(gaze_spin_state == SPIN_STATE_STOP)     shrink = 1.0f-((float)gaze_spin/max_spin);
+    rot = ((float)gaze_spin/max_spin)*360.0f;
+    gaze_spinner.transform.localScale = new Vector3(shrink,shrink,shrink);
+    gaze_spinner.transform.localRotation = Quaternion.Euler(0,0,rot);
+
+    shrink = 0.0f;
+    rot = 0.0f;
+         if(cam_spin_state == SPIN_STATE_START)    shrink =       (float)cam_spin/max_spin;
+    else if(cam_spin_state == SPIN_STATE_RUN)      shrink = 1.0f;
+    else if(cam_spin_state == SPIN_STATE_STOPPING) shrink = 1.0f;
+    else if(cam_spin_state == SPIN_STATE_STOP)     shrink = 1.0f-((float)cam_spin/max_spin);
+    rot = ((float)cam_spin/max_spin)*360.0f;
+    cam_spinner.transform.localScale = new Vector3(shrink,shrink,shrink);
+    cam_spinner.transform.localRotation = Quaternion.Euler(0,0,rot);
   }
 
 }
