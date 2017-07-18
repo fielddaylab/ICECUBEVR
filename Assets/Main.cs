@@ -46,6 +46,8 @@ public class Main : MonoBehaviour
   int n_layers;
   int[] layers;
   int all_layer;
+  int cam_layer;
+  int portal_layer;
 
   bool mouse_captured;
   bool mouse_just_captured;
@@ -115,6 +117,8 @@ public class Main : MonoBehaviour
     for(int i = 0; i < n_layers; i++)
       layers[i] = LayerMask.NameToLayer("Set_"+i);
     all_layer = LayerMask.NameToLayer("Set_ALL");
+    cam_layer = LayerMask.NameToLayer("Set_Cam_Only");
+    portal_layer = LayerMask.NameToLayer("Set_Portal_Only");
     cur_layer_i = 0;
     prev_layer_i = 0;
     next_layer_i = 1;
@@ -193,9 +197,9 @@ public class Main : MonoBehaviour
       cur_layer_i = next_layer_i;
       next_layer_i = (next_layer_i+1)%n_layers;
 
-      main_camera.GetComponent<Camera>().cullingMask = (1 << layers[cur_layer_i]) | (1 << all_layer);
-      portal_camera_next.GetComponent<Camera>().cullingMask = (1 << layers[next_layer_i]) | (1 << all_layer);
-      portal_camera_prev.GetComponent<Camera>().cullingMask = (1 << layers[prev_layer_i]) | (1 << all_layer);
+      main_camera.GetComponent<Camera>().cullingMask = (1 << layers[cur_layer_i]) | (1 << cam_layer) | (1 << all_layer);
+      portal_camera_next.GetComponent<Camera>().cullingMask = (1 << layers[next_layer_i]) | (1 << portal_layer) | (1 << all_layer);
+      portal_camera_prev.GetComponent<Camera>().cullingMask = (1 << layers[prev_layer_i]) | (1 << portal_layer) | (1 << all_layer);
       portal.layer = layers[cur_layer_i];
       portal_disk_next.layer = layers[cur_layer_i];
       portal_disk_prev.layer = layers[cur_layer_i];

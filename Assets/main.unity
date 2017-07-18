@@ -256,7 +256,7 @@ GameObject:
   - component: {fileID: 234132043}
   - component: {fileID: 234132045}
   - component: {fileID: 234132044}
-  m_Layer: 13
+  m_Layer: 14
   m_Name: Gaze_Reticle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -324,7 +324,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 246561821}
-  m_Layer: 13
+  m_Layer: 14
   m_Name: Gaze_Spinner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -680,7 +680,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 445391020}
-  m_Layer: 13
+  m_Layer: 14
   m_Name: Gaze
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1059,7 +1059,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 954345267}
-  m_Layer: 13
+  m_Layer: 14
   m_Name: Cam_Spinner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1090,7 +1090,7 @@ GameObject:
   - component: {fileID: 1271334939}
   - component: {fileID: 1271334942}
   - component: {fileID: 1271334940}
-  m_Layer: 13
+  m_Layer: 14
   m_Name: Cam_Reticle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1160,7 +1160,7 @@ GameObject:
   - component: {fileID: 1426508084}
   - component: {fileID: 1426508086}
   - component: {fileID: 1426508085}
-  m_Layer: 13
+  m_Layer: 14
   m_Name: Gaze_Spinner_Reticle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1290,7 +1290,7 @@ Prefab:
     - target: {fileID: 20530901816750388, guid: 3eea00799ca494406b93472ca47969d7,
         type: 2}
       propertyPath: m_CullingMask.m_Bits
-      value: 4294959560
+      value: 4294926792
       objectReference: {fileID: 0}
     - target: {fileID: 1203403614043170, guid: 3eea00799ca494406b93472ca47969d7, type: 2}
       propertyPath: m_Layer
@@ -1452,7 +1452,7 @@ GameObject:
   - component: {fileID: 1603345947}
   - component: {fileID: 1603345949}
   - component: {fileID: 1603345948}
-  m_Layer: 13
+  m_Layer: 14
   m_Name: Cam_Spinner_Reticle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1524,7 +1524,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 1840336085}
-  m_Layer: 13
+  m_Layer: 14
   m_Name: Gaze_Transform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1628,7 +1628,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294959816
+    m_Bits: 4294943432
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 8400000, guid: 691a5b5efc69d46f29697ebf9c9edda8, type: 2}
   m_TargetDisplay: 0
@@ -1721,7 +1721,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 8448
+    m_Bits: 41216
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 8400000, guid: f37354cab1de243afb467e4db8f8f5f5, type: 2}
   m_TargetDisplay: 0
