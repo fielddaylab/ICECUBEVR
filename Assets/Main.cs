@@ -38,6 +38,8 @@ public class Main : MonoBehaviour
   public AudioClip sound;
   AudioSource source;
 
+  public GameObject star_prefab;
+
   GameObject[,] debug_cubes;
 
   int cur_layer_i;
@@ -164,6 +166,62 @@ public class Main : MonoBehaviour
     spin = 0;
     spin_max = 200;
     spins_per = 4;
+
+    GameObject[] star_groups;
+    GameObject star;
+    Vector3[] star_positions;
+    Vector3 starpos;
+
+    int n_stars = 5000;
+    int n_groups = (int)Mathf.Ceil(n_stars/1000);
+    int n_stars_in_group;
+    star_groups = new GameObject[n_groups];
+    star = (GameObject)Instantiate(star_prefab);
+
+    star_positions = new Vector3[n_stars];
+    for(int i = 0; i < n_stars; i++)
+    {
+      bool good_star = false;
+      starpos = new Vector3(Random.Range(-1f,1f),Random.Range(-1f,1f),Random.Range(-1f,1f));
+      good_star = (starpos.sqrMagnitude < Random.Range(0f,1f));
+      while(!good_star)
+      {
+        starpos = new Vector3(Random.Range(-1f,1f),Random.Range(-1f,1f),Random.Range(-1f,1f));
+        good_star = (starpos.sqrMagnitude < Random.Range(0f,1f));
+      }
+      starpos = starpos.normalized;
+      star_positions[i] = starpos;
+    }
+
+    for(int i = 0; i < n_groups; i++)
+    {
+      n_stars_in_group = Mathf.Min(1000,n_stars);
+      CombineInstance[] combine = new CombineInstance[n_stars_in_group];
+
+      for(int j = 0; j < n_stars_in_group; j++)
+      {
+        starpos = star_positions[i*n_stars_in_group+j];
+        float r = Random.Range(0f,1f);
+        starpos *= Mathf.Lerp(20f,30f,r*r);
+
+        star.transform.position = starpos;
+        star.transform.rotation = Quaternion.Euler(Random.Range(0f,360f),Random.Range(0f,360f),Random.Range(0f,360f));
+        star.transform.localScale = new Vector3(0.05f,0.05f,0.05f);
+
+        combine[j].mesh = star.transform.GetComponent<MeshFilter>().mesh;
+        combine[j].transform = star.transform.localToWorldMatrix;
+      }
+
+      star_groups[i] = (GameObject)Instantiate(star_prefab);
+      star_groups[i].transform.position = new Vector3(0,0,0);
+      star_groups[i].transform.rotation = Quaternion.Euler(0,0,0);
+      star_groups[i].transform.localScale = new Vector3(1,1,1);
+      star_groups[i].transform.GetComponent<MeshFilter>().mesh = new Mesh();
+      star_groups[i].transform.GetComponent<MeshFilter>().mesh.CombineMeshes(combine);
+
+      n_stars -= n_stars_in_group;
+    }
+    Destroy(star,0f);
   }
 
   void Update()
