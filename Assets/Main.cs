@@ -172,12 +172,13 @@ public class Main : MonoBehaviour
     Vector3[] star_positions;
     Vector3 starpos;
 
-    int n_stars = 5000;
+    int n_stars = 4000;
     int n_groups = (int)Mathf.Ceil(n_stars/1000);
     int n_stars_in_group;
     star_groups = new GameObject[n_groups];
     star = (GameObject)Instantiate(star_prefab);
 
+    //gen positions
     star_positions = new Vector3[n_stars];
     for(int i = 0; i < n_stars; i++)
     {
@@ -193,6 +194,29 @@ public class Main : MonoBehaviour
       star_positions[i] = starpos;
     }
 
+    //morph positions
+    for(int n = 0; n < 2; n++)
+    {
+      for(int i = 0; i < n_stars; i++)
+      {
+        Vector3 delta = new Vector3(0,0,0);
+        Vector3 dist;
+        for(int j = 0; j < n_stars; j++)
+        {
+          if(j != i)
+          {
+            dist = star_positions[j]-star_positions[i];
+            if(dist.sqrMagnitude < 0.1)
+            {
+              delta += dist*(0.0001f/dist.sqrMagnitude);
+            }
+          }
+        }
+        star_positions[i] = (star_positions[i]+delta).normalized;
+      }
+    }
+
+    //gen assets
     for(int i = 0; i < n_groups; i++)
     {
       n_stars_in_group = Mathf.Min(1000,n_stars);
