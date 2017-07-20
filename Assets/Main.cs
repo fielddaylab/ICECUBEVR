@@ -18,6 +18,9 @@ public class Main : MonoBehaviour
   GameObject portal_camera_prev;
   GameObject helmet;
   GameObject satellite;
+  GameObject earth;
+  GameObject galaxy;
+  GameObject black_hole;
   GameObject cam_reticle;
   GameObject cam_spinner;
   GameObject gaze_lift;
@@ -55,6 +58,7 @@ public class Main : MonoBehaviour
   int all_layer;
   int cam_layer;
   int portal_layer;
+  int stars_layer;
 
   bool mouse_captured;
   bool mouse_just_captured;
@@ -106,6 +110,9 @@ public class Main : MonoBehaviour
     portal_camera_prev = GameObject.Find("Portal_Camera_Prev");
     helmet             = GameObject.Find("Helmet");
     satellite          = GameObject.Find("Satellite");
+    earth              = GameObject.Find("Earth");
+    galaxy             = GameObject.Find("Galaxy");
+    black_hole         = GameObject.Find("Black_Hole");
     cam_reticle        = GameObject.Find("Cam_Reticle");
     cam_spinner        = GameObject.Find("Cam_Spinner");
     gaze_lift          = GameObject.Find("Gaze_Lift");
@@ -138,6 +145,7 @@ public class Main : MonoBehaviour
     all_layer = LayerMask.NameToLayer("Set_ALL");
     cam_layer = LayerMask.NameToLayer("Set_Cam_Only");
     portal_layer = LayerMask.NameToLayer("Set_Portal_Only");
+    stars_layer = LayerMask.NameToLayer("Set_Stars");
     cur_layer_i = 0;
     prev_layer_i = 0;
     next_layer_i = 1;
@@ -150,7 +158,8 @@ public class Main : MonoBehaviour
     {
       int i = ((x+1)*9+(y+1)*3+(z+1)*1);
       debug_cubes[l,i] = (GameObject)Instantiate(debug_cube_prefab);
-      debug_cubes[l,i].transform.position = new Vector3(x*10,y*10,z*10);
+      if(x == y && y == z  && z == 0) debug_cubes[l,i].transform.position = new Vector3(Random.Range(-100.0f,100.0f),Random.Range(-100.0f,100.0f),Random.Range(-100.0f,100.0f));
+      else                 debug_cubes[l,i].transform.position = new Vector3(x*10,y*10,z*10);
       debug_cubes[l,i].layer = layers[l];
       switch(l)
       {
@@ -254,6 +263,7 @@ public class Main : MonoBehaviour
       }
 
       star_groups[i] = (GameObject)Instantiate(star_prefab);
+      star_groups[i].layer = stars_layer;
       star_groups[i].transform.position = new Vector3(0,0,0);
       star_groups[i].transform.rotation = Quaternion.Euler(0,0,0);
       star_groups[i].transform.localScale = new Vector3(1,1,1);
@@ -271,11 +281,15 @@ public class Main : MonoBehaviour
     ).normalized)*100;
     gaze_cam_euler = getCamEuler(gaze_pt);
 
-    eyeray.GetComponent<LineRenderer>().SetPosition(0,new Vector3(0,0,0));
+    eyeray.GetComponent<LineRenderer>().SetPosition(0,gaze_pt*-100);
     eyeray.GetComponent<LineRenderer>().SetPosition(1,gaze_pt*100);
 
     gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
     portal_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
+
+    earth.transform.position = gaze_pt*-2;
+    galaxy.transform.position = gaze_pt*-2;
+    black_hole.transform.position = gaze_pt*10;
   }
 
   void Update()
@@ -309,9 +323,12 @@ public class Main : MonoBehaviour
       cur_layer_i = next_layer_i;
       next_layer_i = (next_layer_i+1)%n_layers;
 
-      main_camera.GetComponent<Camera>().cullingMask = (1 << layers[cur_layer_i]) | (1 << cam_layer) | (1 << all_layer);
-      portal_camera_next.GetComponent<Camera>().cullingMask = (1 << layers[next_layer_i]) | (1 << portal_layer) | (1 << all_layer);
-      portal_camera_prev.GetComponent<Camera>().cullingMask = (1 << layers[prev_layer_i]) | (1 << portal_layer) | (1 << all_layer);
+      if(cur_layer_i == 3)  main_camera.GetComponent<Camera>().cullingMask        = (1 << layers[cur_layer_i])  | (1 << cam_layer)    | (1 << all_layer);
+      else                  main_camera.GetComponent<Camera>().cullingMask        = (1 << layers[cur_layer_i])  | (1 << cam_layer)    | (1 << all_layer) | (1 << stars_layer);
+      if(next_layer_i == 3) portal_camera_next.GetComponent<Camera>().cullingMask = (1 << layers[next_layer_i]) | (1 << portal_layer) | (1 << all_layer);
+      else                  portal_camera_next.GetComponent<Camera>().cullingMask = (1 << layers[next_layer_i]) | (1 << portal_layer) | (1 << all_layer) | (1 << stars_layer);
+      if(prev_layer_i == 3) portal_camera_prev.GetComponent<Camera>().cullingMask = (1 << layers[prev_layer_i]) | (1 << portal_layer) | (1 << all_layer);
+      else                  portal_camera_prev.GetComponent<Camera>().cullingMask = (1 << layers[prev_layer_i]) | (1 << portal_layer) | (1 << all_layer) | (1 << stars_layer);
       portal_lift.layer = layers[cur_layer_i];
       portal_projection.layer = layers[cur_layer_i];
       portal.layer = layers[cur_layer_i];
