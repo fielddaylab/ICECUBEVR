@@ -8,6 +8,8 @@ public class Main : MonoBehaviour
 
   GameObject camera_house;
   GameObject main_camera;
+  GameObject portal_lift;
+  GameObject portal_projection;
   GameObject portal;
   GameObject portal_disk_prev;
   GameObject portal_disk_next;
@@ -18,9 +20,12 @@ public class Main : MonoBehaviour
   GameObject satellite;
   GameObject cam_reticle;
   GameObject cam_spinner;
+  GameObject gaze_lift;
+  GameObject gaze_projection;
   GameObject gaze;
   GameObject gaze_reticle;
   GameObject gaze_spinner;
+  GameObject eyeray;
 
   Vector3 default_portal_scale;
   Vector3 default_portal_position;
@@ -70,10 +75,17 @@ public class Main : MonoBehaviour
   int spin_max;
   int spins_per;
 
+  Vector3 gaze_pt;
+  Vector2 gaze_cam_euler;
+
   Vector2 getEuler(Vector3 v)
   {
     float plane_dist = new Vector2(v.x,v.z).magnitude;
     return new Vector2(Mathf.Atan2(v.y,plane_dist),-1*(Mathf.Atan2(v.z,v.x)-Mathf.PI/2));
+  }
+  Vector2 getCamEuler(Vector3 v)
+  {
+    return getEuler(v-main_camera.transform.position);
   }
   Quaternion rotationFromEuler(Vector2 euler)
   {
@@ -84,6 +96,8 @@ public class Main : MonoBehaviour
   {
     camera_house       = GameObject.Find("CameraHouse");
     main_camera        = GameObject.Find("Main Camera");
+    portal_lift        = GameObject.Find("Portal_Lift");
+    portal_projection  = GameObject.Find("Portal_Projection");
     portal             = GameObject.Find("Portal");
     portal_disk_next   = GameObject.Find("Disk_Next");
     portal_disk_prev   = GameObject.Find("Disk_Prev");
@@ -94,9 +108,12 @@ public class Main : MonoBehaviour
     satellite          = GameObject.Find("Satellite");
     cam_reticle        = GameObject.Find("Cam_Reticle");
     cam_spinner        = GameObject.Find("Cam_Spinner");
+    gaze_lift          = GameObject.Find("Gaze_Lift");
+    gaze_projection    = GameObject.Find("Gaze_Projection");
     gaze               = GameObject.Find("Gaze");
     gaze_reticle       = GameObject.Find("Gaze_Reticle");
     gaze_spinner       = GameObject.Find("Gaze_Spinner");
+    eyeray             = GameObject.Find("Ray");
 
     alpha_id = Shader.PropertyToID("alpha");
     flash_alpha = 0;
@@ -246,6 +263,19 @@ public class Main : MonoBehaviour
       n_stars -= n_stars_in_group;
     }
     Destroy(star,0f);
+
+    gaze_pt = (new Vector3(
+      Random.Range(-1.0f,1.0f),
+      Random.Range(0.2f,0.8f),
+      Random.Range(-1.0f,1.0f)
+    ).normalized)*100;
+    gaze_cam_euler = getCamEuler(gaze_pt);
+
+    eyeray.GetComponent<LineRenderer>().SetPosition(0,new Vector3(0,0,0));
+    eyeray.GetComponent<LineRenderer>().SetPosition(1,gaze_pt*100);
+
+    gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
+    portal_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
   }
 
   void Update()
@@ -282,6 +312,8 @@ public class Main : MonoBehaviour
       main_camera.GetComponent<Camera>().cullingMask = (1 << layers[cur_layer_i]) | (1 << cam_layer) | (1 << all_layer);
       portal_camera_next.GetComponent<Camera>().cullingMask = (1 << layers[next_layer_i]) | (1 << portal_layer) | (1 << all_layer);
       portal_camera_prev.GetComponent<Camera>().cullingMask = (1 << layers[prev_layer_i]) | (1 << portal_layer) | (1 << all_layer);
+      portal_lift.layer = layers[cur_layer_i];
+      portal_projection.layer = layers[cur_layer_i];
       portal.layer = layers[cur_layer_i];
       portal_disk_next.layer = layers[cur_layer_i];
       portal_disk_prev.layer = layers[cur_layer_i];
