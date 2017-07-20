@@ -69,15 +69,11 @@ public class Main : MonoBehaviour
   int out_portal_motion;
   int max_portal_motion;
 
-  const int SPIN_STATE_IDLE = 0;
-  const int SPIN_STATE_START = 1;
-  const int SPIN_STATE_RUN = 2;
-  const int SPIN_STATE_STOPPING = 3;
-  const int SPIN_STATE_STOP = 4;
-  int spin_state;
-  int spin;
-  int spin_max;
-  int spins_per;
+  int gaze_t_max;
+  int gaze_t_since; //if positive, time since entered. if negative, time since exited.
+  int gaze_t_in; //grows to max when in, shrinks to 0 when out
+  int gaze_t_run; //grows while not fully out. 0 when fully out
+  int gaze_t_numb; //countdown when distance should be ignored
 
   Vector3 gaze_pt;
   Vector2 gaze_cam_euler;
@@ -182,16 +178,11 @@ public class Main : MonoBehaviour
     out_portal_motion = 0;
     max_portal_motion = 100;
 
-    //SPIN_STATE_IDLE     = 0;
-    //SPIN_STATE_START    = 1;
-    //SPIN_STATE_RUN      = 2;
-    //SPIN_STATE_STOPPING = 3;
-    //SPIN_STATE_STOP     = 4;
-
-    spin_state = SPIN_STATE_IDLE;
-    spin = 0;
-    spin_max = 200;
-    spins_per = 4;
+    gaze_t_max = 200;
+    gaze_t_since = 0;
+    gaze_t_in = 0;
+    gaze_t_run = 0;
+    gaze_t_numb = 0;
 
     GameObject[] star_groups;
     GameObject star;
@@ -403,50 +394,11 @@ public class Main : MonoBehaviour
     flash_alpha = flash_alpha*flash_alpha;
     alpha_material.SetFloat(alpha_id,flash_alpha);
 
-    if(spin_state > SPIN_STATE_IDLE)
-    {
-      spin++;
-      if(spin > spin_max)
-      {
-        spin = 0;
-        if(spin_state != SPIN_STATE_RUN) spin_state = (spin_state+1)%(SPIN_STATE_STOP+1);
-      }
-    }
-
-    switch(spin_state)
-    {
-      case SPIN_STATE_IDLE: break;
-      case SPIN_STATE_START:
-      case SPIN_STATE_STOP:
-        spin++;
-        if(spin > spin_max)
-        {
-          spin = 0;
-          spin_state = (spin_state+1)%(SPIN_STATE_STOP+1);
-        }
-        break;
-      case SPIN_STATE_RUN:
-      case SPIN_STATE_STOPPING:
-        if(spin > spin_max/spins_per) spin = spin%(spin_max/spins_per);
-        spin++;
-        if(spin > spin_max/spins_per)
-        {
-          spin = 0;
-          spin_state++;
-        }
-        break;
-    }
-
     float shrink;
     float rot;
 
-    shrink = 0.0f;
-    rot = 0.0f;
-         if(spin_state == SPIN_STATE_START)    shrink = (float)spin/spin_max;
-    else if(spin_state == SPIN_STATE_RUN)      shrink = 1.0f;
-    else if(spin_state == SPIN_STATE_STOPPING) shrink = 1.0f;
-    else if(spin_state == SPIN_STATE_STOP)     shrink = 1.0f-((float)spin/spin_max);
-    rot = ((float)spin/spin_max)*360.0f*spins_per;
+    shrink = (float)gaze_t_in/(float)gaze_t_max;
+    rot = ((float)gaze_t_run/gaze_t_max)*5*360.0f;
 
     gaze_spinner.transform.localScale = new Vector3(shrink,shrink,shrink);
     gaze_spinner.transform.localRotation = Quaternion.Euler(0,0,rot);
@@ -454,20 +406,30 @@ public class Main : MonoBehaviour
     cam_spinner.transform.localRotation = Quaternion.Euler(0,0,rot);
 
     float distance = Vector3.Distance(gaze_reticle.transform.position,cam_reticle.transform.position);
-    if(spin_state == SPIN_STATE_IDLE &&  distance < 0.2)
+    if(gaze_t_numb == 0 && distance < 0.2)
     {
-      spin_state = SPIN_STATE_START;
+      if(gaze_t_since < 0) gaze_t_since = 1;
+      else                 gaze_t_since++;
+      if(gaze_t_in < gaze_t_max) gaze_t_in++;
+      if(gaze_t_in == gaze_t_max) gaze_t_numb = gaze_t_max*2;
+
+      //advance
+      if(gaze_t_in == gaze_t_max)
+      {
+        if(in_portal_motion == 0 && out_portal_motion == 0) in_portal_motion = 1;
+        source.PlayOneShot(sound,1);
+      }
     }
-    if(spin_state == SPIN_STATE_START && distance > 0.2)
+    else
     {
-      spin_state = SPIN_STATE_STOP;
+      if(gaze_t_since > 0) gaze_t_since = -1;
+      else                 gaze_t_since--;
+      if(gaze_t_in > 0) gaze_t_in--;
     }
-    if(spin_state == SPIN_STATE_RUN)
-    {
-      spin_state = SPIN_STATE_STOPPING;
-      if(in_portal_motion == 0 && out_portal_motion == 0) in_portal_motion = 1;
-      source.PlayOneShot(sound,1);
-    }
+    if(gaze_t_in > 0) gaze_t_run++;
+    else              gaze_t_run = 0;
+    if(gaze_t_numb > 0) gaze_t_numb--;
+
   }
 
 }
