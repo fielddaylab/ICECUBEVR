@@ -322,7 +322,7 @@ public class Main : MonoBehaviour
     ).normalized)*100;
     gaze_cam_euler = getCamEuler(gaze_pt);
 
-    eyeray.GetComponent<LineRenderer>().SetPosition(0,gaze_pt*-100);
+    eyeray.GetComponent<LineRenderer>().SetPosition(0,(gaze_pt*-100)+new Vector3(10,0,0));
     eyeray.GetComponent<LineRenderer>().SetPosition(1,gaze_pt*100);
 
     gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
