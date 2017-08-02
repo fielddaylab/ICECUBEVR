@@ -195,6 +195,7 @@ public class Main : MonoBehaviour
     portal_layer = LayerMask.NameToLayer("Set_Portal_Only");
     stars_layer = LayerMask.NameToLayer("Set_Stars");
     cur_layer_i = 0;
+    helmet.layer = layers[cur_layer_i];
     prev_layer_i = 0;
     next_layer_i = 1;
 
@@ -391,6 +392,7 @@ public class Main : MonoBehaviour
       portal_disk_next.layer = layers[cur_layer_i];
       portal_disk_prev.layer = layers[cur_layer_i];
       portal_border.layer = layers[cur_layer_i];
+      helmet.layer = layers[cur_layer_i];
     }
     if(out_portal_motion > 0) out_portal_motion++;
     if(out_portal_motion > max_portal_motion)
