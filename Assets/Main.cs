@@ -196,6 +196,7 @@ public class Main : MonoBehaviour
     prev_layer_i = 0;
     next_layer_i = 1;
 
+/*
     debug_cubes = new GameObject[n_layers,3*3*3];
     for(int l = 0; l < n_layers; l++)
     for(int x = -1; x <= 1; x++)
@@ -216,6 +217,7 @@ public class Main : MonoBehaviour
         case 4: debug_cubes[l,i].GetComponent<Renderer>().material.SetColor("_Color", Color.blue); break;
       }
     }
+*/
 
     mouse_captured = false;
     mouse_just_captured = true;
