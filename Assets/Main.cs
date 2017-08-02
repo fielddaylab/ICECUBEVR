@@ -35,6 +35,7 @@ public class Main : MonoBehaviour
   Vector3 default_look_ahead;
   Vector3 look_ahead;
   Vector3 lazy_look_ahead;
+  Vector3 player_head;
   Vector3 default_satellite_position;
   Vector3 satellite_position;
   Vector3 satellite_velocity;
@@ -183,6 +184,7 @@ public class Main : MonoBehaviour
     default_look_ahead = new Vector3(0,0,1);
     look_ahead = default_look_ahead;
     lazy_look_ahead = default_look_ahead;
+    player_head = new Vector3(0,2,0);
 
     n_layers = 5;
     layers = new int[n_layers];
@@ -316,12 +318,17 @@ public class Main : MonoBehaviour
       n_stars -= n_stars_in_group;
     }
     Destroy(star,0f);
-
-    gaze_pt = (new Vector3(
-      Random.Range(-1.0f,1.0f),
-      Random.Range(0.2f,0.8f),
-      Random.Range(-1.0f,1.0f)
-    ).normalized)*100;
+  
+    gaze_pt = player_head;
+    while(Vector3.Distance(gaze_pt,player_head) < 1.5)
+    {
+      gaze_pt = new Vector3(
+        Random.Range(-1.0f,1.0f),
+        Random.Range(0.2f,0.8f),
+        Random.Range(-1.0f,1.0f)
+      ).normalized;
+    }
+    gaze_pt = gaze_pt * 100;
     gaze_cam_euler = getCamEuler(gaze_pt);
 
     eyeray.GetComponent<LineRenderer>().SetPosition(0,(gaze_pt*-100)+new Vector3(10,0,0));
@@ -435,7 +442,7 @@ public class Main : MonoBehaviour
       -main_camera.transform.localPosition.x,
       -main_camera.transform.localPosition.y, 
       -main_camera.transform.localPosition.z);
-    main_camera.transform.localPosition = offset;
+    camera_house.transform.localPosition = offset+player_head;
 
     look_ahead = main_camera.transform.rotation*default_look_ahead;
     lazy_look_ahead = Vector3.Lerp(lazy_look_ahead,look_ahead,0.1f);
