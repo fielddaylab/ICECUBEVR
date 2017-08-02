@@ -431,6 +431,12 @@ public class Main : MonoBehaviour
       }
     }
 
+    Vector3 offset = new Vector3(
+      -main_camera.transform.localPosition.x,
+      -main_camera.transform.localPosition.y, 
+      -main_camera.transform.localPosition.z);
+    main_camera.transform.localPosition = offset;
+
     look_ahead = main_camera.transform.rotation*default_look_ahead;
     lazy_look_ahead = Vector3.Lerp(lazy_look_ahead,look_ahead,0.1f);
     helmet.transform.position = main_camera.transform.position;
