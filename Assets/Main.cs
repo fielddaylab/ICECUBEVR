@@ -44,11 +44,60 @@ public class Main : MonoBehaviour
   float flash_alpha;
 
   public AudioClip sound;
-  AudioSource source;
+  AudioSource track_source;
+  AudioSource sfx_source;
 
   public GameObject star_prefab;
 
   GameObject[,] debug_cubes;
+  string[] audio_files = new string[] {
+   "tracks/0_intro_0",
+   "tracks/0_intro_1",
+   "tracks/0_intro_2",
+   "tracks/1_helio_0",
+   "tracks/1_helio_1",
+   "tracks/2_milky_0",
+   "tracks/2_milky_1",
+   "tracks/3_black_0",
+   "tracks/3_black_1",
+   "tracks/3_black_2",
+   "tracks/4_return_0",
+   "tracks/5_back_0",
+   "tracks/5_back_1",
+   "tracks/6_kuiper_0",
+   "tracks/6_kuiper_1",
+   "tracks/7_local_0",
+   "tracks/7_local_1",
+   "tracks/8_pulsar_0",
+   "tracks/8_pulsar_1",
+   "tracks/8_pulsar_2",
+   "tracks/9_back_0",
+   "tracks/9_back_1",
+   "tracks/9_back_2",
+   "tracks/9_back_3",
+   "tracks/10_helio_0",
+   "tracks/11_grav_0",
+   "tracks/11_grav_1",
+   "tracks/12_nothing_0",
+   "tracks/12_nothing_1",
+   "tracks/13_return_0",
+   "tracks/13_return_1",
+   "tracks/14_alpha_0",
+   "tracks/14_alpha_1",
+   "tracks/14_alpha_2",
+   "tracks/15_milky_0",
+   "tracks/15_milky_1",
+   "tracks/16_magnet_0",
+   "tracks/16_magnet_1",
+   "tracks/16_magnet_2",
+   "tracks/16_magnet_3",
+   "tracks/17_return_0",
+   "tracks/18_debrief_0",
+   "tracks/18_debrief_1"
+  };
+  AudioClip[] audio_clips;
+  int cur_audio_playing_i;
+  int cur_audio_playing_section;
 
   int cur_layer_i;
   int next_layer_i;
@@ -120,7 +169,8 @@ public class Main : MonoBehaviour
 
     alpha_id = Shader.PropertyToID("alpha");
     flash_alpha = 0;
-    source = GetComponent<AudioSource>();
+    track_source = GameObject.Find("Script").AddComponent<AudioSource>();
+    sfx_source   = GameObject.Find("Script").AddComponent<AudioSource>();
 
     default_portal_scale = portal.transform.localScale;
     default_portal_position = portal.transform.position;
@@ -281,6 +331,12 @@ public class Main : MonoBehaviour
     earth.transform.position = gaze_pt*-2;
     galaxy.transform.position = gaze_pt*-2;
     black_hole.transform.position = gaze_pt*10;
+
+    audio_clips = new AudioClip[audio_files.Length];
+    for(int i = 0; i < audio_files.Length; i++)
+      audio_clips[i] = Resources.Load<AudioClip>(audio_files[i]);
+    cur_audio_playing_i = -1;
+    cur_audio_playing_section = 0;
   }
 
   void Update()
@@ -417,7 +473,22 @@ public class Main : MonoBehaviour
       if(gaze_t_in == gaze_t_max)
       {
         if(in_portal_motion == 0 && out_portal_motion == 0) in_portal_motion = 1;
-        source.PlayOneShot(sound,1);
+        if(track_source.isPlaying) track_source.Stop();
+
+        cur_audio_playing_section++;
+        while(!track_source.isPlaying)
+        {
+          string next_file = audio_files[(cur_audio_playing_i+1)%audio_files.Length];
+          int u_i = next_file.IndexOf("_");
+          string number = next_file.Substring(7,u_i-7);
+          int section = int.Parse(number);
+          cur_audio_playing_i = (cur_audio_playing_i+1)%audio_files.Length;
+          if(section == cur_audio_playing_section)
+          {
+            track_source.clip = audio_clips[cur_audio_playing_i];
+            track_source.Play();
+          }
+        }
       }
     }
     else
@@ -430,6 +501,20 @@ public class Main : MonoBehaviour
     else              gaze_t_run = 0;
     if(gaze_t_numb > 0) gaze_t_numb--;
 
+    if(!track_source.isPlaying)
+    {
+      string next_file = audio_files[(cur_audio_playing_i+1)%audio_files.Length];
+      int u_i = next_file.IndexOf("_");
+      string number = next_file.Substring(7,u_i-7);
+      int section = int.Parse(number);
+      if(section == cur_audio_playing_section)
+      {
+        cur_audio_playing_i = (cur_audio_playing_i+1)%audio_files.Length;
+        track_source.clip = audio_clips[cur_audio_playing_i];
+        track_source.volume = 1;
+        track_source.Play();
+      }
+    }
   }
 
 }
