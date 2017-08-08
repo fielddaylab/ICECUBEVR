@@ -8,6 +8,7 @@ public class Main : MonoBehaviour
 
   GameObject camera_house;
   GameObject main_camera;
+  Skybox main_camera_skybox;
   GameObject portal_lift;
   GameObject portal_projection;
   GameObject portal;
@@ -16,6 +17,8 @@ public class Main : MonoBehaviour
   GameObject portal_border;
   GameObject portal_camera_next;
   GameObject portal_camera_prev;
+  Skybox portal_camera_next_skybox;
+  Skybox portal_camera_prev_skybox;
   GameObject helmet;
   GameObject satellite;
   GameObject earth;
@@ -100,6 +103,21 @@ public class Main : MonoBehaviour
   int cur_audio_playing_i;
   int cur_audio_playing_section;
 
+  string[] skybox_files = new string[] {
+   "GalaxyBox2/Skybox2_1/Skybox2_1",
+   "GalaxyBox2/Skybox2_2/Skybox2_2",
+   "GalaxyBox2/Skybox2_3/Skybox2_3",
+   "GalaxyBox2/Skybox2_4/Skybox2_4",
+   "GalaxyBox2/Skybox2_5/Skybox2_5",
+   "GalaxyBox2/Skybox2_6/Skybox2_6",
+   "GalaxyBox2/Skybox2_7/Skybox2_7",
+   "GalaxyBox2/Skybox2_8/Skybox2_8",
+   "GalaxyBox2/Skybox2_9/Skybox2_9",
+   "GalaxyBox2/Skybox2_10/Skybox2_10"
+  };
+  Material[] skyboxes;
+  int cur_skybox_i;
+
   int cur_layer_i;
   int next_layer_i;
   int prev_layer_i;
@@ -146,6 +164,7 @@ public class Main : MonoBehaviour
   {
     camera_house       = GameObject.Find("CameraHouse");
     main_camera        = GameObject.Find("Main Camera");
+    main_camera_skybox = main_camera.GetComponent<Skybox>();
     portal_lift        = GameObject.Find("Portal_Lift");
     portal_projection  = GameObject.Find("Portal_Projection");
     portal             = GameObject.Find("Portal");
@@ -154,6 +173,8 @@ public class Main : MonoBehaviour
     portal_border      = GameObject.Find("Border");
     portal_camera_next = GameObject.Find("Portal_Camera_Next");
     portal_camera_prev = GameObject.Find("Portal_Camera_Prev");
+    portal_camera_prev_skybox = portal_camera_prev.GetComponent<Skybox>();
+    portal_camera_next_skybox = portal_camera_next.GetComponent<Skybox>();
     helmet             = GameObject.Find("Helmet");
     satellite          = GameObject.Find("Satellite");
     earth              = GameObject.Find("Earth");
@@ -347,6 +368,14 @@ public class Main : MonoBehaviour
       audio_clips[i] = Resources.Load<AudioClip>(audio_files[i]);
     cur_audio_playing_i = -1;
     cur_audio_playing_section = 0;
+
+    skyboxes = new Material[skybox_files.Length];
+    for(int i = 0; i < skybox_files.Length; i++)
+      skyboxes[i] = Resources.Load<Material>(skybox_files[i]);
+    cur_skybox_i = 0;
+    main_camera_skybox.material = skyboxes[cur_skybox_i];
+    portal_camera_prev_skybox.material = skyboxes[cur_skybox_i];
+    portal_camera_next_skybox.material = skyboxes[cur_skybox_i+1];
   }
 
   void Update()
@@ -393,6 +422,11 @@ public class Main : MonoBehaviour
       portal_disk_prev.layer = layers[cur_layer_i];
       portal_border.layer = layers[cur_layer_i];
       helmet.layer = layers[cur_layer_i];
+
+      cur_skybox_i = (cur_skybox_i+1)%skybox_files.Length;
+      main_camera_skybox.material = skyboxes[cur_skybox_i];
+      portal_camera_prev_skybox.material = skyboxes[cur_skybox_i];
+      portal_camera_next_skybox.material = skyboxes[(cur_skybox_i+1)%skybox_files.Length];
     }
     if(out_portal_motion > 0) out_portal_motion++;
     if(out_portal_motion > max_portal_motion)
