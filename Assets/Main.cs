@@ -265,7 +265,7 @@ public class Main : MonoBehaviour
     Vector3[] star_positions;
     Vector3 starpos;
 
-    int n_stars = 4000;
+    int n_stars = 0;//4000;
     int n_groups = (int)Mathf.Ceil(n_stars/1000);
     int n_stars_in_group;
     star_groups = new GameObject[n_groups];
