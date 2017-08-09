@@ -340,7 +340,7 @@ public class Main : MonoBehaviour
       n_stars -= n_stars_in_group;
     }
     Destroy(star,0f);
-  
+
     gaze_pt = player_head;
     while(Vector3.Distance(gaze_pt,player_head) < 1.5)
     {
@@ -422,6 +422,8 @@ public class Main : MonoBehaviour
       portal_disk_prev.layer = layers[cur_layer_i];
       portal_border.layer = layers[cur_layer_i];
       helmet.layer = layers[cur_layer_i];
+      foreach(Transform child in helmet.transform)
+         child.gameObject.layer = layers[cur_layer_i];
 
       cur_skybox_i = (cur_skybox_i+1)%skybox_files.Length;
       main_camera_skybox.material = skyboxes[cur_skybox_i];
