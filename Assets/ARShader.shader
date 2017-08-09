@@ -1,25 +1,23 @@
-﻿Shader "Unlit/PortalBorderShader"
+﻿Shader "Unlit/ARShader"
 {
   Properties
   {
   }
   SubShader
   {
-    Tags { "RenderType"="Opaque" }
+    Tags { "Queue"="Transparent" "RenderType"="Transparent" "IgnoreProjector"="True" }
     LOD 100
 
     Pass
     {
+      Cull back
+      Blend SrcAlpha OneMinusSrcAlpha
+
       CGPROGRAM
       #pragma vertex vert
       #pragma fragment frag
 
       #include "UnityCG.cginc"
-
-      float rand(float3 co)
-      {
-        return frac(sin( dot(co.xyz ,float3(12.9898,78.233,45.5432) )) * 43758.5453);
-      }
 
       struct appdata
       {
@@ -37,9 +35,6 @@
       {
         v2f o;
         o.vertex = UnityObjectToClipPos(v.vertex);
-        o.vertex.x += (rand(o.vertex.xyz)-0.5)*0.4;
-        o.vertex.y += (rand(o.vertex.xyz)-0.5)*0.4;
-        o.vertex.z += (rand(o.vertex.xyz)-0.5)*0.4;
         o.screen = ComputeScreenPos(o.vertex);
         o.vw = o.vertex.w;
         return o;
@@ -57,3 +52,4 @@
     }
   }
 }
+
