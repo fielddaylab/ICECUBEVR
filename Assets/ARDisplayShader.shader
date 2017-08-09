@@ -1,4 +1,4 @@
-﻿Shader "Unlit/AlphaTextureShader"
+﻿Shader "Unlit/ARDisplayShader"
 {
   Properties
   {
@@ -29,7 +29,8 @@
       struct v2f
       {
         float2 uv : TEXCOORD0;
-        UNITY_FOG_COORDS(1)
+        float2 screen : TEXCOORD1;
+        float vw : TEXCOORD2;
         float4 vertex : SV_POSITION;
       };
 
@@ -41,16 +42,17 @@
         v2f o;
         o.vertex = UnityObjectToClipPos(v.vertex);
         o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-        UNITY_TRANSFER_FOG(o,o.vertex);
+        o.screen = ComputeScreenPos(o.vertex);
+        o.vw = o.vertex.w;
         return o;
       }
 
       fixed4 frag (v2f i) : SV_Target
       {
-        // sample the texture
-        fixed4 col = tex2D(_MainTex, i.uv);
-        // apply fog
-        UNITY_APPLY_FOG(i.fogCoord, col);
+        float y = i.screen.y/i.vw;
+        float a = 0.6+sin(y*10000)*0.2;
+        fixed4 col = fixed4(0.8,0.8,1.0,a*tex2D(_MainTex, i.uv).a);
+
         return col;
       }
       ENDCG
