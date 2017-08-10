@@ -32,6 +32,7 @@ public class Main : MonoBehaviour
   GameObject gaze_reticle;
   GameObject gaze_spinner;
   GameObject eyeray;
+  GameObject ar_quad;
 
   Vector3 default_portal_scale;
   Vector3 default_portal_position;
@@ -188,6 +189,7 @@ public class Main : MonoBehaviour
     gaze_reticle       = GameObject.Find("Gaze_Reticle");
     gaze_spinner       = GameObject.Find("Gaze_Spinner");
     eyeray             = GameObject.Find("Ray");
+    ar_quad            = GameObject.Find("AR_Quad");
 
     alpha_id = Shader.PropertyToID("alpha");
     flash_alpha = 0;
@@ -252,7 +254,7 @@ public class Main : MonoBehaviour
 
     in_portal_motion = 0;
     out_portal_motion = 0;
-    max_portal_motion = 100;
+    max_portal_motion = 1000;
 
     gaze_t_max = 200;
     gaze_t_since = 0;
@@ -420,10 +422,10 @@ public class Main : MonoBehaviour
       portal.layer = layers[cur_layer_i];
       portal_disk_next.layer = layers[cur_layer_i];
       portal_disk_prev.layer = layers[cur_layer_i];
-      portal_border.layer = layers[cur_layer_i];
       helmet.layer = layers[cur_layer_i];
       foreach(Transform child in helmet.transform)
          child.gameObject.layer = layers[cur_layer_i];
+      ar_quad.layer = layers[cur_layer_i];
 
       cur_skybox_i = (cur_skybox_i+1)%skybox_files.Length;
       main_camera_skybox.material = skyboxes[cur_skybox_i];
