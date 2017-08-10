@@ -435,8 +435,6 @@ public class Main : MonoBehaviour
 
       cur_skybox_i = (cur_skybox_i+1)%skybox_files.Length;
       main_camera_skybox.material = skyboxes[cur_skybox_i];
-      portal_camera_prev_skybox.material = skyboxes[cur_skybox_i];
-      portal_camera_next_skybox.material = skyboxes[(cur_skybox_i+1)%skybox_files.Length];
     }
     if(out_portal_motion > 0) out_portal_motion++;
     if(out_portal_motion > max_portal_motion)
@@ -533,7 +531,12 @@ public class Main : MonoBehaviour
       //advance
       if(gaze_t_in == gaze_t_max)
       {
-        if(in_portal_motion == 0 && out_portal_motion == 0) in_portal_motion = 1;
+        if(in_portal_motion == 0 && out_portal_motion == 0)
+        {
+          in_portal_motion = 1;
+          portal_camera_prev_skybox.material = skyboxes[cur_skybox_i];
+          portal_camera_next_skybox.material = skyboxes[(cur_skybox_i+1)%skybox_files.Length];
+        }
         if(track_source.isPlaying) track_source.Stop();
 
         cur_audio_playing_section++;
