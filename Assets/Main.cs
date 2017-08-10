@@ -32,6 +32,8 @@ public class Main : MonoBehaviour
   GameObject gaze_reticle;
   GameObject gaze_spinner;
   GameObject eyeray;
+  GameObject ar_camera_project;
+  GameObject ar_camera_static;
   GameObject ar_quad;
 
   Vector3 default_portal_scale;
@@ -189,6 +191,8 @@ public class Main : MonoBehaviour
     gaze_reticle       = GameObject.Find("Gaze_Reticle");
     gaze_spinner       = GameObject.Find("Gaze_Spinner");
     eyeray             = GameObject.Find("Ray");
+    ar_camera_project  = GameObject.Find("AR_Camera_Project");
+    ar_camera_static   = GameObject.Find("AR_Camera_Static");
     ar_quad            = GameObject.Find("AR_Quad");
 
     alpha_id = Shader.PropertyToID("alpha");
@@ -254,7 +258,7 @@ public class Main : MonoBehaviour
 
     in_portal_motion = 0;
     out_portal_motion = 0;
-    max_portal_motion = 1000;
+    max_portal_motion = 100;
 
     gaze_t_max = 200;
     gaze_t_since = 0;
@@ -382,6 +386,8 @@ public class Main : MonoBehaviour
 
   void Update()
   {
+    ar_camera_project.GetComponent<Camera>().aspect = main_camera.GetComponent<Camera>().aspect;
+    ar_camera_static.GetComponent<Camera>().aspect = main_camera.GetComponent<Camera>().aspect;
     if(Input.GetMouseButtonDown(0))
     {
       mouse_captured = !mouse_captured;
