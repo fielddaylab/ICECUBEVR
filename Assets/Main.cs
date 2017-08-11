@@ -386,8 +386,17 @@ public class Main : MonoBehaviour
 
   void Update()
   {
-    ar_camera_project.GetComponent<Camera>().aspect = main_camera.GetComponent<Camera>().aspect;
-    ar_camera_static.GetComponent<Camera>().aspect = main_camera.GetComponent<Camera>().aspect;
+    float aspect = main_camera.GetComponent<Camera>().aspect;
+    float fov = main_camera.GetComponent<Camera>().fov;
+    ar_camera_project.GetComponent<Camera>().aspect = aspect;
+    ar_camera_static.GetComponent<Camera>().aspect = aspect;
+    portal_camera_prev.GetComponent<Camera>().aspect = aspect;
+    portal_camera_next.GetComponent<Camera>().aspect = aspect;
+    ar_camera_project.GetComponent<Camera>().fov = fov;
+    ar_camera_static.GetComponent<Camera>().fov = fov;
+    portal_camera_prev.GetComponent<Camera>().fov = fov;
+    portal_camera_next.GetComponent<Camera>().fov = fov;
+
     if(Input.GetMouseButtonDown(0))
     {
       mouse_captured = !mouse_captured;
