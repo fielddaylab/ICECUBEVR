@@ -203,7 +203,7 @@ public class Main : MonoBehaviour
     default_portal_scale = portal.transform.localScale;
     default_portal_position = portal.transform.position;
 
-    default_satellite_position = new Vector3(1.5f,1.5f,10);
+    default_satellite_position = new Vector3(4f,1.5f,10);
     satellite_position = default_satellite_position;
     satellite_velocity = new Vector3(0,0,-0.01f);
     satellite.transform.position = satellite_position;
