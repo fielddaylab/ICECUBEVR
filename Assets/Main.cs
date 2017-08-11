@@ -30,7 +30,6 @@ public class Main : MonoBehaviour
   GameObject gaze_projection;
   GameObject gaze;
   GameObject gaze_reticle;
-  GameObject gaze_spinner;
   GameObject eyeray;
   GameObject ar_camera_project;
   GameObject ar_camera_static;
@@ -189,7 +188,6 @@ public class Main : MonoBehaviour
     gaze_projection    = GameObject.Find("Gaze_Projection");
     gaze               = GameObject.Find("Gaze");
     gaze_reticle       = GameObject.Find("Gaze_Reticle");
-    gaze_spinner       = GameObject.Find("Gaze_Spinner");
     eyeray             = GameObject.Find("Ray");
     ar_camera_project  = GameObject.Find("AR_Camera_Project");
     ar_camera_static   = GameObject.Find("AR_Camera_Static");
@@ -524,8 +522,6 @@ public class Main : MonoBehaviour
     shrink = (float)gaze_t_in/(float)gaze_t_max;
     rot = ((float)gaze_t_run/gaze_t_max)*5*360.0f;
 
-    gaze_spinner.transform.localScale = new Vector3(shrink,shrink,shrink);
-    gaze_spinner.transform.localRotation = Quaternion.Euler(0,0,rot);
     cam_spinner.transform.localScale = new Vector3(shrink,shrink,shrink);
     cam_spinner.transform.localRotation = Quaternion.Euler(0,0,rot);
 
