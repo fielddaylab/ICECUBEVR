@@ -5,7 +5,7 @@
   }
   SubShader
   {
-    Tags { "Queue"="Transparent" "RenderType"="Transparent" "IgnoreProjector"="True" }
+    Tags { "Queue"="Transparent+2" "RenderType"="Transparent" "IgnoreProjector"="True" }
 
     Pass
     {
