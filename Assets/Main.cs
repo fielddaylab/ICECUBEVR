@@ -20,10 +20,6 @@ public class Main : MonoBehaviour
   Skybox portal_camera_next_skybox;
   Skybox portal_camera_prev_skybox;
   GameObject helmet;
-  GameObject satellite;
-  GameObject earth;
-  GameObject galaxy;
-  GameObject black_hole;
   GameObject cam_reticle;
   GameObject cam_spinner;
   GameObject gaze_lift;
@@ -34,6 +30,17 @@ public class Main : MonoBehaviour
   GameObject ar_camera_project;
   GameObject ar_camera_static;
   GameObject ar_quad;
+
+  GameObject snow;
+  GameObject icecube;
+  GameObject sun1;
+  GameObject pluto;
+  GameObject voyager;
+  GameObject rocks;
+  GameObject milky;
+  GameObject blackhole;
+  GameObject sun4;
+  GameObject earth;
 
   Vector3 default_portal_scale;
   Vector3 default_portal_position;
@@ -161,10 +168,6 @@ public class Main : MonoBehaviour
     portal_camera_prev_skybox = portal_camera_prev.GetComponent<Skybox>();
     portal_camera_next_skybox = portal_camera_next.GetComponent<Skybox>();
     helmet             = GameObject.Find("Helmet");
-    satellite          = GameObject.Find("Satellite");
-    earth              = GameObject.Find("Earth");
-    galaxy             = GameObject.Find("Galaxy");
-    black_hole         = GameObject.Find("Black_Hole");
     cam_reticle        = GameObject.Find("Cam_Reticle");
     cam_spinner        = GameObject.Find("Cam_Spinner");
     gaze_lift          = GameObject.Find("Gaze_Lift");
@@ -175,6 +178,17 @@ public class Main : MonoBehaviour
     ar_camera_project  = GameObject.Find("AR_Camera_Project");
     ar_camera_static   = GameObject.Find("AR_Camera_Static");
     ar_quad            = GameObject.Find("AR_Quad");
+
+    snow      = GameObject.Find("Snow");
+    icecube   = GameObject.Find("Icecube");
+    sun1      = GameObject.Find("Sun1");
+    pluto     = GameObject.Find("Pluto");
+    voyager   = GameObject.Find("Voyager");
+    rocks     = GameObject.Find("Rocks");
+    milky     = GameObject.Find("Milky");
+    blackhole = GameObject.Find("BlackHole");
+    sun4      = GameObject.Find("Sun4");
+    earth     = GameObject.Find("Earth");
 
     alpha_id = Shader.PropertyToID("alpha");
     flash_alpha = 0;
@@ -187,7 +201,7 @@ public class Main : MonoBehaviour
     default_satellite_position = new Vector3(4f,1.5f,10);
     satellite_position = default_satellite_position;
     satellite_velocity = new Vector3(0,0,-0.01f);
-    satellite.transform.position = satellite_position;
+    voyager.transform.position = satellite_position;
 
     default_look_ahead = new Vector3(0,0,1);
     look_ahead = default_look_ahead;
@@ -347,8 +361,8 @@ public class Main : MonoBehaviour
     portal_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
 
     earth.transform.position = gaze_pt*-2;
-    galaxy.transform.position = gaze_pt*-2;
-    black_hole.transform.position = gaze_pt*10;
+    milky.transform.position = gaze_pt*-2;
+    blackhole.transform.position = gaze_pt*10;
 
     audio_clips = new AudioClip[audio_files.Length];
     for(int i = 0; i < audio_files.Length; i++)
@@ -485,7 +499,7 @@ public class Main : MonoBehaviour
 
     satellite_position += satellite_velocity;
     if(cur_layer_i != 1) satellite_position = default_satellite_position;
-    satellite.transform.position = satellite_position;
+    voyager.transform.position = satellite_position;
 
     if(in_portal_motion > 0)
       flash_alpha = (float)in_portal_motion/max_portal_motion;
