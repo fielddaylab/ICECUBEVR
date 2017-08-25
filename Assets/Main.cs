@@ -42,6 +42,8 @@ public class Main : MonoBehaviour
   GameObject sun4;
   GameObject earth;
 
+  GameObject circle;
+
   Vector3 default_portal_scale;
   Vector3 default_portal_position;
   Vector3 default_look_ahead;
@@ -205,6 +207,7 @@ public class Main : MonoBehaviour
     blackhole = GameObject.Find("BlackHole");
     sun4      = GameObject.Find("Sun4");
     earth     = GameObject.Find("Earth");
+    circle     = GameObject.Find("Circle");
 
     alpha_id = Shader.PropertyToID("alpha");
     flash_alpha = 0;
@@ -444,6 +447,35 @@ public class Main : MonoBehaviour
       prev_layer_i = cur_layer_i;
       cur_layer_i = next_layer_i;
       next_layer_i = (next_layer_i+1)%n_layers;
+
+      switch(cur_layer_i)
+      {
+        case 0:
+          circle.transform.position = icecube.transform.position;
+          circle.transform.rotation = rotationFromEuler(getCamEuler(circle.transform.position));
+          circle.transform.localScale = new Vector3(10,10,10);
+          break;
+        case 1:
+          circle.transform.position = pluto.transform.position;
+          circle.transform.rotation = rotationFromEuler(getCamEuler(circle.transform.position));
+          circle.transform.localScale = new Vector3(100,100,100);
+          break;
+        case 2:
+          circle.transform.position = milky.transform.position;
+          circle.transform.rotation = rotationFromEuler(getCamEuler(circle.transform.position));
+          circle.transform.localScale = new Vector3(50,50,50);
+          break;
+        case 3:
+          circle.transform.position = blackhole.transform.position;
+          circle.transform.rotation = rotationFromEuler(getCamEuler(circle.transform.position));
+          circle.transform.localScale = new Vector3(200,200,200);
+          break;
+        case 4:
+          circle.transform.position = earth.transform.position;
+          circle.transform.rotation = rotationFromEuler(getCamEuler(circle.transform.position));
+          circle.transform.localScale = new Vector3(100,100,100);
+          break;
+      }
 
       if(cur_layer_i == 3)  main_camera.GetComponent<Camera>().cullingMask        = (1 << layers[cur_layer_i])  | (1 << cam_layer)    | (1 << all_layer);
       else                  main_camera.GetComponent<Camera>().cullingMask        = (1 << layers[cur_layer_i])  | (1 << cam_layer)    | (1 << all_layer) | (1 << stars_layer);
