@@ -3126,15 +3126,15 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4981915164085114, guid: 72b0c0c0527e643dbb40301b99eddd76, type: 2}
       propertyPath: m_LocalScale.x
-      value: 0.01
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 4981915164085114, guid: 72b0c0c0527e643dbb40301b99eddd76, type: 2}
       propertyPath: m_LocalScale.y
-      value: 0.01
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 4981915164085114, guid: 72b0c0c0527e643dbb40301b99eddd76, type: 2}
       propertyPath: m_LocalScale.z
-      value: 0.01
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 1439170603234836, guid: 72b0c0c0527e643dbb40301b99eddd76, type: 2}
       propertyPath: m_Layer
@@ -3268,7 +3268,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.1
-  far clip plane: 1000
+  far clip plane: 10000
   field of view: 96.01604
   orthographic: 0
   orthographic size: 5
