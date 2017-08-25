@@ -360,7 +360,8 @@ public class Main : MonoBehaviour
     gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
     portal_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
 
-    earth.transform.position = gaze_pt*-2;
+    sun1.transform.position = gaze_pt*-2+new Vector3(gaze_pt.x,0,gaze_pt.z)*-2;
+    earth.transform.position = gaze_pt*-2+new Vector3(0,10,0);
     milky.transform.position = gaze_pt*-2;
     blackhole.transform.position = gaze_pt*10;
 
