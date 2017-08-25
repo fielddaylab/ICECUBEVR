@@ -150,7 +150,9 @@ public class Main : MonoBehaviour
   int gaze_t_numb; //countdown when distance should be ignored
 
   Vector3 gaze_pt;
+  Vector3 anti_gaze_pt;
   Vector2 gaze_cam_euler;
+  Vector2 anti_gaze_cam_euler;
 
   Vector2 getEuler(Vector3 v)
   {
@@ -365,22 +367,24 @@ public class Main : MonoBehaviour
         Random.Range(-1.0f,1.0f)
       ).normalized;
     }
-    gaze_pt = gaze_pt * 100;
+    gaze_pt *= 1000;
     gaze_cam_euler = getCamEuler(gaze_pt);
+    anti_gaze_pt = (gaze_pt*-1)+new Vector3(50f,0,0);
+    anti_gaze_cam_euler = getCamEuler(anti_gaze_pt);
 
-    eyeray.GetComponent<LineRenderer>().SetPosition(0,(gaze_pt*-100)+new Vector3(10,0,0));
-    eyeray.GetComponent<LineRenderer>().SetPosition(1,gaze_pt*100);
+    eyeray.GetComponent<LineRenderer>().SetPosition(0,anti_gaze_pt);
+    eyeray.GetComponent<LineRenderer>().SetPosition(1,gaze_pt);
 
     gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
     portal_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
 
-    sun1.transform.position = gaze_pt*-10+new Vector3(gaze_pt.x,0,gaze_pt.z)*-2;
+    sun1.transform.position = gaze_pt*-1+new Vector3(gaze_pt.x,0,gaze_pt.z)*-0.2f;
     sun1.transform.rotation = rotationFromEuler(gaze_cam_euler);
-    sun4.transform.position = gaze_pt*-5+new Vector3(gaze_pt.x,0,gaze_pt.z)*-2;
+    sun4.transform.position = gaze_pt*-0.5f+new Vector3(gaze_pt.x,0,gaze_pt.z)*-0.2f;
     sun4.transform.rotation = rotationFromEuler(gaze_cam_euler);
-    earth.transform.position = gaze_pt*-1+new Vector3(0,50,0);
-    milky.transform.position = gaze_pt*-2;
-    blackhole.transform.position = gaze_pt*10;
+    earth.transform.position = gaze_pt*-0.1f+new Vector3(0,50,0);
+    milky.transform.position = gaze_pt*-0.2f;
+    blackhole.transform.position = gaze_pt;
     blackhole.transform.rotation = rotationFromEuler(gaze_cam_euler);
 
     audio_clips = new AudioClip[audio_files.Length];
@@ -543,7 +547,7 @@ public class Main : MonoBehaviour
     cam_spinner.transform.localRotation = Quaternion.Euler(0,0,rot);
 
     float distance = Vector3.Distance(gaze_reticle.transform.position,cam_reticle.transform.position);
-    if(gaze_t_numb == 0 && distance < 0.2)
+    if(gaze_t_numb == 0 && distance < 0.3)
     {
       if(gaze_t_since < 0) gaze_t_since = 1;
       else                 gaze_t_since++;
