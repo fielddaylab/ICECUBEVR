@@ -95,17 +95,19 @@ public class Main : MonoBehaviour
   int cur_audio_playing_i;
   int cur_audio_playing_section;
 
+
   string[] skybox_files = new string[] {
-   "GalaxyBox2/Skybox2_1/Skybox2_1",
-   "GalaxyBox2/Skybox2_2/Skybox2_2",
-   "GalaxyBox2/Skybox2_3/Skybox2_3",
-   "GalaxyBox2/Skybox2_4/Skybox2_4",
-   "GalaxyBox2/Skybox2_5/Skybox2_5",
-   "GalaxyBox2/Skybox2_6/Skybox2_6",
-   "GalaxyBox2/Skybox2_7/Skybox2_7",
-   "GalaxyBox2/Skybox2_8/Skybox2_8",
-   "GalaxyBox2/Skybox2_9/Skybox2_9",
-   "GalaxyBox2/Skybox2_10/Skybox2_10"
+   "Ice Planet/Textures/Skybox", //Sky
+   "GalaxyBox2/Skybox2_1/Skybox2_1", //Solar System
+   "GalaxyBox2/Skybox2_4/Skybox2_4", //Out Deep
+   "GalaxyBox2/Skybox2_1/Skybox2_1", //At the Black Hole
+   "GalaxyBox2/Skybox2_1/Skybox2_1", //Back to Earth
+   "Ice Planet/Textures/Skybox", //Back on Ice Cube
+   "Ice Planet/Textures/Skybox", //Sky
+   "GalaxyBox2/Skybox2_1/Skybox2_1", //Solar System
+   "GalaxyBox2/Skybox2_4/Skybox2_4", //Out Deep
+   "GalaxyBox2/Skybox2_1/Skybox2_1", //At the Black Hole
+   "GalaxyBox2/Skybox2_1/Skybox2_1", //Back to Earth
   };
   Material[] skyboxes;
   int cur_skybox_i;
@@ -376,8 +378,8 @@ public class Main : MonoBehaviour
     cur_skybox_i = 0;
     main_camera_skybox.material = skyboxes[cur_skybox_i];
     portal_camera_prev_skybox.material = skyboxes[cur_skybox_i];
-    //portal_camera_next_skybox.material = skyboxes[cur_skybox_i+1];
-    portal_camera_next_skybox.material = skyboxes[cur_skybox_i];
+    portal_camera_next_skybox.material = skyboxes[cur_skybox_i+1];
+    //portal_camera_next_skybox.material = skyboxes[cur_skybox_i];
   }
 
   void Update()
@@ -438,7 +440,7 @@ public class Main : MonoBehaviour
          child.gameObject.layer = layers[cur_layer_i];
       ar_quad.layer = layers[cur_layer_i];
 
-      //cur_skybox_i = (cur_skybox_i+1)%skybox_files.Length;
+      cur_skybox_i = (cur_skybox_i+1)%skybox_files.Length;
       main_camera_skybox.material = skyboxes[cur_skybox_i];
     }
     if(out_portal_motion > 0) out_portal_motion++;
@@ -538,8 +540,8 @@ public class Main : MonoBehaviour
         {
           in_portal_motion = 1;
           portal_camera_prev_skybox.material = skyboxes[cur_skybox_i];
-          //portal_camera_next_skybox.material = skyboxes[(cur_skybox_i+1)%skybox_files.Length];
-          portal_camera_next_skybox.material = skyboxes[cur_skybox_i];
+          portal_camera_next_skybox.material = skyboxes[(cur_skybox_i+1)%skybox_files.Length];
+          //portal_camera_next_skybox.material = skyboxes[cur_skybox_i];
         }
         if(track_source.isPlaying) track_source.Stop();
 
