@@ -111,13 +111,13 @@ public class Main : MonoBehaviour
 
 
   string[] skybox_files = new string[] {
-   "Ice Planet/Textures/Skybox", //Sky
+   "Classic Skybox/sky12", //Sky
    "GalaxyBox2/Skybox2_1/Skybox2_1", //Solar System
    "GalaxyBox2/Skybox2_4/Skybox2_4", //Out Deep
    "GalaxyBox2/Skybox2_1/Skybox2_1", //At the Black Hole
    "GalaxyBox2/Skybox2_1/Skybox2_1", //Back to Earth
    "Ice Planet/Textures/Skybox", //Back on Ice Cube
-   "Ice Planet/Textures/Skybox", //Sky
+   "Classic Skybox/sky12", //Sky
    "GalaxyBox2/Skybox2_1/Skybox2_1", //Solar System
    "GalaxyBox2/Skybox2_4/Skybox2_4", //Out Deep
    "GalaxyBox2/Skybox2_1/Skybox2_1", //At the Black Hole
