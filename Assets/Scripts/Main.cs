@@ -372,9 +372,10 @@ public class Main : MonoBehaviour
       ).normalized;
       */
 
-      //up and to the right of the initial gaze position of the player
+      //Hardcode gaze up and to the right of the initial gaze position of the player
       gaze_pt = new Vector3(1f,.8f,-1f).normalized;
     }
+
     gaze_pt *= 1000;
     gaze_cam_euler = getCamEuler(gaze_pt);
     anti_gaze_pt = (gaze_pt*-1)+new Vector3(50f,0,0);
@@ -386,7 +387,7 @@ public class Main : MonoBehaviour
     gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
     portal_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
 
-
+	/* Hardcode exact locations in the scene
     sun1.transform.position = gaze_pt*-1+new Vector3(gaze_pt.x,0,gaze_pt.z)*-0.2f;
     sun1.transform.rotation = rotationFromEuler(gaze_cam_euler);
     sun4.transform.position = gaze_pt*-0.5f+new Vector3(gaze_pt.x,0,gaze_pt.z)*-0.2f;
@@ -395,6 +396,7 @@ public class Main : MonoBehaviour
     milky.transform.position = gaze_pt*-0.2f;
     blackhole.transform.position = gaze_pt;
     blackhole.transform.rotation = rotationFromEuler(gaze_cam_euler);
+	*/
 
     audio_clips = new AudioClip[audio_files.Length];
     for(int i = 0; i < audio_files.Length; i++)
