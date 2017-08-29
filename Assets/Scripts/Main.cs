@@ -364,11 +364,16 @@ public class Main : MonoBehaviour
     gaze_pt = player_head;
     while(Vector3.Distance(gaze_pt,player_head) < 1.5)
     {
+      /* Random Point
       gaze_pt = new Vector3(
         Random.Range(-1.0f,1.0f),
         Random.Range(0.2f,0.8f),
         Random.Range(-1.0f,1.0f)
       ).normalized;
+      */
+
+      //up and to the right of the initial gaze position of the player
+      gaze_pt = new Vector3(1f,.8f,-1f).normalized;
     }
     gaze_pt *= 1000;
     gaze_cam_euler = getCamEuler(gaze_pt);
