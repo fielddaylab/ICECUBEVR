@@ -6,7 +6,7 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: White_Metal
+  m_Name: metal_grate
   m_Shader: {fileID: 4800000, guid: 31c5d21a666c70c43b7260adef1739d5, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
