@@ -34,7 +34,6 @@ public class Main : MonoBehaviour
   GameObject snow;
   GameObject icecube;
   GameObject sun1;
-  GameObject pluto;
   GameObject voyager;
   GameObject rocks;
   GameObject milky;
@@ -200,7 +199,6 @@ public class Main : MonoBehaviour
     snow      = GameObject.Find("Snow");
     icecube   = GameObject.Find("Icecube");
     sun1      = GameObject.Find("Sun1");
-    pluto     = GameObject.Find("Pluto");
     voyager   = GameObject.Find("Voyager");
     rocks     = GameObject.Find("Rocks");
     milky     = GameObject.Find("Milky");
@@ -464,7 +462,7 @@ public class Main : MonoBehaviour
           circle.transform.localScale = new Vector3(10,10,10);
           break;
         case 1:
-          circle.transform.position = pluto.transform.position;
+          circle.transform.position = voyager.transform.position;
           circle.transform.rotation = rotationFromEuler(getCamEuler(circle.transform.position));
           circle.transform.localScale = new Vector3(100,100,100);
           break;
