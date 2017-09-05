@@ -41,7 +41,10 @@ public class Main : MonoBehaviour
   GameObject sun4;
   GameObject earth;
 
-  GameObject circle;
+  GameObject ar_circle;
+  GameObject ar_label;
+  GameObject ar_label_offset;
+  TextMesh ar_label_text;
 
   Vector3 default_portal_scale;
   Vector3 default_portal_position;
@@ -196,16 +199,22 @@ public class Main : MonoBehaviour
     ar_camera_static   = GameObject.Find("AR_Camera_Static");
     ar_quad            = GameObject.Find("AR_Quad");
 
-    snow      = GameObject.Find("Snow");
-    icecube   = GameObject.Find("Icecube");
-    sun1      = GameObject.Find("Sun1");
-    voyager   = GameObject.Find("Voyager");
-    rocks     = GameObject.Find("Rocks");
-    milky     = GameObject.Find("Milky");
-    blackhole = GameObject.Find("BlackHole");
-    sun4      = GameObject.Find("Sun4");
-    earth     = GameObject.Find("Earth");
-    circle    = GameObject.Find("Circle");
+    snow            = GameObject.Find("Snow");
+    icecube         = GameObject.Find("Icecube");
+    sun1            = GameObject.Find("Sun1");
+    voyager         = GameObject.Find("Voyager");
+    rocks           = GameObject.Find("Rocks");
+    milky           = GameObject.Find("Milky");
+    blackhole       = GameObject.Find("BlackHole");
+    sun4            = GameObject.Find("Sun4");
+    earth           = GameObject.Find("Earth");
+    ar_circle       = GameObject.Find("ARCircle");
+    ar_label        = GameObject.Find("ARLabel");
+    ar_label_offset = GameObject.Find("ARLabelOffset");
+    ar_label_text   = ar_label.GetComponent<TextMesh>();
+    ar_label_text.fontSize = 100;
+    ar_label_text.alignment = TextAlignment.Center;
+    ar_label_text.anchor = TextAnchor.MiddleCenter;
 
     alpha_id = Shader.PropertyToID("alpha");
     flash_alpha = 0;
@@ -278,101 +287,7 @@ public class Main : MonoBehaviour
     gaze_t_run = 0;
     gaze_t_numb = 0;
 
-    GameObject[] star_groups;
-    GameObject star;
-    Vector3[] star_positions;
-    Vector3 starpos;
-
-    int n_stars = 0;//4000;
-    int n_groups = (int)Mathf.Ceil(n_stars/1000);
-    int n_stars_in_group;
-    star_groups = new GameObject[n_groups];
-    star = (GameObject)Instantiate(star_prefab);
-
-    //gen positions
-    star_positions = new Vector3[n_stars];
-    for(int i = 0; i < n_stars; i++)
-    {
-      bool good_star = false;
-      starpos = new Vector3(Random.Range(-1f,1f),Random.Range(-1f,1f),Random.Range(-1f,1f));
-      good_star = (starpos.sqrMagnitude < Random.Range(0f,1f));
-      while(!good_star)
-      {
-        starpos = new Vector3(Random.Range(-1f,1f),Random.Range(-1f,1f),Random.Range(-1f,1f));
-        good_star = (starpos.sqrMagnitude < Random.Range(0f,1f));
-      }
-      starpos = starpos.normalized;
-      star_positions[i] = starpos;
-    }
-
-    //morph positions
-    for(int n = 0; n < 2; n++)
-    {
-      for(int i = 0; i < n_stars; i++)
-      {
-        Vector3 delta = new Vector3(0,0,0);
-        Vector3 dist;
-        for(int j = 0; j < n_stars; j++)
-        {
-          if(j != i)
-          {
-            dist = star_positions[j]-star_positions[i];
-            if(dist.sqrMagnitude < 0.1)
-            {
-              delta += dist*(0.0001f/dist.sqrMagnitude);
-            }
-          }
-        }
-        star_positions[i] = (star_positions[i]+delta).normalized;
-      }
-    }
-
-    //gen assets
-    for(int i = 0; i < n_groups; i++)
-    {
-      n_stars_in_group = Mathf.Min(1000,n_stars);
-      CombineInstance[] combine = new CombineInstance[n_stars_in_group];
-
-      for(int j = 0; j < n_stars_in_group; j++)
-      {
-        starpos = star_positions[i*n_stars_in_group+j];
-        float r = Random.Range(0f,1f);
-        starpos *= Mathf.Lerp(20f,30f,r*r);
-
-        star.transform.position = starpos;
-        star.transform.rotation = Quaternion.Euler(Random.Range(0f,360f),Random.Range(0f,360f),Random.Range(0f,360f));
-        star.transform.localScale = new Vector3(0.05f,0.05f,0.05f);
-
-        combine[j].mesh = star.transform.GetComponent<MeshFilter>().mesh;
-        combine[j].transform = star.transform.localToWorldMatrix;
-      }
-
-      star_groups[i] = (GameObject)Instantiate(star_prefab);
-      star_groups[i].layer = stars_layer;
-      star_groups[i].transform.position = new Vector3(0,0,0);
-      star_groups[i].transform.rotation = Quaternion.Euler(0,0,0);
-      star_groups[i].transform.localScale = new Vector3(1,1,1);
-      star_groups[i].transform.GetComponent<MeshFilter>().mesh = new Mesh();
-      star_groups[i].transform.GetComponent<MeshFilter>().mesh.CombineMeshes(combine);
-
-      n_stars -= n_stars_in_group;
-    }
-    Destroy(star,0f);
-
-    gaze_pt = player_head;
-    while(Vector3.Distance(gaze_pt,player_head) < 1.5)
-    {
-      /* Random Point
-      gaze_pt = new Vector3(
-        Random.Range(-1.0f,1.0f),
-        Random.Range(0.2f,0.8f),
-        Random.Range(-1.0f,1.0f)
-      ).normalized;
-      */
-
-      //Hardcode gaze up and to the right of the initial gaze position of the player
-      gaze_pt = new Vector3(1f,.8f,-1f).normalized;
-    }
+    gaze_pt = new Vector3(1f,.8f,-1f).normalized;
 
     gaze_pt *= 1000;
     gaze_cam_euler = getCamEuler(gaze_pt);
@@ -384,17 +299,6 @@ public class Main : MonoBehaviour
 
     gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
     portal_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
-
-	/* Hardcode exact locations in the scene
-    sun1.transform.position = gaze_pt*-1+new Vector3(gaze_pt.x,0,gaze_pt.z)*-0.2f;
-    sun1.transform.rotation = rotationFromEuler(gaze_cam_euler);
-    sun4.transform.position = gaze_pt*-0.5f+new Vector3(gaze_pt.x,0,gaze_pt.z)*-0.2f;
-    sun4.transform.rotation = rotationFromEuler(gaze_cam_euler);
-    earth.transform.position = gaze_pt*-0.1f+new Vector3(0,150,0);
-    milky.transform.position = gaze_pt*-0.2f;
-    blackhole.transform.position = gaze_pt;
-    blackhole.transform.rotation = rotationFromEuler(gaze_cam_euler);
-	*/
 
     audio_clips = new AudioClip[audio_files.Length];
     for(int i = 0; i < audio_files.Length; i++)
@@ -454,35 +358,6 @@ public class Main : MonoBehaviour
       cur_layer_i = next_layer_i;
       next_layer_i = (next_layer_i+1)%n_layers;
 
-      switch(cur_layer_i)
-      {
-        case 0:
-          circle.transform.position = icecube.transform.position;
-          circle.transform.rotation = rotationFromEuler(getCamEuler(circle.transform.position));
-          circle.transform.localScale = new Vector3(10,10,10);
-          break;
-        case 1:
-          circle.transform.position = voyager.transform.position;
-          circle.transform.rotation = rotationFromEuler(getCamEuler(circle.transform.position));
-          circle.transform.localScale = new Vector3(5,5,5);
-          break;
-        case 2:
-          circle.transform.position = milky.transform.position;
-          circle.transform.rotation = rotationFromEuler(getCamEuler(circle.transform.position));
-          circle.transform.localScale = new Vector3(50,50,50);
-          break;
-        case 3:
-          circle.transform.position = blackhole.transform.position;
-          circle.transform.rotation = rotationFromEuler(getCamEuler(circle.transform.position));
-          circle.transform.localScale = new Vector3(200,200,200);
-          break;
-        case 4:
-          circle.transform.position = earth.transform.position;
-          circle.transform.rotation = rotationFromEuler(getCamEuler(circle.transform.position));
-          circle.transform.localScale = new Vector3(100,100,100);
-          break;
-      }
-
       if(cur_layer_i == 3)  main_camera.GetComponent<Camera>().cullingMask        = (1 << layers[cur_layer_i])  | (1 << cam_layer)    | (1 << all_layer);
       else                  main_camera.GetComponent<Camera>().cullingMask        = (1 << layers[cur_layer_i])  | (1 << cam_layer)    | (1 << all_layer) | (1 << stars_layer);
       if(next_layer_i == 3) portal_camera_next.GetComponent<Camera>().cullingMask = (1 << layers[next_layer_i]) | (1 << portal_layer) | (1 << all_layer);
@@ -532,12 +407,48 @@ public class Main : MonoBehaviour
       portal.transform.localScale = new Vector3(0,0,0);
     }
 
-    if(cur_layer_i == 1) //must do every tick, because voyager is moving
+    switch(cur_layer_i)
     {
-      circle.transform.position = voyager.transform.position;
-      circle.transform.rotation = rotationFromEuler(getCamEuler(circle.transform.position));
-      circle.transform.localScale = new Vector3(5,5,5);
+      case 0:
+        ar_circle.transform.position = icecube.transform.position;
+        ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
+        ar_circle.transform.localScale = new Vector3(200,200,200);
+        ar_label_text.text = "Ice Cube";
+        ar_label.transform.localScale = new Vector3(10,10,10);
+        break;
+      case 1:
+        ar_circle.transform.position = voyager.transform.position;
+        ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
+        ar_circle.transform.localScale = new Vector3(5,5,5);
+        ar_label_text.text = "Voyager";
+        ar_label.transform.localScale = new Vector3(0.5f,0.5f,0.5f);
+        break;
+      case 2:
+        ar_circle.transform.position = milky.transform.position;
+        ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
+        ar_circle.transform.localScale = new Vector3(50,50,50);
+        ar_label_text.text = "Milky Way";
+        ar_label.transform.localScale = new Vector3(2,2,2);
+        break;
+      case 3:
+        ar_circle.transform.position = blackhole.transform.position;
+        ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
+        ar_circle.transform.localScale = new Vector3(200,200,200);
+        ar_label_text.text = "Black Hole";
+        ar_label.transform.localScale = new Vector3(10,10,10);
+        break;
+      case 4:
+        ar_circle.transform.position = earth.transform.position;
+        ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
+        ar_circle.transform.localScale = new Vector3(100,100,100);
+        ar_label_text.text = "Earth";
+        ar_label.transform.localScale = new Vector3(5,5,5);
+        break;
     }
+    ar_label_offset.transform.position = ar_circle.transform.position;
+    ar_label_offset.transform.rotation = ar_circle.transform.rotation;
+    ar_label_offset.transform.localScale = ar_circle.transform.localScale;
+    ar_label.transform.localScale /= ar_circle.transform.localScale.x;
 
     if(mouse_captured)
     {
