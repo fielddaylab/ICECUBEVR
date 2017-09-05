@@ -26,6 +26,12 @@ public class Main : MonoBehaviour
   GameObject gaze_projection;
   GameObject gaze;
   GameObject gaze_reticle;
+  GameObject spec_lift;
+  GameObject spec_projection;
+  GameObject spec;
+  GameObject spec_viz_reticle;
+  GameObject spec_gam_reticle;
+  GameObject spec_neu_reticle;
   GameObject eyeray;
   GameObject ar_camera_project;
   GameObject ar_camera_static;
@@ -155,8 +161,10 @@ public class Main : MonoBehaviour
 
   Vector3 gaze_pt;
   Vector3 anti_gaze_pt;
+  Vector2 cam_euler;
   Vector2 gaze_cam_euler;
   Vector2 anti_gaze_cam_euler;
+  Vector2 spec_euler;
 
   Vector2 getEuler(Vector3 v)
   {
@@ -194,6 +202,12 @@ public class Main : MonoBehaviour
     gaze_projection    = GameObject.Find("Gaze_Projection");
     gaze               = GameObject.Find("Gaze");
     gaze_reticle       = GameObject.Find("Gaze_Reticle");
+    spec_lift          = GameObject.Find("Spec_Lift");
+    spec_projection    = GameObject.Find("Spec_Projection");
+    spec               = GameObject.Find("Spec");
+    spec_viz_reticle   = GameObject.Find("Spec_Viz_Reticle");
+    spec_gam_reticle   = GameObject.Find("Spec_Gam_Reticle");
+    spec_neu_reticle   = GameObject.Find("Spec_Neu_Reticle");
     eyeray             = GameObject.Find("Ray");
     ar_camera_project  = GameObject.Find("AR_Camera_Project");
     ar_camera_static   = GameObject.Find("AR_Camera_Static");
@@ -290,6 +304,7 @@ public class Main : MonoBehaviour
     gaze_pt = new Vector3(1f,.8f,-1f).normalized;
 
     gaze_pt *= 1000;
+    cam_euler = getCamEuler(cam_reticle.transform.position);
     gaze_cam_euler = getCamEuler(gaze_pt);
     anti_gaze_pt = (gaze_pt*-1)+new Vector3(50f,0,0);
     anti_gaze_cam_euler = getCamEuler(anti_gaze_pt);
@@ -299,6 +314,10 @@ public class Main : MonoBehaviour
 
     gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
     portal_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
+
+    spec_euler = cam_euler;
+    spec_euler.x = -3.141592f/3f;
+    spec_projection.transform.rotation = rotationFromEuler(spec_euler);
 
     audio_clips = new AudioClip[audio_files.Length];
     for(int i = 0; i < audio_files.Length; i++)
@@ -476,6 +495,12 @@ public class Main : MonoBehaviour
     lazy_look_ahead = Vector3.Lerp(lazy_look_ahead,look_ahead,0.1f);
     helmet.transform.position = main_camera.transform.position;
     helmet.transform.rotation = rotationFromEuler(getEuler(lazy_look_ahead));
+
+    cam_euler = getCamEuler(cam_reticle.transform.position);
+    spec_euler = cam_euler;
+    spec_euler.x = -3.141592f/3f;
+    spec_projection.transform.rotation = rotationFromEuler(spec_euler);
+
 
     satellite_position += satellite_velocity;
     if(cur_layer_i != 1) satellite_position = default_satellite_position;
