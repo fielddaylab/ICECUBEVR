@@ -32,6 +32,7 @@ public class Main : MonoBehaviour
   GameObject spec_viz_reticle;
   GameObject spec_gam_reticle;
   GameObject spec_neu_reticle;
+  GameObject spec_sel_reticle;
   GameObject eyeray;
   GameObject ar_camera_project;
   GameObject ar_camera_static;
@@ -57,6 +58,7 @@ public class Main : MonoBehaviour
   Vector3 default_look_ahead;
   Vector3 look_ahead;
   Vector3 lazy_look_ahead;
+  Vector3 very_lazy_look_ahead;
   Vector3 player_head;
   Vector3 default_satellite_position;
   Vector3 satellite_position;
@@ -159,6 +161,12 @@ public class Main : MonoBehaviour
   int gaze_t_run; //grows while not fully out. 0 when fully out
   int gaze_t_numb; //countdown when distance should be ignored
 
+  int spec_t_max;
+  int spec_t_since; //if positive, time since entered. if negative, time since exited.
+  int spec_t_in; //grows to max when in, shrinks to 0 when out
+  int spec_t_run; //grows while not fully out. 0 when fully out
+  int spec_t_numb; //countdown when distance should be ignored
+
   Vector3 gaze_pt;
   Vector3 anti_gaze_pt;
   Vector2 cam_euler;
@@ -208,6 +216,7 @@ public class Main : MonoBehaviour
     spec_viz_reticle   = GameObject.Find("Spec_Viz_Reticle");
     spec_gam_reticle   = GameObject.Find("Spec_Gam_Reticle");
     spec_neu_reticle   = GameObject.Find("Spec_Neu_Reticle");
+    spec_sel_reticle   = GameObject.Find("Spec_Sel_Reticle");
     eyeray             = GameObject.Find("Ray");
     ar_camera_project  = GameObject.Find("AR_Camera_Project");
     ar_camera_static   = GameObject.Find("AR_Camera_Static");
@@ -246,6 +255,7 @@ public class Main : MonoBehaviour
     default_look_ahead = new Vector3(0,0,1);
     look_ahead = default_look_ahead;
     lazy_look_ahead = default_look_ahead;
+    very_lazy_look_ahead = default_look_ahead;
     player_head = new Vector3(0,2,0);
 
     n_layers = 5;
@@ -300,6 +310,12 @@ public class Main : MonoBehaviour
     gaze_t_in = 0;
     gaze_t_run = 0;
     gaze_t_numb = 0;
+
+    spec_t_max = 50;
+    spec_t_since = 0;
+    spec_t_in = 0;
+    spec_t_run = 0;
+    spec_t_numb = 0;
 
     gaze_pt = new Vector3(1f,.8f,-1f).normalized;
 
@@ -493,14 +509,14 @@ public class Main : MonoBehaviour
 
     look_ahead = main_camera.transform.rotation*default_look_ahead;
     lazy_look_ahead = Vector3.Lerp(lazy_look_ahead,look_ahead,0.1f);
+    very_lazy_look_ahead = Vector3.Lerp(very_lazy_look_ahead,look_ahead,0.01f);
     helmet.transform.position = main_camera.transform.position;
     helmet.transform.rotation = rotationFromEuler(getEuler(lazy_look_ahead));
 
     cam_euler = getCamEuler(cam_reticle.transform.position);
-    spec_euler = cam_euler;
+    spec_euler = getEuler(very_lazy_look_ahead);
     spec_euler.x = -3.141592f/3f;
     spec_projection.transform.rotation = rotationFromEuler(spec_euler);
-
 
     satellite_position += satellite_velocity;
     if(cur_layer_i != 1) satellite_position = default_satellite_position;
@@ -572,6 +588,36 @@ public class Main : MonoBehaviour
     if(gaze_t_in > 0) gaze_t_run++;
     else              gaze_t_run = 0;
     if(gaze_t_numb > 0) gaze_t_numb--;
+
+    float distance_gam = Vector3.Distance(spec_gam_reticle.transform.position,cam_reticle.transform.position);
+    float distance_viz = Vector3.Distance(spec_viz_reticle.transform.position,cam_reticle.transform.position);
+    float distance_neu = Vector3.Distance(spec_neu_reticle.transform.position,cam_reticle.transform.position);
+    if(spec_t_numb == 0 && (distance_gam < 0.3 || distance_viz < 0.3 || distance_neu < 0.3))
+    {
+      if(spec_t_since < 0) spec_t_since = 1;
+      else                 spec_t_since++;
+      if(spec_t_in < spec_t_max) spec_t_in++;
+      if(spec_t_in == spec_t_max) spec_t_numb = spec_t_max*2;
+
+      if(spec_t_in == spec_t_max)
+      {
+        if(distance_gam <= distance_viz && distance_gam <= distance_neu)
+          spec_sel_reticle.transform.position = spec_gam_reticle.transform.position;
+        if(distance_viz <= distance_gam && distance_viz <= distance_neu)
+          spec_sel_reticle.transform.position = spec_viz_reticle.transform.position;
+        if(distance_neu <= distance_gam && distance_neu <= distance_viz)
+          spec_sel_reticle.transform.position = spec_neu_reticle.transform.position;
+      }
+    }
+    else
+    {
+      if(spec_t_since > 0) spec_t_since = -1;
+      else                 spec_t_since--;
+      if(spec_t_in > 0) spec_t_in--;
+    }
+    if(spec_t_in > 0) spec_t_run++;
+    else              spec_t_run = 0;
+    if(spec_t_numb > 0) spec_t_numb--;
 
     if(!track_source.isPlaying)
     {
