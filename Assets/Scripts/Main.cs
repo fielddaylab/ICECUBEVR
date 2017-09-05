@@ -205,7 +205,7 @@ public class Main : MonoBehaviour
     blackhole = GameObject.Find("BlackHole");
     sun4      = GameObject.Find("Sun4");
     earth     = GameObject.Find("Earth");
-    circle     = GameObject.Find("Circle");
+    circle    = GameObject.Find("Circle");
 
     alpha_id = Shader.PropertyToID("alpha");
     flash_alpha = 0;
@@ -464,7 +464,7 @@ public class Main : MonoBehaviour
         case 1:
           circle.transform.position = voyager.transform.position;
           circle.transform.rotation = rotationFromEuler(getCamEuler(circle.transform.position));
-          circle.transform.localScale = new Vector3(100,100,100);
+          circle.transform.localScale = new Vector3(5,5,5);
           break;
         case 2:
           circle.transform.position = milky.transform.position;
@@ -530,6 +530,13 @@ public class Main : MonoBehaviour
     {
       portal.transform.localPosition = default_portal_position;
       portal.transform.localScale = new Vector3(0,0,0);
+    }
+
+    if(cur_layer_i == 1) //must do every tick, because voyager is moving
+    {
+      circle.transform.position = voyager.transform.position;
+      circle.transform.rotation = rotationFromEuler(getCamEuler(circle.transform.position));
+      circle.transform.localScale = new Vector3(5,5,5);
     }
 
     if(mouse_captured)
