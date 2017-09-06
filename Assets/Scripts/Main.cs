@@ -217,7 +217,6 @@ public class Main : MonoBehaviour
     {
       for(int j = 0; j < (int)SCENE.COUNT; j++)
       {
-        Debug.Log(layer_names[i,j]);
         layers[i,j] = LayerMask.NameToLayer(layer_names[i,j]);
       }
     }
@@ -607,11 +606,23 @@ public class Main : MonoBehaviour
       if(spec_t_in == spec_t_max)
       {
         if(distance_gam <= distance_viz && distance_gam <= distance_neu)
+        {
+          cur_spec_i = (int)SPEC.GAM;
           spec_sel_reticle.transform.position = spec_gam_reticle.transform.position;
+        }
         if(distance_viz <= distance_gam && distance_viz <= distance_neu)
+        {
+          cur_spec_i = (int)SPEC.VIZ;
           spec_sel_reticle.transform.position = spec_viz_reticle.transform.position;
+        }
         if(distance_neu <= distance_gam && distance_neu <= distance_viz)
+        {
+          cur_spec_i = (int)SPEC.NEU;
           spec_sel_reticle.transform.position = spec_neu_reticle.transform.position;
+        }
+        main_camera.GetComponent<Camera>().cullingMask        = (1 << layers[cur_spec_i,cur_scene_i]) | (1 << default_layer);
+        portal_camera_next.GetComponent<Camera>().cullingMask = (1 << layers[cur_spec_i,next_scene_i]);
+        portal_camera_prev.GetComponent<Camera>().cullingMask = (1 << layers[cur_spec_i,prev_scene_i]);
       }
     }
     else
