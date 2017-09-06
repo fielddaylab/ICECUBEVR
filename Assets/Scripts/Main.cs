@@ -194,11 +194,11 @@ public class Main : MonoBehaviour
       string name = "";
       switch(i)
       {
-        case (int)SCENE.ICE:     name = "Ice_"; break;
-        case (int)SCENE.VOYAGER: name = "Voyager_"; break;
-        case (int)SCENE.NOTHING: name = "Nothing_"; break;
-        case (int)SCENE.EXTREME: name = "Extreme_"; break;
-        case (int)SCENE.EARTH:   name = "Earth_"; break;
+        case (int)SCENE.ICE:     name = "Ice"; break;
+        case (int)SCENE.VOYAGER: name = "Voyager"; break;
+        case (int)SCENE.NOTHING: name = "Nothing"; break;
+        case (int)SCENE.EXTREME: name = "Extreme"; break;
+        case (int)SCENE.EARTH:   name = "Earth"; break;
       }
       scene_names[i] = name;
     }
@@ -217,6 +217,7 @@ public class Main : MonoBehaviour
     {
       for(int j = 0; j < (int)SCENE.COUNT; j++)
       {
+        Debug.Log(layer_names[i,j]);
         layers[i,j] = LayerMask.NameToLayer(layer_names[i,j]);
       }
     }

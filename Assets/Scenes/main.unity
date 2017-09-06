@@ -42,7 +42,7 @@ RenderSettings:
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 11
+  serializedVersion: 9
   m_GIWorkflowMode: 0
   m_GISettings:
     serializedVersion: 2
@@ -54,7 +54,7 @@ LightmapSettings:
     m_EnableBakedLightmaps: 1
     m_EnableRealtimeLightmaps: 1
   m_LightmapEditorSettings:
-    serializedVersion: 9
+    serializedVersion: 8
     m_Resolution: 2
     m_BakeResolution: 40
     m_TextureWidth: 1024
@@ -87,7 +87,7 @@ LightmapSettings:
     m_PVRFilteringAtrousNormalSigma: 1
     m_PVRFilteringAtrousPositionSigma: 1
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 1
+  m_ShadowMaskMode: 2
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -207,7 +207,6 @@ LineRenderer:
     numCapVertices: 0
     alignment: 0
     textureMode: 0
-    generateLightingData: 0
   m_UseWorldSpace: 1
   m_Loop: 0
 --- !u!4 &6699574
@@ -1172,7 +1171,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 445391020}
-  m_Layer: 18
+  m_Layer: 31
   m_Name: Gaze_Projection
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2406,7 +2405,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: be9b2d44d1bec4ff9b3a5e505e7649e6, type: 3}
       propertyPath: m_Layer
-      value: 18
+      value: 31
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: be9b2d44d1bec4ff9b3a5e505e7649e6, type: 3}
       propertyPath: m_LocalScale.z
@@ -3097,7 +3096,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 1061111962}
-  m_Layer: 18
+  m_Layer: 31
   m_Name: Gaze_Lift
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4332,6 +4331,10 @@ Prefab:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: be9b2d44d1bec4ff9b3a5e505e7649e6, type: 3}
+      propertyPath: m_Name
+      value: center
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: be9b2d44d1bec4ff9b3a5e505e7649e6, type: 3}
   m_IsPrefabParent: 0
@@ -4741,7 +4744,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 1840336085}
-  m_Layer: 18
+  m_Layer: 31
   m_Name: Gaze
   m_TagString: Untagged
   m_Icon: {fileID: 0}
