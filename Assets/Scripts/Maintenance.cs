@@ -10,7 +10,7 @@ public class Maintenance : MonoBehaviour
   string[] spec_names;
   string[] scene_names;
   string[,] layer_names;
-  GameObject[][] sets;
+  GameObject[,] sets;
 
   GameObject[] icecube;
   GameObject[] voyager;
@@ -18,13 +18,27 @@ public class Maintenance : MonoBehaviour
   GameObject[] blackhole;
   GameObject[] earth;
 
+  private void setAllLayers(GameObject parent, int layer)
+  {
+    foreach(Transform child_transform in parent.transform)
+    {
+      GameObject child = child_transform.gameObject;
+      child.layer = layer;
+      setAllLayers(child,layer);
+    }
+  }
+
   private void setAllLights(GameObject parent)
   {
-    foreach(Transform child_transform in sets[i,j].transform)
+    foreach(Transform child_transform in parent.transform)
     {
       GameObject child = child_transform.gameObject;
       Light light = child.GetComponent<Light>();
-      if(light) light.cullingMask = child.layer;
+      if(light)
+      {
+        LayerMask l = child.layer;
+        light.cullingMask = 1 << l;
+      }
       setAllLights(child);
     }
   }
@@ -92,7 +106,7 @@ public class Maintenance : MonoBehaviour
             GameObject servant_set = sets[i,j];
             foreach(Transform servant_child in servant_set.transform)
             {
-              if(servant_child.name.equals(master_name+"_"+spec_names[i]))
+              if(servant_child.name.Equals(master_name+"_"+spec_names[i]))
               {
                 servant_child.position   = master_child.position;
                 servant_child.rotation   = master_child.rotation;
@@ -104,7 +118,14 @@ public class Maintenance : MonoBehaviour
       }
     }
 
-    sets = new GameObject[(int)SPEC.COUNT,(int)SCENE.COUNT];
+    for(int i = 0; i < (int)SPEC.COUNT; i++)
+    {
+      for(int j = 0; j < (int)SCENE.COUNT; j++)
+      {
+        setAllLayers(sets[i,j],sets[i,j].layer);
+      }
+    }
+
     for(int i = 0; i < (int)SPEC.COUNT; i++)
     {
       for(int j = 0; j < (int)SCENE.COUNT; j++)
@@ -112,8 +133,6 @@ public class Maintenance : MonoBehaviour
         setAllLights(sets[i,j]);
       }
     }
-
-
 
   }
 
