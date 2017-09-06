@@ -146,7 +146,7 @@ public class Main : MonoBehaviour
   int gaze_t_run; //grows while not fully out. 0 when fully out
   int gaze_t_numb; //countdown when distance should be ignored
 
-  int spec_t_max;
+  int spec_t_max; //The time required to select a button 
   int spec_t_since; //if positive, time since entered. if negative, time since exited.
   int spec_t_in; //grows to max when in, shrinks to 0 when out
   int spec_t_run; //grows while not fully out. 0 when fully out
