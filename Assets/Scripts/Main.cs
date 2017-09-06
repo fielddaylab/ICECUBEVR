@@ -4,17 +4,12 @@ using UnityEngine;
 
 public class Main : MonoBehaviour
 {
-  public GameObject debug_cube_prefab;
-
   GameObject camera_house;
   GameObject main_camera;
   Skybox main_camera_skybox;
   GameObject portal_lift;
   GameObject portal_projection;
   GameObject portal;
-  GameObject portal_disk_prev;
-  GameObject portal_disk_next;
-  GameObject portal_border;
   GameObject portal_camera_next;
   GameObject portal_camera_prev;
   Skybox portal_camera_next_skybox;
@@ -22,13 +17,9 @@ public class Main : MonoBehaviour
   GameObject helmet;
   GameObject cam_reticle;
   GameObject cam_spinner;
-  GameObject gaze_lift;
   GameObject gaze_projection;
-  GameObject gaze;
   GameObject gaze_reticle;
-  GameObject spec_lift;
   GameObject spec_projection;
-  GameObject spec;
   GameObject spec_viz_reticle;
   GameObject spec_gam_reticle;
   GameObject spec_neu_reticle;
@@ -37,21 +28,16 @@ public class Main : MonoBehaviour
   GameObject ar_camera_project;
   GameObject ar_camera_static;
   GameObject ar_quad;
-
-  GameObject snow;
-  GameObject icecube;
-  GameObject sun1;
-  GameObject voyager;
-  GameObject rocks;
-  GameObject milky;
-  GameObject blackhole;
-  GameObject sun4;
-  GameObject earth;
-
   GameObject ar_circle;
   GameObject ar_label;
   GameObject ar_label_offset;
   TextMesh ar_label_text;
+
+  GameObject[] icecube;
+  GameObject[] voyager;
+  GameObject[] milky;
+  GameObject[] blackhole;
+  GameObject[] earth;
 
   Vector3 default_portal_scale;
   Vector3 default_portal_position;
@@ -68,13 +54,9 @@ public class Main : MonoBehaviour
   int alpha_id;
   float flash_alpha;
 
-  public AudioClip sound;
   AudioSource track_source;
   AudioSource sfx_source;
 
-  public GameObject star_prefab;
-
-  GameObject[,] debug_cubes;
   string[] audio_files = new string[] {
    "tracks/0_silence",
    "tracks/0_intro_0",
@@ -136,15 +118,18 @@ public class Main : MonoBehaviour
   Material[] skyboxes;
   int cur_skybox_i;
 
-  int cur_layer_i;
-  int next_layer_i;
-  int prev_layer_i;
-  int n_layers;
-  int[] layers;
-  int all_layer;
-  int cam_layer;
-  int portal_layer;
-  int stars_layer;
+  enum SPEC { VIZ, GAM, NEU, COUNT };
+  enum SCENE { ICE, VOYAGER, NOTHING, EXTREME, EARTH, COUNT };
+
+  int cur_scene_i;
+  int next_scene_i;
+  int prev_scene_i;
+  int cur_spec_i;
+  int[,] layers;
+  string[] spec_names;
+  string[] scene_names;
+  string[,] layer_names;
+  int default_layer;
 
   bool mouse_captured;
   bool mouse_just_captured;
@@ -190,15 +175,60 @@ public class Main : MonoBehaviour
 
   void Start()
   {
+    spec_names = new string[(int)SPEC.COUNT];
+    for(int i = 0; i < (int)SPEC.COUNT; i++)
+    {
+      string name = "";
+      switch(i)
+      {
+        case (int)SPEC.VIZ: name = "Viz"; break;
+        case (int)SPEC.GAM: name = "Gam"; break;
+        case (int)SPEC.NEU: name = "Neu"; break;
+      }
+      spec_names[i] = name;
+    }
+
+    scene_names = new string[(int)SCENE.COUNT];
+    for(int i = 0; i < (int)SCENE.COUNT; i++)
+    {
+      string name = "";
+      switch(i)
+      {
+        case (int)SCENE.ICE:     name = "Ice_"; break;
+        case (int)SCENE.VOYAGER: name = "Voyager_"; break;
+        case (int)SCENE.NOTHING: name = "Nothing_"; break;
+        case (int)SCENE.EXTREME: name = "Extreme_"; break;
+        case (int)SCENE.EARTH:   name = "Earth_"; break;
+      }
+      scene_names[i] = name;
+    }
+
+    layer_names = new string[(int)SPEC.COUNT,(int)SCENE.COUNT];
+    for(int i = 0; i < (int)SPEC.COUNT; i++)
+    {
+      for(int j = 0; j < (int)SCENE.COUNT; j++)
+      {
+        layer_names[i,j] = "Set_"+scene_names[j]+"_"+spec_names[i];
+      }
+    }
+
+    layers = new int[(int)SPEC.COUNT,(int)SCENE.COUNT];
+    for(int i = 0; i < (int)SPEC.COUNT; i++)
+    {
+      for(int j = 0; j < (int)SCENE.COUNT; j++)
+      {
+        layers[i,j] = LayerMask.NameToLayer(layer_names[i,j]);
+      }
+    }
+
+    default_layer = LayerMask.NameToLayer("Default");
+
     camera_house       = GameObject.Find("CameraHouse");
     main_camera        = GameObject.Find("Main Camera");
     main_camera_skybox = main_camera.GetComponent<Skybox>();
     portal_lift        = GameObject.Find("Portal_Lift");
     portal_projection  = GameObject.Find("Portal_Projection");
     portal             = GameObject.Find("Portal");
-    portal_disk_next   = GameObject.Find("Disk_Next");
-    portal_disk_prev   = GameObject.Find("Disk_Prev");
-    portal_border      = GameObject.Find("Border");
     portal_camera_next = GameObject.Find("Portal_Camera_Next");
     portal_camera_prev = GameObject.Find("Portal_Camera_Prev");
     portal_camera_prev_skybox = portal_camera_prev.GetComponent<Skybox>();
@@ -206,13 +236,9 @@ public class Main : MonoBehaviour
     helmet             = GameObject.Find("Helmet");
     cam_reticle        = GameObject.Find("Cam_Reticle");
     cam_spinner        = GameObject.Find("Cam_Spinner");
-    gaze_lift          = GameObject.Find("Gaze_Lift");
     gaze_projection    = GameObject.Find("Gaze_Projection");
-    gaze               = GameObject.Find("Gaze");
     gaze_reticle       = GameObject.Find("Gaze_Reticle");
-    spec_lift          = GameObject.Find("Spec_Lift");
     spec_projection    = GameObject.Find("Spec_Projection");
-    spec               = GameObject.Find("Spec");
     spec_viz_reticle   = GameObject.Find("Spec_Viz_Reticle");
     spec_gam_reticle   = GameObject.Find("Spec_Gam_Reticle");
     spec_neu_reticle   = GameObject.Find("Spec_Neu_Reticle");
@@ -221,23 +247,44 @@ public class Main : MonoBehaviour
     ar_camera_project  = GameObject.Find("AR_Camera_Project");
     ar_camera_static   = GameObject.Find("AR_Camera_Static");
     ar_quad            = GameObject.Find("AR_Quad");
+    ar_circle          = GameObject.Find("ARCircle");
+    ar_label           = GameObject.Find("ARLabel");
+    ar_label_offset    = GameObject.Find("ARLabelOffset");
+    ar_label_text      = ar_label.GetComponent<TextMesh>();
 
-    snow            = GameObject.Find("Snow");
-    icecube         = GameObject.Find("Icecube");
-    sun1            = GameObject.Find("Sun1");
-    voyager         = GameObject.Find("Voyager");
-    rocks           = GameObject.Find("Rocks");
-    milky           = GameObject.Find("Milky");
-    blackhole       = GameObject.Find("BlackHole");
-    sun4            = GameObject.Find("Sun4");
-    earth           = GameObject.Find("Earth");
-    ar_circle       = GameObject.Find("ARCircle");
-    ar_label        = GameObject.Find("ARLabel");
-    ar_label_offset = GameObject.Find("ARLabelOffset");
-    ar_label_text   = ar_label.GetComponent<TextMesh>();
-    ar_label_text.fontSize = 100;
-    ar_label_text.alignment = TextAlignment.Center;
-    ar_label_text.anchor = TextAnchor.MiddleCenter;
+    icecube   = new GameObject[(int)SPEC.COUNT];
+    voyager   = new GameObject[(int)SPEC.COUNT];
+    milky     = new GameObject[(int)SPEC.COUNT];
+    blackhole = new GameObject[(int)SPEC.COUNT];
+    earth     = new GameObject[(int)SPEC.COUNT];
+    for(int i = 0; i < (int)SPEC.COUNT; i++)
+    {
+      icecube[i]   = GameObject.Find("Icecube_"+spec_names[i]);
+      voyager[i]   = GameObject.Find("Voyager_"+spec_names[i]);
+      milky[i]     = GameObject.Find("Milky_"+spec_names[i]);
+      blackhole[i] = GameObject.Find("BlackHole_"+spec_names[i]);
+      earth[i]     = GameObject.Find("Earth_"+spec_names[i]);
+    }
+
+    //conform initial state to master state
+    for(int i = 1; i < (int)SPEC.COUNT; i++)
+    {
+      icecube[i].transform.position   = icecube[0].transform.position;
+      icecube[i].transform.rotation   = icecube[0].transform.rotation;
+      icecube[i].transform.localScale = icecube[0].transform.localScale;
+      voyager[i].transform.position   = voyager[0].transform.position;
+      voyager[i].transform.rotation   = voyager[0].transform.rotation;
+      voyager[i].transform.localScale = voyager[0].transform.localScale;
+      milky[i].transform.position   = milky[0].transform.position;
+      milky[i].transform.rotation   = milky[0].transform.rotation;
+      milky[i].transform.localScale = milky[0].transform.localScale;
+      blackhole[i].transform.position   = blackhole[0].transform.position;
+      blackhole[i].transform.rotation   = blackhole[0].transform.rotation;
+      blackhole[i].transform.localScale = blackhole[0].transform.localScale;
+      earth[i].transform.position   = earth[0].transform.position;
+      earth[i].transform.rotation   = earth[0].transform.rotation;
+      earth[i].transform.localScale = earth[0].transform.localScale;
+    }
 
     alpha_id = Shader.PropertyToID("alpha");
     flash_alpha = 0;
@@ -250,7 +297,7 @@ public class Main : MonoBehaviour
     default_satellite_position = new Vector3(4f,1.5f,10);
     satellite_position = default_satellite_position;
     satellite_velocity = new Vector3(0,0,-0.01f);
-    voyager.transform.position = satellite_position;
+    voyager[0].transform.position = satellite_position;
 
     default_look_ahead = new Vector3(0,0,1);
     look_ahead = default_look_ahead;
@@ -258,41 +305,10 @@ public class Main : MonoBehaviour
     very_lazy_look_ahead = default_look_ahead;
     player_head = new Vector3(0,2,0);
 
-    n_layers = 5;
-    layers = new int[n_layers];
-    for(int i = 0; i < n_layers; i++)
-      layers[i] = LayerMask.NameToLayer("Set_"+i);
-    all_layer = LayerMask.NameToLayer("Set_ALL");
-    cam_layer = LayerMask.NameToLayer("Set_Cam_Only");
-    portal_layer = LayerMask.NameToLayer("Set_Portal_Only");
-    stars_layer = LayerMask.NameToLayer("Set_Stars");
-    cur_layer_i = 0;
-    helmet.layer = layers[cur_layer_i];
-    prev_layer_i = 0;
-    next_layer_i = 1;
-
-/*
-    debug_cubes = new GameObject[n_layers,3*3*3];
-    for(int l = 0; l < n_layers; l++)
-    for(int x = -1; x <= 1; x++)
-    for(int y = -1; y <= 1; y++)
-    for(int z = -1; z <= 1; z++)
-    {
-      int i = ((x+1)*9+(y+1)*3+(z+1)*1);
-      debug_cubes[l,i] = (GameObject)Instantiate(debug_cube_prefab);
-      if(x == y && y == z  && z == 0) debug_cubes[l,i].transform.position = new Vector3(Random.Range(-100.0f,100.0f),Random.Range(-100.0f,100.0f),Random.Range(-100.0f,100.0f));
-      else                 debug_cubes[l,i].transform.position = new Vector3(x*10,y*10,z*10);
-      debug_cubes[l,i].layer = layers[l];
-      switch(l)
-      {
-        case 0: debug_cubes[l,i].GetComponent<Renderer>().material.SetColor("_Color", Color.white); break;
-        case 1: debug_cubes[l,i].GetComponent<Renderer>().material.SetColor("_Color", Color.red); break;
-        case 2: debug_cubes[l,i].GetComponent<Renderer>().material.SetColor("_Color", Color.yellow); break;
-        case 3: debug_cubes[l,i].GetComponent<Renderer>().material.SetColor("_Color", Color.green); break;
-        case 4: debug_cubes[l,i].GetComponent<Renderer>().material.SetColor("_Color", Color.blue); break;
-      }
-    }
-*/
+    cur_scene_i = 0;
+    prev_scene_i = 0;
+    next_scene_i = 1;
+    cur_spec_i = 0;
 
     mouse_captured = false;
     mouse_just_captured = true;
@@ -311,7 +327,7 @@ public class Main : MonoBehaviour
     gaze_t_run = 0;
     gaze_t_numb = 0;
 
-    spec_t_max = 50;
+    spec_t_max = 1;
     spec_t_since = 0;
     spec_t_in = 0;
     spec_t_run = 0;
@@ -389,25 +405,13 @@ public class Main : MonoBehaviour
     {
       in_portal_motion = 0;
       out_portal_motion = 1;
-      prev_layer_i = cur_layer_i;
-      cur_layer_i = next_layer_i;
-      next_layer_i = (next_layer_i+1)%n_layers;
+      prev_scene_i = cur_scene_i;
+      cur_scene_i = next_scene_i;
+      next_scene_i = (next_scene_i+1)%((int)SCENE.COUNT);
 
-      if(cur_layer_i == 3)  main_camera.GetComponent<Camera>().cullingMask        = (1 << layers[cur_layer_i])  | (1 << cam_layer)    | (1 << all_layer);
-      else                  main_camera.GetComponent<Camera>().cullingMask        = (1 << layers[cur_layer_i])  | (1 << cam_layer)    | (1 << all_layer) | (1 << stars_layer);
-      if(next_layer_i == 3) portal_camera_next.GetComponent<Camera>().cullingMask = (1 << layers[next_layer_i]) | (1 << portal_layer) | (1 << all_layer);
-      else                  portal_camera_next.GetComponent<Camera>().cullingMask = (1 << layers[next_layer_i]) | (1 << portal_layer) | (1 << all_layer) | (1 << stars_layer);
-      if(prev_layer_i == 3) portal_camera_prev.GetComponent<Camera>().cullingMask = (1 << layers[prev_layer_i]) | (1 << portal_layer) | (1 << all_layer);
-      else                  portal_camera_prev.GetComponent<Camera>().cullingMask = (1 << layers[prev_layer_i]) | (1 << portal_layer) | (1 << all_layer) | (1 << stars_layer);
-      portal_lift.layer = layers[cur_layer_i];
-      portal_projection.layer = layers[cur_layer_i];
-      portal.layer = layers[cur_layer_i];
-      portal_disk_next.layer = layers[cur_layer_i];
-      portal_disk_prev.layer = layers[cur_layer_i];
-      helmet.layer = layers[cur_layer_i];
-      foreach(Transform child in helmet.transform)
-         child.gameObject.layer = layers[cur_layer_i];
-      ar_quad.layer = layers[cur_layer_i];
+      main_camera.GetComponent<Camera>().cullingMask        = (1 << layers[cur_spec_i,cur_scene_i]) | (1 << default_layer);
+      portal_camera_next.GetComponent<Camera>().cullingMask = (1 << layers[cur_spec_i,next_scene_i]);
+      portal_camera_prev.GetComponent<Camera>().cullingMask = (1 << layers[cur_spec_i,prev_scene_i]);
 
       cur_skybox_i = (cur_skybox_i+1)%skybox_files.Length;
       main_camera_skybox.material = skyboxes[cur_skybox_i];
@@ -442,38 +446,38 @@ public class Main : MonoBehaviour
       portal.transform.localScale = new Vector3(0,0,0);
     }
 
-    switch(cur_layer_i)
+    switch(cur_scene_i)
     {
       case 0:
-        ar_circle.transform.position = icecube.transform.position;
+        ar_circle.transform.position = icecube[0].transform.position;
         ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
         ar_circle.transform.localScale = new Vector3(200,200,200);
         ar_label_text.text = "Ice Cube";
         ar_label.transform.localScale = new Vector3(10,10,10);
         break;
       case 1:
-        ar_circle.transform.position = voyager.transform.position;
+        ar_circle.transform.position = voyager[0].transform.position;
         ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
         ar_circle.transform.localScale = new Vector3(5,5,5);
         ar_label_text.text = "Voyager";
         ar_label.transform.localScale = new Vector3(0.5f,0.5f,0.5f);
         break;
       case 2:
-        ar_circle.transform.position = milky.transform.position;
+        ar_circle.transform.position = milky[0].transform.position;
         ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
         ar_circle.transform.localScale = new Vector3(50,50,50);
         ar_label_text.text = "Milky Way";
         ar_label.transform.localScale = new Vector3(2,2,2);
         break;
       case 3:
-        ar_circle.transform.position = blackhole.transform.position;
+        ar_circle.transform.position = blackhole[0].transform.position;
         ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
         ar_circle.transform.localScale = new Vector3(200,200,200);
         ar_label_text.text = "Black Hole";
         ar_label.transform.localScale = new Vector3(10,10,10);
         break;
       case 4:
-        ar_circle.transform.position = earth.transform.position;
+        ar_circle.transform.position = earth[0].transform.position;
         ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
         ar_circle.transform.localScale = new Vector3(100,100,100);
         ar_label_text.text = "Earth";
@@ -519,8 +523,8 @@ public class Main : MonoBehaviour
     spec_projection.transform.rotation = rotationFromEuler(spec_euler);
 
     satellite_position += satellite_velocity;
-    if(cur_layer_i != 1) satellite_position = default_satellite_position;
-    voyager.transform.position = satellite_position;
+    if(cur_scene_i != 1) satellite_position = default_satellite_position;
+    voyager[0].transform.position = satellite_position;
 
     if(in_portal_motion > 0)
       flash_alpha = (float)in_portal_motion/max_portal_motion;
@@ -589,8 +593,8 @@ public class Main : MonoBehaviour
     else              gaze_t_run = 0;
     if(gaze_t_numb > 0) gaze_t_numb--;
 
-    float distance_gam = Vector3.Distance(spec_gam_reticle.transform.position,cam_reticle.transform.position);
     float distance_viz = Vector3.Distance(spec_viz_reticle.transform.position,cam_reticle.transform.position);
+    float distance_gam = Vector3.Distance(spec_gam_reticle.transform.position,cam_reticle.transform.position);
     float distance_neu = Vector3.Distance(spec_neu_reticle.transform.position,cam_reticle.transform.position);
     if(spec_t_numb == 0 && (distance_gam < 0.3 || distance_viz < 0.3 || distance_neu < 0.3))
     {

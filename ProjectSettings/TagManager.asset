@@ -13,30 +13,30 @@ TagManager:
   - UI
   - 
   - 
-  - Set_0
-  - Set_1
-  - Set_2
-  - Set_3
-  - Set_4
-  - Set_ALL
-  - Set_Cam_Only
-  - Set_Portal_Only
-  - Set_Stars
+  - Set_Ice_Viz
+  - Set_Voyager_Viz
+  - Set_Nothing_Viz
+  - Set_Extreme_Viz
+  - Set_Earth_Viz
+  - Set_Ice_Gam
+  - Set_Voyager_Gam
+  - Set_Nothing_Gam
+  - Set_Extreme_Gam
+  - Set_Earth_Gam
+  - Set_Ice_Neu
+  - Set_Voyager_Neu
+  - Set_Nothing_Neu
+  - Set_Extreme_Neu
+  - Set_Earth_Neu
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
   - Set_AR_Static
   - Set_AR_Project
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
   m_SortingLayers:
   - name: Default
     uniqueID: 0
