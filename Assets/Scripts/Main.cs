@@ -266,26 +266,6 @@ public class Main : MonoBehaviour
       earth[i]     = GameObject.Find("Earth_"+spec_names[i]);
     }
 
-    //conform initial state to master state
-    for(int i = 1; i < (int)SPEC.COUNT; i++)
-    {
-      icecube[i].transform.position   = icecube[0].transform.position;
-      icecube[i].transform.rotation   = icecube[0].transform.rotation;
-      icecube[i].transform.localScale = icecube[0].transform.localScale;
-      voyager[i].transform.position   = voyager[0].transform.position;
-      voyager[i].transform.rotation   = voyager[0].transform.rotation;
-      voyager[i].transform.localScale = voyager[0].transform.localScale;
-      milky[i].transform.position   = milky[0].transform.position;
-      milky[i].transform.rotation   = milky[0].transform.rotation;
-      milky[i].transform.localScale = milky[0].transform.localScale;
-      blackhole[i].transform.position   = blackhole[0].transform.position;
-      blackhole[i].transform.rotation   = blackhole[0].transform.rotation;
-      blackhole[i].transform.localScale = blackhole[0].transform.localScale;
-      earth[i].transform.position   = earth[0].transform.position;
-      earth[i].transform.rotation   = earth[0].transform.rotation;
-      earth[i].transform.localScale = earth[0].transform.localScale;
-    }
-
     alpha_id = Shader.PropertyToID("alpha");
     flash_alpha = 0;
     track_source = GameObject.Find("Script").AddComponent<AudioSource>();

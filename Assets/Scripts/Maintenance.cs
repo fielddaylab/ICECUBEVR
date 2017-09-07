@@ -35,10 +35,7 @@ public class Maintenance : MonoBehaviour
       GameObject child = child_transform.gameObject;
       Light light = child.GetComponent<Light>();
       if(light)
-      {
-        LayerMask l = child.layer;
-        light.cullingMask = 1 << l;
-      }
+        light.cullingMask = 1 << child.layer;
       setAllLights(child);
     }
   }
