@@ -7,7 +7,6 @@ public class Main : MonoBehaviour
   GameObject camera_house;
   GameObject main_camera;
   Skybox main_camera_skybox;
-  GameObject portal_lift;
   GameObject portal_projection;
   GameObject portal;
   GameObject portal_camera_next;
@@ -27,11 +26,13 @@ public class Main : MonoBehaviour
   GameObject eyeray;
   GameObject ar_camera_project;
   GameObject ar_camera_static;
-  GameObject ar_quad;
   GameObject ar_circle;
   GameObject ar_label;
   GameObject ar_label_offset;
   TextMesh ar_label_text;
+  GameObject ar_alert;
+  GameObject ar_timer;
+  TextMesh ar_timer_text;
 
   GameObject[] icecube;
   GameObject[] voyager;
@@ -53,6 +54,9 @@ public class Main : MonoBehaviour
   public Material alpha_material;
   int alpha_id;
   float flash_alpha;
+
+  float alert_t;
+  float timer_t;
 
   AudioSource track_source;
   AudioSource sfx_source;
@@ -100,7 +104,6 @@ public class Main : MonoBehaviour
   AudioClip[] audio_clips;
   int cur_audio_playing_i;
   int cur_audio_playing_section;
-
 
   string[] skybox_files = new string[] {
    "Classic Skybox/sky12", //Sky
@@ -156,7 +159,6 @@ public class Main : MonoBehaviour
   Vector3 anti_gaze_pt;
   Vector2 cam_euler;
   Vector2 gaze_cam_euler;
-  Vector2 anti_gaze_cam_euler;
   Vector2 spec_euler;
 
   Vector2 getEuler(Vector3 v)
@@ -226,7 +228,6 @@ public class Main : MonoBehaviour
     camera_house       = GameObject.Find("CameraHouse");
     main_camera        = GameObject.Find("Main Camera");
     main_camera_skybox = main_camera.GetComponent<Skybox>();
-    portal_lift        = GameObject.Find("Portal_Lift");
     portal_projection  = GameObject.Find("Portal_Projection");
     portal             = GameObject.Find("Portal");
     portal_camera_next = GameObject.Find("Portal_Camera_Next");
@@ -246,11 +247,16 @@ public class Main : MonoBehaviour
     eyeray             = GameObject.Find("Ray");
     ar_camera_project  = GameObject.Find("AR_Camera_Project");
     ar_camera_static   = GameObject.Find("AR_Camera_Static");
-    ar_quad            = GameObject.Find("AR_Quad");
     ar_circle          = GameObject.Find("ARCircle");
     ar_label           = GameObject.Find("ARLabel");
     ar_label_offset    = GameObject.Find("ARLabelOffset");
     ar_label_text      = ar_label.GetComponent<TextMesh>();
+    ar_alert           = GameObject.Find("Alert");
+    ar_timer           = GameObject.Find("Timer");
+    ar_timer_text      = ar_timer.GetComponent<TextMesh>();
+
+    ar_alert.active = false;
+    ar_timer.active = false;
 
     icecube   = new GameObject[(int)SPEC.COUNT];
     voyager   = new GameObject[(int)SPEC.COUNT];
@@ -319,7 +325,6 @@ public class Main : MonoBehaviour
     cam_euler = getCamEuler(cam_reticle.transform.position);
     gaze_cam_euler = getCamEuler(gaze_pt);
     anti_gaze_pt = (gaze_pt*-1)+new Vector3(50f,0,0);
-    anti_gaze_cam_euler = getCamEuler(anti_gaze_pt);
 
     eyeray.GetComponent<LineRenderer>().SetPosition(0,anti_gaze_pt);
     eyeray.GetComponent<LineRenderer>().SetPosition(1,gaze_pt);
@@ -345,6 +350,12 @@ public class Main : MonoBehaviour
     portal_camera_prev_skybox.material = skyboxes[cur_skybox_i];
     portal_camera_next_skybox.material = skyboxes[cur_skybox_i+1];
     //portal_camera_next_skybox.material = skyboxes[cur_skybox_i];
+
+    ar_circle.transform.position = icecube[0].transform.position;
+    ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
+    ar_circle.transform.localScale = new Vector3(200,200,200);
+    ar_label_text.text = "Ice Cube";
+    ar_label.transform.localScale = new Vector3(10,10,10);
   }
 
   void Update()
@@ -395,6 +406,53 @@ public class Main : MonoBehaviour
 
       cur_skybox_i = (cur_skybox_i+1)%skybox_files.Length;
       main_camera_skybox.material = skyboxes[cur_skybox_i];
+
+      switch(cur_scene_i)
+      {
+        case 0:
+          ar_circle.transform.position = icecube[0].transform.position;
+          ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
+          ar_circle.transform.localScale = new Vector3(200,200,200);
+          ar_label_text.text = "Ice Cube";
+          ar_label.transform.localScale = new Vector3(10,10,10);
+          break;
+        case 1:
+          ar_circle.transform.position = voyager[0].transform.position;
+          ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
+          ar_circle.transform.localScale = new Vector3(5,5,5);
+          ar_label_text.text = "Voyager";
+          ar_label.transform.localScale = new Vector3(0.5f,0.5f,0.5f);
+          break;
+        case 2:
+          ar_circle.transform.position = milky[0].transform.position;
+          ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
+          ar_circle.transform.localScale = new Vector3(50,50,50);
+          ar_label_text.text = "Milky Way";
+          ar_label.transform.localScale = new Vector3(2,2,2);
+          break;
+        case 3:
+          ar_circle.transform.position = blackhole[0].transform.position;
+          ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
+          ar_circle.transform.localScale = new Vector3(200,200,200);
+          ar_label_text.text = "Black Hole";
+          ar_label.transform.localScale = new Vector3(10,10,10);
+          ar_alert.active = true;
+          ar_timer.active = true;
+          timer_t = 0;
+          alert_t = 0;
+          break;
+        case 4:
+          ar_circle.transform.position = earth[0].transform.position;
+          ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
+          ar_circle.transform.localScale = new Vector3(100,100,100);
+          ar_label_text.text = "Earth";
+          ar_label.transform.localScale = new Vector3(5,5,5);
+          ar_alert.active = false;
+          ar_timer.active = false;
+          break;
+      }
+      ar_label_offset.transform.localScale = ar_circle.transform.localScale;
+      ar_label.transform.localScale /= ar_circle.transform.localScale.x;
     }
     if(out_portal_motion > 0) out_portal_motion++;
     if(out_portal_motion > max_portal_motion)
@@ -429,45 +487,37 @@ public class Main : MonoBehaviour
     switch(cur_scene_i)
     {
       case 0:
-        ar_circle.transform.position = icecube[0].transform.position;
-        ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
-        ar_circle.transform.localScale = new Vector3(200,200,200);
-        ar_label_text.text = "Ice Cube";
-        ar_label.transform.localScale = new Vector3(10,10,10);
         break;
       case 1:
         ar_circle.transform.position = voyager[0].transform.position;
         ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
-        ar_circle.transform.localScale = new Vector3(5,5,5);
-        ar_label_text.text = "Voyager";
-        ar_label.transform.localScale = new Vector3(0.5f,0.5f,0.5f);
+        for(int i = 1; i < voyager.Length; i++)
+        {
+          voyager[i].transform.position = voyager[0].transform.position;
+        }
         break;
       case 2:
-        ar_circle.transform.position = milky[0].transform.position;
-        ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
-        ar_circle.transform.localScale = new Vector3(50,50,50);
-        ar_label_text.text = "Milky Way";
-        ar_label.transform.localScale = new Vector3(2,2,2);
         break;
       case 3:
-        ar_circle.transform.position = blackhole[0].transform.position;
-        ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
-        ar_circle.transform.localScale = new Vector3(200,200,200);
-        ar_label_text.text = "Black Hole";
-        ar_label.transform.localScale = new Vector3(10,10,10);
+        alert_t += Time.deltaTime;
+        timer_t += Time.deltaTime;
+        if(Mathf.Floor(alert_t)%2 == 1) ar_alert.active = false;
+        else                            ar_alert.active = true;
+        float seconds_left = 20-timer_t;
+        if(seconds_left > 0)
+        {
+          ar_timer_text.text = "00:"+Mathf.Floor(seconds_left)+":"+Mathf.Floor((seconds_left-Mathf.Floor(seconds_left))*100);
+        }
+        else
+        {
+          ar_timer_text.text = "00:00:00";
+        }
         break;
       case 4:
-        ar_circle.transform.position = earth[0].transform.position;
-        ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
-        ar_circle.transform.localScale = new Vector3(100,100,100);
-        ar_label_text.text = "Earth";
-        ar_label.transform.localScale = new Vector3(5,5,5);
         break;
     }
     ar_label_offset.transform.position = ar_circle.transform.position;
     ar_label_offset.transform.rotation = ar_circle.transform.rotation;
-    ar_label_offset.transform.localScale = ar_circle.transform.localScale;
-    ar_label.transform.localScale /= ar_circle.transform.localScale.x;
 
     if(mouse_captured)
     {
