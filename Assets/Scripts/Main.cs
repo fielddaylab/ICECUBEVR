@@ -132,7 +132,9 @@ public class Main : MonoBehaviour
   string[] spec_names;
   string[] scene_names;
   string[,] layer_names;
+  GameObject[,] scene_groups;
   int default_layer;
+  float cur_movement_theta;
 
   bool mouse_captured;
   bool mouse_just_captured;
@@ -211,6 +213,15 @@ public class Main : MonoBehaviour
       for(int j = 0; j < (int)SCENE.COUNT; j++)
       {
         layer_names[i,j] = "Set_"+scene_names[j]+"_"+spec_names[i];
+      }
+    }
+
+    scene_groups = new GameObject[(int)SPEC.COUNT,(int)SCENE.COUNT];
+    for(int i = 0; i < (int)SPEC.COUNT; i++)
+    {
+      for(int j = 0; j < (int)SCENE.COUNT; j++)
+      {
+        scene_groups[i,j] = GameObject.Find(layer_names[i,j]);
       }
     }
 
@@ -295,6 +306,7 @@ public class Main : MonoBehaviour
     prev_scene_i = 0;
     next_scene_i = 1;
     cur_spec_i = 0;
+    cur_movement_theta = 0;
 
     mouse_captured = false;
     mouse_just_captured = true;
@@ -664,6 +676,11 @@ public class Main : MonoBehaviour
     if(spec_t_in > 0) spec_t_run++;
     else              spec_t_run = 0;
     if(spec_t_numb > 0) spec_t_numb--;
+
+    cur_movement_theta += 0.01f;
+    while(cur_movement_theta > 3.14159265f*2.0f)
+      cur_movement_theta -= (3.14159265f*2.0f);
+    scene_groups[cur_spec_i,cur_scene_i].transform.position = new Vector3(Mathf.Cos(cur_movement_theta)*10.0f,0.0f,Mathf.Sin(cur_movement_theta)*10.0f);
 
     if(!track_source.isPlaying)
     {
