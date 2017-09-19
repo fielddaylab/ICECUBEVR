@@ -39,6 +39,7 @@ public class Main : MonoBehaviour
   GameObject[] milky;
   GameObject[] blackhole;
   GameObject[] earth;
+  GameObject stars;
 
   Vector3 default_portal_scale;
   Vector3 default_portal_position;
@@ -52,6 +53,7 @@ public class Main : MonoBehaviour
   Vector3 satellite_velocity;
 
   public Material alpha_material;
+  public GameObject star_prefab;
   int alpha_id;
   float flash_alpha;
 
@@ -265,6 +267,7 @@ public class Main : MonoBehaviour
     ar_alert           = GameObject.Find("Alert");
     ar_timer           = GameObject.Find("Timer");
     ar_timer_text      = ar_timer.GetComponent<TextMesh>();
+    stars = GameObject.Find("Stars");
 
     ar_alert.active = false;
     ar_timer.active = false;
@@ -368,6 +371,91 @@ public class Main : MonoBehaviour
     ar_circle.transform.localScale = new Vector3(200,200,200);
     ar_label_text.text = "Ice Cube";
     ar_label.transform.localScale = new Vector3(10,10,10);
+
+    //stars
+    GameObject[] star_groups;
+    GameObject star;
+    Vector3[] star_positions;
+    Vector3 starpos;
+
+    int n_stars = 4000;
+    int n_groups = (int)Mathf.Ceil(n_stars/1000);
+    int n_stars_in_group;
+    star_groups = new GameObject[n_groups];
+    star = (GameObject)Instantiate(star_prefab);
+
+    //gen positions
+    star_positions = new Vector3[n_stars];
+    for(int i = 0; i < n_stars; i++)
+    {
+      bool good_star = false;
+      starpos = new Vector3(Random.Range(-1f,1f),Random.Range(-1f,1f),Random.Range(-1f,1f));
+      good_star = (starpos.sqrMagnitude < Random.Range(0f,1f));
+      while(!good_star)
+      {
+        starpos = new Vector3(Random.Range(-1f,1f),Random.Range(-1f,1f),Random.Range(-1f,1f));
+        good_star = (starpos.sqrMagnitude < Random.Range(0f,1f));
+      }
+      starpos = starpos.normalized;
+      star_positions[i] = starpos;
+    }
+
+    //morph positions
+    for(int n = 0; n < 2; n++)
+    {
+      for(int i = 0; i < n_stars; i++)
+      {
+        Vector3 delta = new Vector3(0,0,0);
+        Vector3 dist;
+        for(int j = 0; j < n_stars; j++)
+        {
+          if(j != i)
+          {
+            dist = star_positions[j]-star_positions[i];
+            if(dist.sqrMagnitude < 0.1)
+            {
+              delta += dist*(0.0001f/dist.sqrMagnitude);
+            }
+          }
+        }
+        star_positions[i] = (star_positions[i]+delta).normalized;
+      }
+    }
+
+    //gen assets
+    for(int i = 0; i < n_groups; i++)
+    {
+      n_stars_in_group = Mathf.Min(1000,n_stars);
+      CombineInstance[] combine = new CombineInstance[n_stars_in_group];
+
+      for(int j = 0; j < n_stars_in_group; j++)
+      {
+        starpos = star_positions[i*n_stars_in_group+j];
+        float r = Random.Range(0f,1f);
+        starpos *= Mathf.Lerp(20f,30f,r*r);
+
+        star.transform.position = starpos;
+        star.transform.rotation = Quaternion.Euler(Random.Range(0f,360f),Random.Range(0f,360f),Random.Range(0f,360f));
+        star.transform.localScale = new Vector3(0.05f,0.05f,0.05f);
+
+        combine[j].mesh = star.transform.GetComponent<MeshFilter>().mesh;
+        combine[j].transform = star.transform.localToWorldMatrix;
+      }
+
+      star_groups[i] = (GameObject)Instantiate(star_prefab);
+      //star_groups[i].layer = stars_layer;
+      star_groups[i].transform.position = new Vector3(0,0,0);
+      star_groups[i].transform.rotation = Quaternion.Euler(0,0,0);
+      star_groups[i].transform.localScale = new Vector3(1,1,1);
+      star_groups[i].transform.GetComponent<MeshFilter>().mesh = new Mesh();
+      star_groups[i].transform.GetComponent<MeshFilter>().mesh.CombineMeshes(combine);
+      star_groups[i].transform.parent = stars.transform;
+
+      n_stars -= n_stars_in_group;
+    }
+    Destroy(star,0f);
+
+
   }
 
   void Update()
@@ -677,10 +765,11 @@ public class Main : MonoBehaviour
     else              spec_t_run = 0;
     if(spec_t_numb > 0) spec_t_numb--;
 
-    cur_movement_theta += 0.01f;
+    cur_movement_theta += 0.002f;
     while(cur_movement_theta > 3.14159265f*2.0f)
       cur_movement_theta -= (3.14159265f*2.0f);
     scene_groups[cur_spec_i,cur_scene_i].transform.position = new Vector3(Mathf.Cos(cur_movement_theta)*10.0f,0.0f,Mathf.Sin(cur_movement_theta)*10.0f);
+    stars.transform.position = new Vector3(Mathf.Cos(cur_movement_theta)*10.0f,0.0f,Mathf.Sin(cur_movement_theta)*10.0f);
 
     if(!track_source.isPlaying)
     {
