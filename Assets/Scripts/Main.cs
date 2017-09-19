@@ -40,6 +40,7 @@ public class Main : MonoBehaviour
   GameObject[] blackhole;
   GameObject[] earth;
   GameObject stars;
+  GameObject starsscale;
 
   Vector3 default_portal_scale;
   Vector3 default_portal_position;
@@ -268,6 +269,7 @@ public class Main : MonoBehaviour
     ar_timer           = GameObject.Find("Timer");
     ar_timer_text      = ar_timer.GetComponent<TextMesh>();
     stars = GameObject.Find("Stars");
+    starsscale = GameObject.Find("StarsScale");
 
     ar_alert.active = false;
     ar_timer.active = false;
@@ -378,7 +380,7 @@ public class Main : MonoBehaviour
     Vector3[] star_positions;
     Vector3 starpos;
 
-    int n_stars = 4000;
+    int n_stars = 10000;
     int n_groups = (int)Mathf.Ceil(n_stars/1000);
     int n_stars_in_group;
     star_groups = new GameObject[n_groups];
@@ -400,6 +402,7 @@ public class Main : MonoBehaviour
       star_positions[i] = starpos;
     }
 
+/*
     //morph positions
     for(int n = 0; n < 2; n++)
     {
@@ -421,6 +424,7 @@ public class Main : MonoBehaviour
         star_positions[i] = (star_positions[i]+delta).normalized;
       }
     }
+*/
 
     //gen assets
     for(int i = 0; i < n_groups; i++)
@@ -443,13 +447,14 @@ public class Main : MonoBehaviour
       }
 
       star_groups[i] = (GameObject)Instantiate(star_prefab);
+      star_groups[i].transform.parent = starsscale.transform;
       //star_groups[i].layer = stars_layer;
-      star_groups[i].transform.position = new Vector3(0,0,0);
-      star_groups[i].transform.rotation = Quaternion.Euler(0,0,0);
-      star_groups[i].transform.localScale = new Vector3(1,1,1);
+      star_groups[i].transform.localPosition = new Vector3(0,0,0);
+      star_groups[i].transform.localRotation = Quaternion.Euler(0,0,0);
+      float ss = 2.0f;
+      star_groups[i].transform.localScale = new Vector3(ss,ss,ss);
       star_groups[i].transform.GetComponent<MeshFilter>().mesh = new Mesh();
       star_groups[i].transform.GetComponent<MeshFilter>().mesh.CombineMeshes(combine);
-      star_groups[i].transform.parent = stars.transform;
 
       n_stars -= n_stars_in_group;
     }
