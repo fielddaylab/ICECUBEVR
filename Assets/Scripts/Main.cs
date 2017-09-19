@@ -380,7 +380,7 @@ public class Main : MonoBehaviour
     Vector3[] star_positions;
     Vector3 starpos;
 
-    int n_stars = 10000;
+    int n_stars = 100000;
     int n_groups = (int)Mathf.Ceil(n_stars/1000);
     int n_stars_in_group;
     star_groups = new GameObject[n_groups];
@@ -392,11 +392,11 @@ public class Main : MonoBehaviour
     {
       bool good_star = false;
       starpos = new Vector3(Random.Range(-1f,1f),Random.Range(-1f,1f),Random.Range(-1f,1f));
-      good_star = (starpos.sqrMagnitude < Random.Range(0f,1f));
+      good_star = (starpos.sqrMagnitude < 1f);
       while(!good_star)
       {
         starpos = new Vector3(Random.Range(-1f,1f),Random.Range(-1f,1f),Random.Range(-1f,1f));
-        good_star = (starpos.sqrMagnitude < Random.Range(0f,1f));
+        good_star = (starpos.sqrMagnitude < 1f);
       }
       starpos = starpos.normalized;
       star_positions[i] = starpos;
@@ -435,12 +435,12 @@ public class Main : MonoBehaviour
       for(int j = 0; j < n_stars_in_group; j++)
       {
         starpos = star_positions[i*n_stars_in_group+j];
-        float r = Random.Range(0f,1f);
-        starpos *= Mathf.Lerp(20f,30f,r*r);
+        starpos *= Mathf.Lerp(0f,30f,Random.Range(0f,1f));
 
         star.transform.position = starpos;
         star.transform.rotation = Quaternion.Euler(Random.Range(0f,360f),Random.Range(0f,360f),Random.Range(0f,360f));
-        star.transform.localScale = new Vector3(0.05f,0.05f,0.05f);
+        float ss = 0.1f;
+        star.transform.localScale = new Vector3(ss,ss,ss);
 
         combine[j].mesh = star.transform.GetComponent<MeshFilter>().mesh;
         combine[j].transform = star.transform.localToWorldMatrix;
@@ -451,16 +451,13 @@ public class Main : MonoBehaviour
       //star_groups[i].layer = stars_layer;
       star_groups[i].transform.localPosition = new Vector3(0,0,0);
       star_groups[i].transform.localRotation = Quaternion.Euler(0,0,0);
-      float ss = 2.0f;
-      star_groups[i].transform.localScale = new Vector3(ss,ss,ss);
+      star_groups[i].transform.localScale = new Vector3(1,1,1);
       star_groups[i].transform.GetComponent<MeshFilter>().mesh = new Mesh();
       star_groups[i].transform.GetComponent<MeshFilter>().mesh.CombineMeshes(combine);
 
       n_stars -= n_stars_in_group;
     }
     Destroy(star,0f);
-
-
   }
 
   void Update()
