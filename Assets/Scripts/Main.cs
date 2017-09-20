@@ -10,9 +10,7 @@ public class Main : MonoBehaviour
   GameObject portal_projection;
   GameObject portal;
   GameObject portal_camera_next;
-  GameObject portal_camera_prev;
   Skybox portal_camera_next_skybox;
-  Skybox portal_camera_prev_skybox;
   GameObject helmet;
   GameObject cam_reticle;
   GameObject cam_spinner;
@@ -145,7 +143,6 @@ public class Main : MonoBehaviour
 
   int cur_scene_i;
   int next_scene_i;
-  int prev_scene_i;
   int cur_spec_i;
   int[,] layers;
   string[] spec_names;
@@ -253,8 +250,6 @@ public class Main : MonoBehaviour
     portal_projection  = GameObject.Find("Portal_Projection");
     portal             = GameObject.Find("Portal");
     portal_camera_next = GameObject.Find("Portal_Camera_Next");
-    portal_camera_prev = GameObject.Find("Portal_Camera_Prev");
-    portal_camera_prev_skybox = portal_camera_prev.GetComponent<Skybox>();
     portal_camera_next_skybox = portal_camera_next.GetComponent<Skybox>();
     helmet             = GameObject.Find("Helmet");
     cam_reticle        = GameObject.Find("Cam_Reticle");
@@ -322,7 +317,6 @@ public class Main : MonoBehaviour
     player_head = new Vector3(0,2,0);
 
     cur_scene_i = 0;
-    prev_scene_i = 0;
     next_scene_i = cur_scene_i+1;
     cur_spec_i = 0;
 
@@ -371,7 +365,6 @@ public class Main : MonoBehaviour
       for(int j = 0; j < (int)SCENE.COUNT; j++)
       skyboxes[i,j] = Resources.Load<Material>(skybox_files[i,j]);
     main_camera_skybox.material        = skyboxes[cur_spec_i,cur_scene_i];
-    portal_camera_prev_skybox.material = skyboxes[cur_spec_i,cur_scene_i];
     portal_camera_next_skybox.material = skyboxes[cur_spec_i,next_scene_i];
 
     audio_clips = new AudioClip[audio_files.Length];
@@ -476,11 +469,9 @@ public class Main : MonoBehaviour
     float fov = main_camera.GetComponent<Camera>().fieldOfView;
     ar_camera_project.GetComponent<Camera>().aspect = aspect;
     ar_camera_static.GetComponent<Camera>().aspect = aspect;
-    portal_camera_prev.GetComponent<Camera>().aspect = aspect;
     portal_camera_next.GetComponent<Camera>().aspect = aspect;
     ar_camera_project.GetComponent<Camera>().fieldOfView = fov;
     ar_camera_static.GetComponent<Camera>().fieldOfView = fov;
-    portal_camera_prev.GetComponent<Camera>().fieldOfView = fov;
     portal_camera_next.GetComponent<Camera>().fieldOfView = fov;
 
     if(Input.GetMouseButtonDown(0))
@@ -508,13 +499,11 @@ public class Main : MonoBehaviour
     {
       in_portal_motion = 0;
       out_portal_motion = 1;
-      prev_scene_i = cur_scene_i;
       cur_scene_i = next_scene_i;
       next_scene_i = (next_scene_i+1)%((int)SCENE.COUNT);
 
       main_camera.GetComponent<Camera>().cullingMask        = (1 << layers[cur_spec_i,cur_scene_i]) | (1 << default_layer);
       portal_camera_next.GetComponent<Camera>().cullingMask = (1 << layers[cur_spec_i,next_scene_i]);
-      portal_camera_prev.GetComponent<Camera>().cullingMask = (1 << layers[cur_spec_i,prev_scene_i]);
 
       main_camera_skybox.material = skyboxes[cur_spec_i,cur_scene_i];
 
@@ -576,15 +565,6 @@ public class Main : MonoBehaviour
       float t = in_portal_motion/(float)max_portal_motion;
       portal.transform.localPosition = new Vector3(default_portal_position.x,default_portal_position.y,Mathf.Lerp(default_portal_position.z,0,t*t*t*t*t));
       float engulf = t-1;
-      engulf *= -engulf;
-      engulf += 1;
-      portal.transform.localScale = new Vector3(default_portal_scale.x*engulf,default_portal_scale.y*engulf,default_portal_scale.z*engulf);
-    }
-    else if(out_portal_motion > 0)
-    {
-      float t = out_portal_motion/(float)max_portal_motion;
-      portal.transform.localPosition = new Vector3(default_portal_position.x,default_portal_position.y,Mathf.Lerp(0,-default_portal_position.z,1-((1-t)*(1-t)*(1-t)*(1-t)*(1-t))));
-      float engulf = t;
       engulf *= -engulf;
       engulf += 1;
       portal.transform.localScale = new Vector3(default_portal_scale.x*engulf,default_portal_scale.y*engulf,default_portal_scale.z*engulf);
@@ -708,7 +688,6 @@ public class Main : MonoBehaviour
         {
           in_portal_motion = 1;
           scene_rots[next_scene_i] = 0; //set rot at start of scene transition
-          portal_camera_prev_skybox.material = skyboxes[cur_spec_i,cur_scene_i];
           portal_camera_next_skybox.material = skyboxes[cur_spec_i,next_scene_i];
         }
         if(track_source.isPlaying) track_source.Stop();
@@ -768,9 +747,7 @@ public class Main : MonoBehaviour
         }
         main_camera.GetComponent<Camera>().cullingMask        = (1 << layers[cur_spec_i,cur_scene_i]) | (1 << default_layer);
         portal_camera_next.GetComponent<Camera>().cullingMask = (1 << layers[cur_spec_i,next_scene_i]);
-        portal_camera_prev.GetComponent<Camera>().cullingMask = (1 << layers[cur_spec_i,prev_scene_i]);
         main_camera_skybox.material        = skyboxes[cur_spec_i,cur_scene_i];
-        portal_camera_prev_skybox.material = skyboxes[cur_spec_i,cur_scene_i];
         portal_camera_next_skybox.material = skyboxes[cur_spec_i,next_scene_i];
       }
     }
