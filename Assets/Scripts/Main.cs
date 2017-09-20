@@ -567,6 +567,7 @@ public class Main : MonoBehaviour
       float engulf = t-1;
       engulf *= -engulf;
       engulf += 1;
+      engulf /= 2;
       portal.transform.localScale = new Vector3(default_portal_scale.x*engulf,default_portal_scale.y*engulf,default_portal_scale.z*engulf);
     }
     else
