@@ -564,15 +564,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7399f46fd4111644af16a6c3fd8399a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  my_num: 7
   alpha_material: {fileID: 2100000, guid: cc5ad7b8644194bbeb74b46a13481cb7, type: 2}
   star_prefab: {fileID: 1299812747390152, guid: 87ab197597dec455b8decc685297db07,
     type: 2}
-  scene0_helmet_light_color: {r: 0, g: 0, b: 0, a: 0}
-  scene1_helmet_light_color: {r: 0, g: 0, b: 0, a: 0}
-  scene2_helmet_light_color: {r: 0, g: 0, b: 0, a: 0}
-  scene3_helmet_light_color: {r: 0, g: 0, b: 0, a: 0}
-  scene4_helmet_light_color: {r: 0, g: 0, b: 0, a: 0}
+  scene0_helmet_color: {r: 1, g: 1, b: 1, a: 0}
+  scene1_helmet_color: {r: 1, g: 0.8483773, b: 0.52205884, a: 0}
+  scene2_helmet_color: {r: 1, g: 1, b: 1, a: 0}
+  scene3_helmet_color: {r: 0, g: 0, b: 0, a: 0}
+  scene4_helmet_color: {r: 0.6764706, g: 0.81257606, b: 1, a: 0}
   alpha_id: 0
 --- !u!4 &253639470
 Transform:
