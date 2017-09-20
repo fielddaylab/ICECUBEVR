@@ -108,21 +108,15 @@ public class Main : MonoBehaviour
   int cur_audio_playing_i;
   int cur_audio_playing_section;
 
-  string[] skybox_files = new string[] {
-   "Classic Skybox/sky12", //Sky
-   "GalaxyBox2/Skybox2_1/Skybox2_1", //Solar System
-   "GalaxyBox2/Skybox2_4/Skybox2_4", //Out Deep
-   "GalaxyBox2/Skybox2_1/Skybox2_1", //At the Black Hole
-   "GalaxyBox2/Skybox2_1/Skybox2_1", //Back to Earth
-   "Ice Planet/Textures/Skybox", //Back on Ice Cube
-   "Classic Skybox/sky12", //Sky
-   "GalaxyBox2/Skybox2_1/Skybox2_1", //Solar System
-   "GalaxyBox2/Skybox2_4/Skybox2_4", //Out Deep
-   "GalaxyBox2/Skybox2_1/Skybox2_1", //At the Black Hole
-   "GalaxyBox2/Skybox2_1/Skybox2_1", //Back to Earth
+  string[] skybox_file_names = new string[] {
+   "Classic Skybox/sky12", //ice
+   "GalaxyBox2/Skybox2_1/Skybox2_1", //voyager
+   "GalaxyBox2/Skybox2_4/Skybox2_4", //nothing
+   "GalaxyBox2/Skybox2_1/Skybox2_1", //extreme
+   "GalaxyBox2/Skybox2_1/Skybox2_1", //earth
   };
-  Material[] skyboxes;
-  int cur_skybox_i;
+  string[,] skybox_files;
+  Material[,] skyboxes;
 
   Vector3[] scene_centers = new Vector3[] {
     new Vector3(0f,0f,0f), //ice
@@ -139,11 +133,11 @@ public class Main : MonoBehaviour
     0f, //earth
   };
   float[] scene_rot_deltas = new float[] {
-    0.01f, //ice
-    0.01f, //voyager
-    0.01f, //nothing
-    0.01f, //extreme
-    0.01f, //earth
+    0.0f, //ice
+    0.0f, //voyager
+    0.0001f, //nothing
+    0.0001f, //extreme
+    0.00005f, //earth
   };
 
   enum SPEC { VIZ, GAM, NEU, COUNT };
@@ -233,30 +227,23 @@ public class Main : MonoBehaviour
 
     layer_names = new string[(int)SPEC.COUNT,(int)SCENE.COUNT];
     for(int i = 0; i < (int)SPEC.COUNT; i++)
-    {
       for(int j = 0; j < (int)SCENE.COUNT; j++)
-      {
         layer_names[i,j] = "Set_"+scene_names[j]+"_"+spec_names[i];
-      }
-    }
 
     scene_groups = new GameObject[(int)SPEC.COUNT,(int)SCENE.COUNT];
     for(int i = 0; i < (int)SPEC.COUNT; i++)
-    {
       for(int j = 0; j < (int)SCENE.COUNT; j++)
-      {
         scene_groups[i,j] = GameObject.Find(layer_names[i,j]);
-      }
-    }
 
     layers = new int[(int)SPEC.COUNT,(int)SCENE.COUNT];
     for(int i = 0; i < (int)SPEC.COUNT; i++)
-    {
       for(int j = 0; j < (int)SCENE.COUNT; j++)
-      {
         layers[i,j] = LayerMask.NameToLayer(layer_names[i,j]);
-      }
-    }
+
+    string[,] skybox_files = new string[(int)SPEC.COUNT,(int)SCENE.COUNT];
+    for(int i = 0; i < (int)SPEC.COUNT; i++)
+      for(int j = 0; j < (int)SCENE.COUNT; j++)
+        skybox_files[i,j] = spec_names[i]+"/"+skybox_file_names[j];
 
     default_layer = LayerMask.NameToLayer("Default");
 
@@ -336,7 +323,7 @@ public class Main : MonoBehaviour
 
     cur_scene_i = 0;
     prev_scene_i = 0;
-    next_scene_i = 1;
+    next_scene_i = cur_scene_i+1;
     cur_spec_i = 0;
 
     mouse_captured = false;
@@ -379,20 +366,19 @@ public class Main : MonoBehaviour
     spec_euler.x = -3.141592f/3f;
     spec_projection.transform.rotation = rotationFromEuler(spec_euler);
 
+    skyboxes = new Material[(int)SPEC.COUNT,(int)SCENE.COUNT];
+    for(int i = 0; i < (int)SPEC.COUNT; i++)
+      for(int j = 0; j < (int)SCENE.COUNT; j++)
+      skyboxes[i,j] = Resources.Load<Material>(skybox_files[i,j]);
+    main_camera_skybox.material        = skyboxes[cur_spec_i,cur_scene_i];
+    portal_camera_prev_skybox.material = skyboxes[cur_spec_i,cur_scene_i];
+    portal_camera_next_skybox.material = skyboxes[cur_spec_i,next_scene_i];
+
     audio_clips = new AudioClip[audio_files.Length];
     for(int i = 0; i < audio_files.Length; i++)
       audio_clips[i] = Resources.Load<AudioClip>(audio_files[i]);
     cur_audio_playing_i = -1;
     cur_audio_playing_section = 0;
-
-    skyboxes = new Material[skybox_files.Length];
-    for(int i = 0; i < skybox_files.Length; i++)
-      skyboxes[i] = Resources.Load<Material>(skybox_files[i]);
-    cur_skybox_i = 0;
-    main_camera_skybox.material = skyboxes[cur_skybox_i];
-    portal_camera_prev_skybox.material = skyboxes[cur_skybox_i];
-    portal_camera_next_skybox.material = skyboxes[cur_skybox_i+1];
-    //portal_camera_next_skybox.material = skyboxes[cur_skybox_i];
 
     ar_circle.transform.position = icecube[0].transform.position;
     ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
@@ -530,8 +516,7 @@ public class Main : MonoBehaviour
       portal_camera_next.GetComponent<Camera>().cullingMask = (1 << layers[cur_spec_i,next_scene_i]);
       portal_camera_prev.GetComponent<Camera>().cullingMask = (1 << layers[cur_spec_i,prev_scene_i]);
 
-      cur_skybox_i = (cur_skybox_i+1)%skybox_files.Length;
-      main_camera_skybox.material = skyboxes[cur_skybox_i];
+      main_camera_skybox.material = skyboxes[cur_spec_i,cur_scene_i];
 
       switch(cur_scene_i)
       {
@@ -718,9 +703,8 @@ public class Main : MonoBehaviour
         {
           in_portal_motion = 1;
           scene_rots[next_scene_i] = 0; //set rot at start of scene transition
-          portal_camera_prev_skybox.material = skyboxes[cur_skybox_i];
-          portal_camera_next_skybox.material = skyboxes[(cur_skybox_i+1)%skybox_files.Length];
-          //portal_camera_next_skybox.material = skyboxes[cur_skybox_i];
+          portal_camera_prev_skybox.material = skyboxes[cur_spec_i,cur_scene_i];
+          portal_camera_next_skybox.material = skyboxes[cur_spec_i,next_scene_i];
         }
         if(track_source.isPlaying) track_source.Stop();
 
@@ -780,6 +764,9 @@ public class Main : MonoBehaviour
         main_camera.GetComponent<Camera>().cullingMask        = (1 << layers[cur_spec_i,cur_scene_i]) | (1 << default_layer);
         portal_camera_next.GetComponent<Camera>().cullingMask = (1 << layers[cur_spec_i,next_scene_i]);
         portal_camera_prev.GetComponent<Camera>().cullingMask = (1 << layers[cur_spec_i,prev_scene_i]);
+        main_camera_skybox.material        = skyboxes[cur_spec_i,cur_scene_i];
+        portal_camera_prev_skybox.material = skyboxes[cur_spec_i,cur_scene_i];
+        portal_camera_next_skybox.material = skyboxes[cur_spec_i,next_scene_i];
       }
     }
     else
