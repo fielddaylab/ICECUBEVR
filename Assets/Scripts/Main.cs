@@ -54,7 +54,6 @@ public class Main : MonoBehaviour
   Vector3 satellite_position;
   Vector3 satellite_velocity;
 
-
   public Material alpha_material;
   public GameObject star_prefab;
 
@@ -167,21 +166,21 @@ public class Main : MonoBehaviour
   float mouse_x;
   float mouse_y;
 
-  int in_portal_motion;
-  int out_portal_motion;
-  int max_portal_motion;
+  float in_portal_motion;
+  float out_portal_motion;
+  float max_portal_motion;
 
-  int gaze_t_max;
-  int gaze_t_since; //if positive, time since entered. if negative, time since exited.
-  int gaze_t_in; //grows to max when in, shrinks to 0 when out
-  int gaze_t_run; //grows while not fully out. 0 when fully out
-  int gaze_t_numb; //countdown when distance should be ignored
+  float gaze_t_max;
+  float gaze_t_since; //if positive, time since entered. if negative, time since exited.
+  float gaze_t_in; //grows to max when in, shrinks to 0 when out
+  float gaze_t_run; //grows while not fully out. 0 when fully out
+  float gaze_t_numb; //countdown when distance should be ignored
 
-  int spec_t_max; //The time required to select a button 
-  int spec_t_since; //if positive, time since entered. if negative, time since exited.
-  int spec_t_in; //grows to max when in, shrinks to 0 when out
-  int spec_t_run; //grows while not fully out. 0 when fully out
-  int spec_t_numb; //countdown when distance should be ignored
+  float spec_t_max; //The time required to select a button 
+  float spec_t_since; //if positive, time since entered. if negative, time since exited.
+  float spec_t_in; //grows to max when in, shrinks to 0 when out
+  float spec_t_run; //grows while not fully out. 0 when fully out
+  float spec_t_numb; //countdown when distance should be ignored
 
   Vector3 gaze_pt;
   Vector3 anti_gaze_pt;
@@ -320,7 +319,7 @@ public class Main : MonoBehaviour
 
     default_satellite_position = new Vector3(4f,1.5f,10);
     satellite_position = default_satellite_position;
-    satellite_velocity = new Vector3(0,0,-0.01f);
+    satellite_velocity = new Vector3(0,0,-0.5f);
     voyager[0].transform.position = satellite_position;
 
     default_look_ahead = new Vector3(0,0,1);
@@ -342,15 +341,15 @@ public class Main : MonoBehaviour
 
     in_portal_motion = 0;
     out_portal_motion = 0;
-    max_portal_motion = 100;
+    max_portal_motion = 1;
 
-    gaze_t_max = 200;
+    gaze_t_max = 2;
     gaze_t_since = 0;
     gaze_t_in = 0;
     gaze_t_run = 0;
     gaze_t_numb = 0;
 
-    spec_t_max = 1;
+    spec_t_max = 0.01f;
     spec_t_since = 0;
     spec_t_in = 0;
     spec_t_run = 0;
@@ -509,11 +508,11 @@ public class Main : MonoBehaviour
     {
     }
 
-    if(in_portal_motion > 0) in_portal_motion++;
+    if(in_portal_motion > 0) in_portal_motion += Time.deltaTime;
     if(in_portal_motion > max_portal_motion)
     {
       in_portal_motion = 0;
-      out_portal_motion = 1;
+      out_portal_motion = Time.deltaTime;
       cur_scene_i = next_scene_i;
       next_scene_i = (next_scene_i+1)%((int)SCENE.COUNT);
 
@@ -569,7 +568,7 @@ public class Main : MonoBehaviour
       ar_label_offset.transform.localScale = ar_circle.transform.localScale;
       ar_label.transform.localScale /= ar_circle.transform.localScale.x;
     }
-    if(out_portal_motion > 0) out_portal_motion++;
+    if(out_portal_motion > 0) out_portal_motion += Time.deltaTime;
     if(out_portal_motion > max_portal_motion)
     {
       out_portal_motion = 0;
@@ -659,7 +658,7 @@ public class Main : MonoBehaviour
     spec_euler.x = -3.141592f/3f;
     spec_projection.transform.rotation = rotationFromEuler(spec_euler);
 
-    satellite_position += satellite_velocity;
+    satellite_position += satellite_velocity*Time.deltaTime;
     if(cur_scene_i != 1) satellite_position = default_satellite_position;
     voyager[0].transform.position = satellite_position;
 
@@ -690,19 +689,19 @@ public class Main : MonoBehaviour
     cam_spinner.transform.localRotation = Quaternion.Euler(0,0,rot);
 
     float distance = Vector3.Distance(gaze_reticle.transform.position,cam_reticle.transform.position);
-    if(gaze_t_numb == 0 && distance < 0.3)
+    if(gaze_t_numb <= 0 && distance < 0.3)
     {
-      if(gaze_t_since < 0) gaze_t_since = 1;
-      else                 gaze_t_since++;
-      if(gaze_t_in < gaze_t_max) gaze_t_in++;
-      if(gaze_t_in == gaze_t_max) gaze_t_numb = gaze_t_max*2;
+      if(gaze_t_since < 0) gaze_t_since = Time.deltaTime;
+      else                 gaze_t_since += Time.deltaTime;
+      if(gaze_t_in < gaze_t_max) gaze_t_in += Time.deltaTime;
+      if(gaze_t_in >= gaze_t_max) gaze_t_numb = gaze_t_max*2;
 
       //advance
-      if(gaze_t_in == gaze_t_max)
+      if(gaze_t_in >= gaze_t_max)
       {
         if(in_portal_motion == 0 && out_portal_motion == 0)
         {
-          in_portal_motion = 1;
+          in_portal_motion = Time.deltaTime;
           scene_rots[next_scene_i] = 0; //set rot at start of scene transition
           portal_camera_next_skybox.material = skyboxes[cur_spec_i,next_scene_i];
         }
@@ -726,25 +725,25 @@ public class Main : MonoBehaviour
     }
     else
     {
-      if(gaze_t_since > 0) gaze_t_since = -1;
-      else                 gaze_t_since--;
-      if(gaze_t_in > 0) gaze_t_in--;
+      if(gaze_t_since > 0) gaze_t_since = -Time.deltaTime;
+      else                 gaze_t_since -= Time.deltaTime;
+      if(gaze_t_in > 0) gaze_t_in -= Time.deltaTime;
     }
-    if(gaze_t_in > 0) gaze_t_run++;
+    if(gaze_t_in > 0) gaze_t_run += Time.deltaTime;
     else              gaze_t_run = 0;
-    if(gaze_t_numb > 0) gaze_t_numb--;
+    if(gaze_t_numb > 0) gaze_t_numb -= Time.deltaTime;
 
     float distance_viz = Vector3.Distance(spec_viz_reticle.transform.position,cam_reticle.transform.position);
     float distance_gam = Vector3.Distance(spec_gam_reticle.transform.position,cam_reticle.transform.position);
     float distance_neu = Vector3.Distance(spec_neu_reticle.transform.position,cam_reticle.transform.position);
-    if(spec_t_numb == 0 && (distance_gam < 0.3 || distance_viz < 0.3 || distance_neu < 0.3))
+    if(spec_t_numb <= 0 && (distance_gam < 0.3 || distance_viz < 0.3 || distance_neu < 0.3))
     {
-      if(spec_t_since < 0) spec_t_since = 1;
-      else                 spec_t_since++;
-      if(spec_t_in < spec_t_max) spec_t_in++;
-      if(spec_t_in == spec_t_max) spec_t_numb = spec_t_max*2;
+      if(spec_t_since < 0) spec_t_since = Time.deltaTime;
+      else                 spec_t_since += Time.deltaTime;
+      if(spec_t_in < spec_t_max) spec_t_in += Time.deltaTime;
+      if(spec_t_in >= spec_t_max) spec_t_numb = spec_t_max*2;
 
-      if(spec_t_in == spec_t_max)
+      if(spec_t_in >= spec_t_max)
       {
         if(distance_gam <= distance_viz && distance_gam <= distance_neu)
         {
@@ -769,18 +768,18 @@ public class Main : MonoBehaviour
     }
     else
     {
-      if(spec_t_since > 0) spec_t_since = -1;
-      else                 spec_t_since--;
-      if(spec_t_in > 0) spec_t_in--;
+      if(spec_t_since > 0) spec_t_since = -Time.deltaTime;
+      else                 spec_t_since -= Time.deltaTime;
+      if(spec_t_in > 0) spec_t_in -= Time.deltaTime;
     }
-    if(spec_t_in > 0) spec_t_run++;
+    if(spec_t_in > 0) spec_t_run += Time.deltaTime;
     else              spec_t_run = 0;
-    if(spec_t_numb > 0) spec_t_numb--;
+    if(spec_t_numb > 0) spec_t_numb -= Time.deltaTime;
 
-    scene_rots[cur_scene_i] += scene_rot_deltas[cur_scene_i];
+    scene_rots[cur_scene_i] += scene_rot_deltas[cur_scene_i]*Time.deltaTime;
     while(scene_rots[cur_scene_i] > 3.14159265f*2.0f)
       scene_rots[cur_scene_i] -= (3.14159265f*2.0f);
-    scene_rots[next_scene_i] += scene_rot_deltas[next_scene_i];
+    scene_rots[next_scene_i] += scene_rot_deltas[next_scene_i]*Time.deltaTime;
     while(scene_rots[next_scene_i] > 3.14159265f*2.0f)
       scene_rots[next_scene_i] -= (3.14159265f*2.0f);
 
