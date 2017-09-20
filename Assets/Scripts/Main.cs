@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Main : MonoBehaviour
 {
-  public float my_num = 7.0f;
   GameObject camera_house;
   GameObject main_camera;
   Skybox main_camera_skybox;
@@ -58,11 +57,11 @@ public class Main : MonoBehaviour
   public Material alpha_material;
   public GameObject star_prefab;
 
-  public Color scene0_helmet_light_color;
-  public Color scene1_helmet_light_color;
-  public Color scene2_helmet_light_color;
-  public Color scene3_helmet_light_color;
-  public Color scene4_helmet_light_color;
+  public Color scene0_helmet_color;
+  public Color scene1_helmet_color;
+  public Color scene2_helmet_color;
+  public Color scene3_helmet_color;
+  public Color scene4_helmet_color;
 
   public int alpha_id;
   float flash_alpha;
@@ -392,7 +391,7 @@ public class Main : MonoBehaviour
     ar_label_text.text = "Ice Cube";
     ar_label.transform.localScale = new Vector3(10,10,10);
 
-    helmet_light_light.color = scene0_helmet_light_color;
+    helmet_light_light.color = scene0_helmet_color;
 
     //stars
     GameObject[] star_groups;
@@ -533,7 +532,7 @@ public class Main : MonoBehaviour
           ar_circle.transform.localScale = new Vector3(5,5,5);
           ar_label_text.text = "Voyager";
           ar_label.transform.localScale = new Vector3(0.5f,0.5f,0.5f);
-          helmet_light_light.color = scene1_helmet_light_color;
+          helmet_light_light.color = scene1_helmet_color;
           break;
         case 2:
           ar_circle.transform.position = milky[0].transform.position;
@@ -541,7 +540,7 @@ public class Main : MonoBehaviour
           ar_circle.transform.localScale = new Vector3(50,50,50);
           ar_label_text.text = "Milky Way";
           ar_label.transform.localScale = new Vector3(2,2,2);
-          helmet_light_light.color = scene2_helmet_light_color;
+          helmet_light_light.color = scene2_helmet_color;
           break;
         case 3:
           ar_circle.transform.position = blackhole[0].transform.position;
@@ -553,7 +552,7 @@ public class Main : MonoBehaviour
           ar_timer.SetActive(true);
           timer_t = 0;
           alert_t = 0;
-          helmet_light_light.color = scene3_helmet_light_color;
+          helmet_light_light.color = scene3_helmet_color;
           break;
         case 4:
           ar_circle.transform.position = earth[0].transform.position;
@@ -563,7 +562,7 @@ public class Main : MonoBehaviour
           ar_label.transform.localScale = new Vector3(5,5,5);
           ar_alert.SetActive(false);
           ar_timer.SetActive(false);
-          helmet_light_light.color = scene4_helmet_light_color;
+          helmet_light_light.color = scene4_helmet_color;
           break;
       }
       ar_label_offset.transform.localScale = ar_circle.transform.localScale;
