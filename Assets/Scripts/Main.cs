@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Main : MonoBehaviour
 {
+  public float my_num = 7.0f;
   GameObject camera_house;
   GameObject main_camera;
   Skybox main_camera_skybox;
@@ -12,6 +13,8 @@ public class Main : MonoBehaviour
   GameObject portal_camera_next;
   Skybox portal_camera_next_skybox;
   GameObject helmet;
+  GameObject helmet_light;
+  Light helmet_light_light;
   GameObject cam_reticle;
   GameObject cam_spinner;
   GameObject gaze_projection;
@@ -51,9 +54,17 @@ public class Main : MonoBehaviour
   Vector3 satellite_position;
   Vector3 satellite_velocity;
 
+
   public Material alpha_material;
   public GameObject star_prefab;
-  int alpha_id;
+
+  public Color scene0_helmet_light_color;
+  public Color scene1_helmet_light_color;
+  public Color scene2_helmet_light_color;
+  public Color scene3_helmet_light_color;
+  public Color scene4_helmet_light_color;
+
+  public int alpha_id;
   float flash_alpha;
 
   float alert_t;
@@ -252,6 +263,8 @@ public class Main : MonoBehaviour
     portal_camera_next = GameObject.Find("Portal_Camera_Next");
     portal_camera_next_skybox = portal_camera_next.GetComponent<Skybox>();
     helmet             = GameObject.Find("Helmet");
+    helmet_light       = GameObject.Find("Helmet_Light");
+    helmet_light_light = helmet_light.GetComponent<Light>();
     cam_reticle        = GameObject.Find("Cam_Reticle");
     cam_spinner        = GameObject.Find("Cam_Spinner");
     gaze_projection    = GameObject.Find("Gaze_Projection");
@@ -378,6 +391,8 @@ public class Main : MonoBehaviour
     ar_circle.transform.localScale = new Vector3(200,200,200);
     ar_label_text.text = "Ice Cube";
     ar_label.transform.localScale = new Vector3(10,10,10);
+
+    helmet_light_light.color = scene0_helmet_light_color;
 
     //stars
     GameObject[] star_groups;
@@ -510,11 +525,7 @@ public class Main : MonoBehaviour
       switch(cur_scene_i)
       {
         case 0:
-          ar_circle.transform.position = icecube[0].transform.position;
-          ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
-          ar_circle.transform.localScale = new Vector3(200,200,200);
-          ar_label_text.text = "Ice Cube";
-          ar_label.transform.localScale = new Vector3(10,10,10);
+          //See Start Function
           break;
         case 1:
           ar_circle.transform.position = voyager[0].transform.position;
@@ -522,6 +533,7 @@ public class Main : MonoBehaviour
           ar_circle.transform.localScale = new Vector3(5,5,5);
           ar_label_text.text = "Voyager";
           ar_label.transform.localScale = new Vector3(0.5f,0.5f,0.5f);
+          helmet_light_light.color = scene1_helmet_light_color;
           break;
         case 2:
           ar_circle.transform.position = milky[0].transform.position;
@@ -529,6 +541,7 @@ public class Main : MonoBehaviour
           ar_circle.transform.localScale = new Vector3(50,50,50);
           ar_label_text.text = "Milky Way";
           ar_label.transform.localScale = new Vector3(2,2,2);
+          helmet_light_light.color = scene2_helmet_light_color;
           break;
         case 3:
           ar_circle.transform.position = blackhole[0].transform.position;
@@ -540,6 +553,7 @@ public class Main : MonoBehaviour
           ar_timer.SetActive(true);
           timer_t = 0;
           alert_t = 0;
+          helmet_light_light.color = scene3_helmet_light_color;
           break;
         case 4:
           ar_circle.transform.position = earth[0].transform.position;
@@ -549,6 +563,7 @@ public class Main : MonoBehaviour
           ar_label.transform.localScale = new Vector3(5,5,5);
           ar_alert.SetActive(false);
           ar_timer.SetActive(false);
+          helmet_light_light.color = scene4_helmet_light_color;
           break;
       }
       ar_label_offset.transform.localScale = ar_circle.transform.localScale;
