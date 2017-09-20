@@ -574,7 +574,7 @@ public class Main : MonoBehaviour
     if(in_portal_motion > 0)
     {
       float t = in_portal_motion/(float)max_portal_motion;
-      portal.transform.localPosition = new Vector3(default_portal_position.x,default_portal_position.y,Mathf.Lerp(default_portal_position.z,0,t));
+      portal.transform.localPosition = new Vector3(default_portal_position.x,default_portal_position.y,Mathf.Lerp(default_portal_position.z,0,t*t*t*t*t));
       float engulf = t-1;
       engulf *= -engulf;
       engulf += 1;
@@ -583,7 +583,7 @@ public class Main : MonoBehaviour
     else if(out_portal_motion > 0)
     {
       float t = out_portal_motion/(float)max_portal_motion;
-      portal.transform.localPosition = new Vector3(default_portal_position.x,default_portal_position.y,Mathf.Lerp(0,-default_portal_position.z,t));
+      portal.transform.localPosition = new Vector3(default_portal_position.x,default_portal_position.y,Mathf.Lerp(0,-default_portal_position.z,1-((1-t)*(1-t)*(1-t)*(1-t)*(1-t))));
       float engulf = t;
       engulf *= -engulf;
       engulf += 1;
@@ -668,9 +668,14 @@ public class Main : MonoBehaviour
     voyager[0].transform.position = satellite_position;
 
     if(in_portal_motion > 0)
-      flash_alpha = (float)in_portal_motion/max_portal_motion;
+    {
+      float t = (float)in_portal_motion/max_portal_motion;
+      flash_alpha = t*t*t*t*t;
+    }
     else if(out_portal_motion > 0)
+    {
       flash_alpha = 1.0f-((float)out_portal_motion/max_portal_motion);
+    }
     else
       flash_alpha = 0;
     flash_alpha *= 1.1f;
@@ -782,6 +787,9 @@ public class Main : MonoBehaviour
     scene_rots[cur_scene_i] += scene_rot_deltas[cur_scene_i];
     while(scene_rots[cur_scene_i] > 3.14159265f*2.0f)
       scene_rots[cur_scene_i] -= (3.14159265f*2.0f);
+    scene_rots[next_scene_i] += scene_rot_deltas[next_scene_i];
+    while(scene_rots[next_scene_i] > 3.14159265f*2.0f)
+      scene_rots[next_scene_i] -= (3.14159265f*2.0f);
 
     //Matrix4x4 m = Matrix4x4.Translate(-scene_centers[cur_scene_i]);
     //m *= Matrix4x4.Rotate(Quaternion.Euler(0f, Mathf.Rad2Deg*scene_rots[cur_scene_i], 0f));
