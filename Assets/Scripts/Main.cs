@@ -124,6 +124,28 @@ public class Main : MonoBehaviour
   Material[] skyboxes;
   int cur_skybox_i;
 
+  Vector3[] scene_centers = new Vector3[] {
+    new Vector3(0f,0f,0f), //ice
+    new Vector3(0f,0f,0f), //voyager
+    new Vector3(0f,0f,0f), //nothing
+    new Vector3(0f,0f,0f), //extreme
+    new Vector3(0f,0f,0f), //earth
+  };
+  float[] scene_rots = new float[] {
+    0f, //ice
+    0f, //voyager
+    0f, //nothing
+    0f, //extreme
+    0f, //earth
+  };
+  float[] scene_rot_deltas = new float[] {
+    0.01f, //ice
+    0.01f, //voyager
+    0.01f, //nothing
+    0.01f, //extreme
+    0.01f, //earth
+  };
+
   enum SPEC { VIZ, GAM, NEU, COUNT };
   enum SCENE { ICE, VOYAGER, NOTHING, EXTREME, EARTH, COUNT };
 
@@ -137,7 +159,6 @@ public class Main : MonoBehaviour
   string[,] layer_names;
   GameObject[,] scene_groups;
   int default_layer;
-  float cur_movement_theta;
 
   bool mouse_captured;
   bool mouse_just_captured;
@@ -271,8 +292,8 @@ public class Main : MonoBehaviour
     stars = GameObject.Find("Stars");
     starsscale = GameObject.Find("StarsScale");
 
-    ar_alert.active = false;
-    ar_timer.active = false;
+    ar_alert.SetActive(false);
+    ar_timer.SetActive(false);
 
     icecube   = new GameObject[(int)SPEC.COUNT];
     voyager   = new GameObject[(int)SPEC.COUNT];
@@ -287,6 +308,12 @@ public class Main : MonoBehaviour
       blackhole[i] = GameObject.Find("BlackHole_"+spec_names[i]);
       earth[i]     = GameObject.Find("Earth_"+spec_names[i]);
     }
+
+    scene_centers[(int)SCENE.ICE]     = icecube[0].transform.position;
+    scene_centers[(int)SCENE.VOYAGER] = voyager[0].transform.position;
+    scene_centers[(int)SCENE.NOTHING] = milky[0].transform.position;
+    scene_centers[(int)SCENE.EXTREME] = blackhole[0].transform.position;
+    scene_centers[(int)SCENE.EARTH]   = earth[0].transform.position;
 
     alpha_id = Shader.PropertyToID("alpha");
     flash_alpha = 0;
@@ -311,7 +338,6 @@ public class Main : MonoBehaviour
     prev_scene_i = 0;
     next_scene_i = 1;
     cur_spec_i = 0;
-    cur_movement_theta = 0;
 
     mouse_captured = false;
     mouse_just_captured = true;
@@ -380,7 +406,7 @@ public class Main : MonoBehaviour
     Vector3[] star_positions;
     Vector3 starpos;
 
-    int n_stars = 100000;
+    int n_stars = 0;//100000;
     int n_groups = (int)Mathf.Ceil(n_stars/1000);
     int n_stars_in_group;
     star_groups = new GameObject[n_groups];
@@ -402,7 +428,6 @@ public class Main : MonoBehaviour
       star_positions[i] = starpos;
     }
 
-/*
     //morph positions
     for(int n = 0; n < 2; n++)
     {
@@ -424,7 +449,6 @@ public class Main : MonoBehaviour
         star_positions[i] = (star_positions[i]+delta).normalized;
       }
     }
-*/
 
     //gen assets
     for(int i = 0; i < n_groups; i++)
@@ -538,8 +562,8 @@ public class Main : MonoBehaviour
           ar_circle.transform.localScale = new Vector3(200,200,200);
           ar_label_text.text = "Black Hole";
           ar_label.transform.localScale = new Vector3(10,10,10);
-          ar_alert.active = true;
-          ar_timer.active = true;
+          ar_alert.SetActive(true);
+          ar_timer.SetActive(true);
           timer_t = 0;
           alert_t = 0;
           break;
@@ -549,8 +573,8 @@ public class Main : MonoBehaviour
           ar_circle.transform.localScale = new Vector3(100,100,100);
           ar_label_text.text = "Earth";
           ar_label.transform.localScale = new Vector3(5,5,5);
-          ar_alert.active = false;
-          ar_timer.active = false;
+          ar_alert.SetActive(false);
+          ar_timer.SetActive(false);
           break;
       }
       ar_label_offset.transform.localScale = ar_circle.transform.localScale;
@@ -603,8 +627,8 @@ public class Main : MonoBehaviour
       case 3:
         alert_t += Time.deltaTime;
         timer_t += Time.deltaTime;
-        if(Mathf.Floor(alert_t)%2 == 1) ar_alert.active = false;
-        else                            ar_alert.active = true;
+        if(Mathf.Floor(alert_t)%2 == 1) ar_alert.SetActive(false);
+        else                            ar_alert.SetActive(true);
         float seconds_left = 20-timer_t;
         if(seconds_left > 0)
         {
@@ -693,6 +717,7 @@ public class Main : MonoBehaviour
         if(in_portal_motion == 0 && out_portal_motion == 0)
         {
           in_portal_motion = 1;
+          scene_rots[next_scene_i] = 0; //set rot at start of scene transition
           portal_camera_prev_skybox.material = skyboxes[cur_skybox_i];
           portal_camera_next_skybox.material = skyboxes[(cur_skybox_i+1)%skybox_files.Length];
           //portal_camera_next_skybox.material = skyboxes[cur_skybox_i];
@@ -767,11 +792,28 @@ public class Main : MonoBehaviour
     else              spec_t_run = 0;
     if(spec_t_numb > 0) spec_t_numb--;
 
-    cur_movement_theta += 0.002f;
-    while(cur_movement_theta > 3.14159265f*2.0f)
-      cur_movement_theta -= (3.14159265f*2.0f);
-    scene_groups[cur_spec_i,cur_scene_i].transform.position = new Vector3(Mathf.Cos(cur_movement_theta)*10.0f,0.0f,Mathf.Sin(cur_movement_theta)*10.0f);
-    stars.transform.position = new Vector3(Mathf.Cos(cur_movement_theta)*10.0f,0.0f,Mathf.Sin(cur_movement_theta)*10.0f);
+    scene_rots[cur_scene_i] += scene_rot_deltas[cur_scene_i];
+    while(scene_rots[cur_scene_i] > 3.14159265f*2.0f)
+      scene_rots[cur_scene_i] -= (3.14159265f*2.0f);
+
+    //Matrix4x4 m = Matrix4x4.Translate(-scene_centers[cur_scene_i]);
+    //m *= Matrix4x4.Rotate(Quaternion.Euler(0f, Mathf.Rad2Deg*scene_rots[cur_scene_i], 0f));
+    //m *= Matrix4x4.Translate(scene_centers[cur_scene_i]);
+    //scene_groups[cur_spec_i,cur_scene_i].transform.localToWorldMatrix = m;
+
+    scene_groups[cur_spec_i,cur_scene_i].transform.position = new Vector3(0,0,0);
+    scene_groups[cur_spec_i,cur_scene_i].transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+
+    scene_groups[cur_spec_i,cur_scene_i].transform.Translate(scene_centers[cur_scene_i]);
+    scene_groups[cur_spec_i,cur_scene_i].transform.Rotate(0f, Mathf.Rad2Deg*scene_rots[cur_scene_i], 0f);
+    scene_groups[cur_spec_i,cur_scene_i].transform.Translate(-scene_centers[cur_scene_i]);
+    main_camera_skybox.material.SetFloat("_Rotation", -Mathf.Rad2Deg*scene_rots[cur_scene_i]);
+
+    //scene_groups[cur_spec_i,cur_scene_i].transform.rotation = Quaternion.Euler(0f, Mathf.Rad2Deg*scene_rots[cur_scene_i], 0f);
+    //scene_groups[cur_spec_i,cur_scene_i].transform.position = -scene_centers[cur_scene_i];
+
+    //scene_groups[cur_spec_i,cur_scene_i].transform.position = new Vector3(Mathf.Cos(cur_movement_theta)*10.0f,0.0f,Mathf.Sin(cur_movement_theta)*10.0f);
+    //stars.transform.position = new Vector3(Mathf.Cos(cur_movement_theta)*10.0f,0.0f,Mathf.Sin(cur_movement_theta)*10.0f);
 
     if(!track_source.isPlaying)
     {
