@@ -142,9 +142,9 @@ public class Main : MonoBehaviour
   float[] scene_rot_deltas = new float[] {
     0.0f, //ice
     0.0f, //voyager
-    0.0001f, //nothing
-    0.0001f, //extreme
-    0.00005f, //earth
+    0.01f, //nothing
+    0.01f, //extreme
+    0.005f, //earth
   };
 
   enum SPEC { VIZ, GAM, NEU, COUNT };
@@ -782,11 +782,6 @@ public class Main : MonoBehaviour
     while(scene_rots[next_scene_i] > 3.14159265f*2.0f)
       scene_rots[next_scene_i] -= (3.14159265f*2.0f);
 
-    //Matrix4x4 m = Matrix4x4.Translate(-scene_centers[cur_scene_i]);
-    //m *= Matrix4x4.Rotate(Quaternion.Euler(0f, Mathf.Rad2Deg*scene_rots[cur_scene_i], 0f));
-    //m *= Matrix4x4.Translate(scene_centers[cur_scene_i]);
-    //scene_groups[cur_spec_i,cur_scene_i].transform.localToWorldMatrix = m;
-
     scene_groups[cur_spec_i,cur_scene_i].transform.position = new Vector3(0,0,0);
     scene_groups[cur_spec_i,cur_scene_i].transform.rotation = Quaternion.Euler(0f, 0f, 0f);
 
@@ -794,12 +789,6 @@ public class Main : MonoBehaviour
     scene_groups[cur_spec_i,cur_scene_i].transform.Rotate(0f, Mathf.Rad2Deg*scene_rots[cur_scene_i], 0f);
     scene_groups[cur_spec_i,cur_scene_i].transform.Translate(-scene_centers[cur_scene_i]);
     main_camera_skybox.material.SetFloat("_Rotation", -Mathf.Rad2Deg*scene_rots[cur_scene_i]);
-
-    //scene_groups[cur_spec_i,cur_scene_i].transform.rotation = Quaternion.Euler(0f, Mathf.Rad2Deg*scene_rots[cur_scene_i], 0f);
-    //scene_groups[cur_spec_i,cur_scene_i].transform.position = -scene_centers[cur_scene_i];
-
-    //scene_groups[cur_spec_i,cur_scene_i].transform.position = new Vector3(Mathf.Cos(cur_movement_theta)*10.0f,0.0f,Mathf.Sin(cur_movement_theta)*10.0f);
-    //stars.transform.position = new Vector3(Mathf.Cos(cur_movement_theta)*10.0f,0.0f,Mathf.Sin(cur_movement_theta)*10.0f);
 
     if(!track_source.isPlaying)
     {
