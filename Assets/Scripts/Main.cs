@@ -523,7 +523,7 @@ public class Main : MonoBehaviour
     {
     }
 
-    if(in_portal_motion > 0) in_portal_motion += Time.deltaTime;
+    if(in_portal_motion > 0) in_portal_motion += Time.deltaTime*0.8f;
     if(in_portal_motion > max_portal_motion)
     {
       in_portal_motion = 0;
