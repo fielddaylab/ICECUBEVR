@@ -64,6 +64,16 @@ public class Main : MonoBehaviour
 
   public int alpha_id;
   float flash_alpha;
+  public int time_mod_twelve_pi_id;
+  float time_mod_twelve_pi;
+  public int jitter_id;
+  float jitter;
+  float jitter_countdown;
+  int jitter_state;
+  float jitter_min_downtime = 0.1f;
+  float jitter_max_downtime = 1f;
+  float jitter_min_uptime = 0.1f;
+  float jitter_max_uptime = 0.4f;
 
   float alert_t;
   float timer_t;
@@ -140,7 +150,7 @@ public class Main : MonoBehaviour
     0f, //earth
   };
   float[] scene_rot_deltas = new float[] {
-    0.0f, //ice
+    0.1f, //ice
     0.0f, //voyager
     0.01f, //nothing
     0.01f, //extreme
@@ -310,6 +320,12 @@ public class Main : MonoBehaviour
 
     alpha_id = Shader.PropertyToID("alpha");
     flash_alpha = 0;
+    time_mod_twelve_pi_id = Shader.PropertyToID("time_mod_twelve_pi");
+    time_mod_twelve_pi = 0;
+    jitter_id = Shader.PropertyToID("jitter");
+    jitter = 0;
+    jitter_countdown = 0;
+    jitter_state = 0;
     track_source = GameObject.Find("Script").AddComponent<AudioSource>();
     sfx_source   = GameObject.Find("Script").AddComponent<AudioSource>();
 
@@ -789,6 +805,18 @@ public class Main : MonoBehaviour
     scene_groups[cur_spec_i,cur_scene_i].transform.Rotate(0f, Mathf.Rad2Deg*scene_rots[cur_scene_i], 0f);
     scene_groups[cur_spec_i,cur_scene_i].transform.Translate(-scene_centers[cur_scene_i]);
     main_camera_skybox.material.SetFloat("_Rotation", -Mathf.Rad2Deg*scene_rots[cur_scene_i]);
+
+    time_mod_twelve_pi = (time_mod_twelve_pi+Time.deltaTime)%(12.0f*3.1415926535f);
+    Shader.SetGlobalFloat(time_mod_twelve_pi_id,time_mod_twelve_pi);
+    jitter_countdown -= Time.deltaTime;
+    if(jitter_countdown <= 0.0f)
+    {
+      if(jitter_state == 1) { jitter_state = 0; jitter_countdown = Random.Range(jitter_min_downtime, jitter_max_downtime); }
+      else                  { jitter_state = 1; jitter_countdown = Random.Range(jitter_min_uptime,   jitter_max_uptime);   }
+    }
+    if(jitter_state == 1) jitter = Random.Range(0f,1f);
+    else                  jitter = 0;
+    Shader.SetGlobalFloat(jitter_id,jitter);
 
     if(!track_source.isPlaying)
     {
