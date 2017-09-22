@@ -24,15 +24,18 @@ public class Main : MonoBehaviour
   GameObject spec_neu_reticle;
   GameObject spec_sel_reticle;
   GameObject eyeray;
+  GameObject ar_group;
   GameObject ar_camera_project;
   GameObject ar_camera_static;
   GameObject ar_circle;
-  GameObject ar_label;
-  GameObject ar_label_offset;
-  TextMesh ar_label_text;
   GameObject ar_alert;
   GameObject ar_timer;
   TextMesh ar_timer_text;
+
+  int MAX_LABELS = 5;
+  GameObject[] ar_labels;
+  GameObject[] ar_label_offsets;
+  TextMesh[] ar_label_texts;
 
   GameObject[] icecube;
   GameObject[] voyager;
@@ -55,6 +58,7 @@ public class Main : MonoBehaviour
 
   public Material alpha_material;
   public GameObject star_prefab;
+  public GameObject ar_label_prefab;
 
   public Color scene0_helmet_color;
   public Color scene1_helmet_color;
@@ -283,17 +287,28 @@ public class Main : MonoBehaviour
     spec_neu_reticle   = GameObject.Find("Spec_Neu_Reticle");
     spec_sel_reticle   = GameObject.Find("Spec_Sel_Reticle");
     eyeray             = GameObject.Find("Ray");
+    ar_group           = GameObject.Find("AR");
     ar_camera_project  = GameObject.Find("AR_Camera_Project");
     ar_camera_static   = GameObject.Find("AR_Camera_Static");
     ar_circle          = GameObject.Find("ARCircle");
-    ar_label           = GameObject.Find("ARLabel");
-    ar_label_offset    = GameObject.Find("ARLabelOffset");
-    ar_label_text      = ar_label.GetComponent<TextMesh>();
     ar_alert           = GameObject.Find("Alert");
     ar_timer           = GameObject.Find("Timer");
     ar_timer_text      = ar_timer.GetComponent<TextMesh>();
     stars = GameObject.Find("Stars");
     starsscale = GameObject.Find("StarsScale");
+
+    ar_labels          = new GameObject[MAX_LABELS];
+    ar_label_offsets   = new GameObject[MAX_LABELS];
+    ar_label_texts     = new TextMesh[MAX_LABELS];
+
+    for(int i = 0; i < MAX_LABELS; i++)
+    {
+      ar_label_offsets[i] = (GameObject)Instantiate(ar_label_prefab);
+      ar_label_offsets[i].transform.parent = ar_group.transform;
+      ar_labels[i] = ar_label_offsets[i].transform.GetChild(0).gameObject;
+      ar_label_texts[i] = ar_labels[i].GetComponent<TextMesh>();
+
+    }
 
     ar_alert.SetActive(false);
     ar_timer.SetActive(false);
@@ -403,8 +418,9 @@ public class Main : MonoBehaviour
     ar_circle.transform.position = icecube[0].transform.position;
     ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
     ar_circle.transform.localScale = new Vector3(200,200,200);
-    ar_label_text.text = "Ice Cube";
-    ar_label.transform.localScale = new Vector3(10,10,10);
+    ar_label_texts[0].text = "Ice Cube";
+    ar_labels[0].transform.localScale = new Vector3(10f,10f,10f);
+    ar_labels[0].transform.localPosition = new Vector3(100f,100f,0f);
 
     helmet_light_light.color = scene0_helmet_color;
 
@@ -544,25 +560,28 @@ public class Main : MonoBehaviour
         case 1:
           ar_circle.transform.position = voyager[0].transform.position;
           ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
-          ar_circle.transform.localScale = new Vector3(5,5,5);
-          ar_label_text.text = "Voyager";
-          ar_label.transform.localScale = new Vector3(0.5f,0.5f,0.5f);
+          ar_circle.transform.localScale = new Vector3(5f,5f,5f);
+          ar_label_texts[0].text = "Voyager";
+          ar_labels[0].transform.localScale = new Vector3(0.5f,0.5f,0.5f);
+          ar_labels[0].transform.localPosition = new Vector3(1f,1f,0f);
           helmet_light_light.color = scene1_helmet_color;
           break;
         case 2:
           ar_circle.transform.position = milky[0].transform.position;
           ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
-          ar_circle.transform.localScale = new Vector3(50,50,50);
-          ar_label_text.text = "Milky Way";
-          ar_label.transform.localScale = new Vector3(2,2,2);
+          ar_circle.transform.localScale = new Vector3(50f,50f,50f);
+          ar_label_texts[0].text = "Milky Way";
+          ar_labels[0].transform.localScale = new Vector3(3f,3f,3f);
+          ar_labels[0].transform.localPosition = new Vector3(1f,1f,0f);
           helmet_light_light.color = scene2_helmet_color;
           break;
         case 3:
           ar_circle.transform.position = blackhole[0].transform.position;
           ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
-          ar_circle.transform.localScale = new Vector3(200,200,200);
-          ar_label_text.text = "Black Hole";
-          ar_label.transform.localScale = new Vector3(10,10,10);
+          ar_circle.transform.localScale = new Vector3(200f,200f,200f);
+          ar_label_texts[0].text = "Black Hole";
+          ar_labels[0].transform.localScale = new Vector3(10f,10f,10f);
+          ar_labels[0].transform.localPosition = new Vector3(1f,1f,0f);
           ar_alert.SetActive(true);
           ar_timer.SetActive(true);
           timer_t = 0;
@@ -572,16 +591,17 @@ public class Main : MonoBehaviour
         case 4:
           ar_circle.transform.position = earth[0].transform.position;
           ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
-          ar_circle.transform.localScale = new Vector3(100,100,100);
-          ar_label_text.text = "Earth";
-          ar_label.transform.localScale = new Vector3(5,5,5);
+          ar_circle.transform.localScale = new Vector3(100f,100f,100f);
+          ar_label_texts[0].text = "Earth";
+          ar_labels[0].transform.localScale = new Vector3(5f,5f,5f);
+          ar_labels[0].transform.localPosition = new Vector3(50f,50f,0f);
           ar_alert.SetActive(false);
           ar_timer.SetActive(false);
           helmet_light_light.color = scene4_helmet_color;
           break;
       }
-      ar_label_offset.transform.localScale = ar_circle.transform.localScale;
-      ar_label.transform.localScale /= ar_circle.transform.localScale.x;
+      ar_label_offsets[0].transform.localScale = ar_circle.transform.localScale;
+      ar_labels[0].transform.localScale /= ar_circle.transform.localScale.x;
     }
     if(out_portal_motion > 0) out_portal_motion += Time.deltaTime;
     if(out_portal_motion > max_portal_motion)
@@ -637,8 +657,8 @@ public class Main : MonoBehaviour
       case 4:
         break;
     }
-    ar_label_offset.transform.position = ar_circle.transform.position;
-    ar_label_offset.transform.rotation = ar_circle.transform.rotation;
+    ar_label_offsets[0].transform.position = ar_circle.transform.position;
+    ar_label_offsets[0].transform.rotation = ar_circle.transform.rotation;
 
     if(mouse_captured)
     {
