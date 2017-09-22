@@ -700,14 +700,16 @@ public class Main : MonoBehaviour
 
     Vector3 offset = new Vector3(
       -main_camera.transform.localPosition.x,
-      -main_camera.transform.localPosition.y, 
+      -main_camera.transform.localPosition.y,
       -main_camera.transform.localPosition.z);
     camera_house.transform.localPosition = offset+player_head;
 
     look_ahead = main_camera.transform.rotation*default_look_ahead;
     lazy_look_ahead = Vector3.Lerp(lazy_look_ahead,look_ahead,0.1f);
     very_lazy_look_ahead = Vector3.Lerp(very_lazy_look_ahead,look_ahead,0.01f);
-    helmet.transform.position = main_camera.transform.position;
+    float shake = 0.001f;
+    if(cur_scene_i == (int)SCENE.EXTREME) helmet.transform.position = main_camera.transform.position+new Vector3(Random.Range(-shake,shake),Random.Range(-shake,shake),Random.Range(-shake,shake));
+    else                                  helmet.transform.position = main_camera.transform.position;
     helmet.transform.rotation = rotationFromEuler(getEuler(lazy_look_ahead));
 
     cam_euler = getCamEuler(cam_reticle.transform.position);
