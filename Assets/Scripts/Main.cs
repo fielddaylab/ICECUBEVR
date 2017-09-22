@@ -856,7 +856,7 @@ public class Main : MonoBehaviour
       if(jitter_state == 1) { jitter_state = 0; jitter_countdown = Random.Range(jitter_min_downtime, jitter_max_downtime); }
       else                  { jitter_state = 1; jitter_countdown = Random.Range(jitter_min_uptime,   jitter_max_uptime);   }
     }
-    if(jitter_state == 1 && cur_scene_i == (int)SCENE.EXTREME) jitter = Random.Range(0f,1f);
+    if(jitter_state == 1 && cur_scene_i == (int)SCENE.EXTREME) jitter += Random.Range(-0.1f,0.1f);
     else                                                       jitter = 0;
     Shader.SetGlobalFloat(jitter_id,jitter);
 
