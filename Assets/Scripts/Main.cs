@@ -150,7 +150,7 @@ public class Main : MonoBehaviour
     0f, //earth
   };
   float[] scene_rot_deltas = new float[] {
-    0.1f, //ice
+    0.0f, //ice
     0.0f, //voyager
     0.01f, //nothing
     0.01f, //extreme
