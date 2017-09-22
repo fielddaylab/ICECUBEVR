@@ -36,6 +36,7 @@ public class Main : MonoBehaviour
   GameObject[] ar_labels;
   GameObject[] ar_label_offsets;
   TextMesh[] ar_label_texts;
+  LineRenderer[] ar_label_lines;
 
   GameObject[] icecube;
   GameObject[] voyager;
@@ -300,6 +301,7 @@ public class Main : MonoBehaviour
     ar_labels          = new GameObject[MAX_LABELS];
     ar_label_offsets   = new GameObject[MAX_LABELS];
     ar_label_texts     = new TextMesh[MAX_LABELS];
+    ar_label_lines     = new LineRenderer[MAX_LABELS];
 
     for(int i = 0; i < MAX_LABELS; i++)
     {
@@ -307,7 +309,7 @@ public class Main : MonoBehaviour
       ar_label_offsets[i].transform.parent = ar_group.transform;
       ar_labels[i] = ar_label_offsets[i].transform.GetChild(0).gameObject;
       ar_label_texts[i] = ar_labels[i].GetComponent<TextMesh>();
-
+      ar_label_lines[i] = ar_labels[i].GetComponent<LineRenderer>();
     }
 
     ar_alert.SetActive(false);
@@ -421,6 +423,10 @@ public class Main : MonoBehaviour
     ar_label_texts[0].text = "Ice Cube";
     ar_labels[0].transform.localScale = new Vector3(10f,10f,10f);
     ar_labels[0].transform.localPosition = new Vector3(100f,100f,0f);
+    ar_label_lines[0].SetWidth(3f,3f);
+    ar_label_lines[0].SetPosition(0,new Vector3(-8,0,0));
+    ar_label_lines[0].SetPosition(1,new Vector3(-10,0,0));
+    ar_label_lines[0].SetPosition(2,new Vector3(-11,-5,0));
 
     helmet_light_light.color = scene0_helmet_color;
 
@@ -564,6 +570,10 @@ public class Main : MonoBehaviour
           ar_label_texts[0].text = "Voyager";
           ar_labels[0].transform.localScale = new Vector3(0.5f,0.5f,0.5f);
           ar_labels[0].transform.localPosition = new Vector3(1f,1f,0f);
+          ar_label_lines[0].SetWidth(0.1f,0.1f);
+          ar_label_lines[0].SetPosition(0,new Vector3(-8,0,0));
+          ar_label_lines[0].SetPosition(1,new Vector3(-10,0,0));
+          ar_label_lines[0].SetPosition(2,new Vector3(-11,-5,0));
           helmet_light_light.color = scene1_helmet_color;
           break;
         case 2:
@@ -573,6 +583,10 @@ public class Main : MonoBehaviour
           ar_label_texts[0].text = "Milky Way";
           ar_labels[0].transform.localScale = new Vector3(3f,3f,3f);
           ar_labels[0].transform.localPosition = new Vector3(1f,1f,0f);
+          ar_label_lines[0].SetWidth(1f,1f);
+          ar_label_lines[0].SetPosition(0,new Vector3(-10,0,0));
+          ar_label_lines[0].SetPosition(1,new Vector3(-12,0,0));
+          ar_label_lines[0].SetPosition(2,new Vector3(-17,-10,0));
           helmet_light_light.color = scene2_helmet_color;
           break;
         case 3:
@@ -582,6 +596,10 @@ public class Main : MonoBehaviour
           ar_label_texts[0].text = "Black Hole";
           ar_labels[0].transform.localScale = new Vector3(10f,10f,10f);
           ar_labels[0].transform.localPosition = new Vector3(1f,1f,0f);
+          ar_label_lines[0].SetWidth(3f,3f);
+          ar_label_lines[0].SetPosition(0,new Vector3(-11,0,0));
+          ar_label_lines[0].SetPosition(1,new Vector3(-14,0,0));
+          ar_label_lines[0].SetPosition(2,new Vector3(-16,-8,0));
           ar_alert.SetActive(true);
           ar_timer.SetActive(true);
           timer_t = 0;
@@ -595,6 +613,10 @@ public class Main : MonoBehaviour
           ar_label_texts[0].text = "Earth";
           ar_labels[0].transform.localScale = new Vector3(5f,5f,5f);
           ar_labels[0].transform.localPosition = new Vector3(50f,50f,0f);
+          ar_label_lines[0].SetWidth(3f,3f);
+          ar_label_lines[0].SetPosition(0,new Vector3(-9,0,0));
+          ar_label_lines[0].SetPosition(1,new Vector3(-10,0,0));
+          ar_label_lines[0].SetPosition(2,new Vector3(-11,-1,0));
           ar_alert.SetActive(false);
           ar_timer.SetActive(false);
           helmet_light_light.color = scene4_helmet_color;

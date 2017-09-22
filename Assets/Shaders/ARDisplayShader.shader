@@ -56,7 +56,7 @@
       {
         float y = i.uv.y/i.vw;
         float a = 0.6+sin(y*4000)*0.2;
-        float rx = (rand(float3(0.2+i.uv.x,0.1+i.uv.y,0.4))-0.5)*jitter * 0.04;
+        float rx = (rand(float3(0.2+i.uv.x,0.1+i.uv.y,0.4))-0.5)*jitter * 0.4;
         float ry = 0;//(rand(float3(0.1+i.uv.y,0.2+i.uv.x,0.4))-0.5)*jitter * 0.02;
         fixed4 col = fixed4(0.8,0.8,1.0,a*tex2D(_MainTex, float2(i.uv.x+rx,i.uv.y+ry)/i.vw).a);
         //fixed4 col = fixed4(tex2D(_MainTex, i.uv/i.vw));
