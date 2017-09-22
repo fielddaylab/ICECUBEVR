@@ -690,7 +690,6 @@ public class Main : MonoBehaviour
       {
         mouse_x += in_x;
         mouse_y += in_y;
-        camera_house.transform.rotation = Quaternion.Euler((mouse_y-Screen.height/2)*-2, (mouse_x-Screen.width/2)*2, 0);
       }
       else
       {
@@ -703,6 +702,8 @@ public class Main : MonoBehaviour
       -main_camera.transform.localPosition.y,
       -main_camera.transform.localPosition.z);
     camera_house.transform.localPosition = offset+player_head;
+    if(cur_scene_i == (int)SCENE.EXTREME) camera_house.transform.rotation = Quaternion.Euler((mouse_y-Screen.height/2)*-2+Random.Range(-1,1), (mouse_x-Screen.width/2)*2+Random.Range(-1,1), 0+Random.Range(-1,1));
+    else                                  camera_house.transform.rotation = Quaternion.Euler((mouse_y-Screen.height/2)*-2, (mouse_x-Screen.width/2)*2, 0);
 
     look_ahead = main_camera.transform.rotation*default_look_ahead;
     lazy_look_ahead = Vector3.Lerp(lazy_look_ahead,look_ahead,0.1f);
