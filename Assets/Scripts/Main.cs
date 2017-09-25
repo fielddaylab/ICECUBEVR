@@ -24,15 +24,19 @@ public class Main : MonoBehaviour
   GameObject spec_neu_reticle;
   GameObject spec_sel_reticle;
   GameObject eyeray;
+  GameObject ar_group;
   GameObject ar_camera_project;
   GameObject ar_camera_static;
   GameObject ar_circle;
-  GameObject ar_label;
-  GameObject ar_label_offset;
-  TextMesh ar_label_text;
   GameObject ar_alert;
   GameObject ar_timer;
   TextMesh ar_timer_text;
+
+  int MAX_LABELS = 5;
+  GameObject[] ar_labels;
+  GameObject[] ar_label_offsets;
+  TextMesh[] ar_label_texts;
+  LineRenderer[] ar_label_lines;
 
   GameObject[] icecube;
   GameObject[] voyager;
@@ -55,6 +59,7 @@ public class Main : MonoBehaviour
 
   public Material alpha_material;
   public GameObject star_prefab;
+  public GameObject ar_label_prefab;
 
   public Color scene0_helmet_color;
   public Color scene1_helmet_color;
@@ -64,6 +69,16 @@ public class Main : MonoBehaviour
 
   public int alpha_id;
   float flash_alpha;
+  public int time_mod_twelve_pi_id;
+  float time_mod_twelve_pi;
+  public int jitter_id;
+  float jitter;
+  float jitter_countdown;
+  int jitter_state;
+  float jitter_min_downtime = 0.1f;
+  float jitter_max_downtime = 1f;
+  float jitter_min_uptime = 0.1f;
+  float jitter_max_uptime = 0.4f;
 
   float alert_t;
   float timer_t;
@@ -142,9 +157,9 @@ public class Main : MonoBehaviour
   float[] scene_rot_deltas = new float[] {
     0.0f, //ice
     0.0f, //voyager
-    0.0001f, //nothing
-    0.0001f, //extreme
-    0.00005f, //earth
+    0.01f, //nothing
+    0.01f, //extreme
+    0.005f, //earth
   };
 
   enum SPEC { VIZ, GAM, NEU, COUNT };
@@ -273,17 +288,29 @@ public class Main : MonoBehaviour
     spec_neu_reticle   = GameObject.Find("Spec_Neu_Reticle");
     spec_sel_reticle   = GameObject.Find("Spec_Sel_Reticle");
     eyeray             = GameObject.Find("Ray");
+    ar_group           = GameObject.Find("AR");
     ar_camera_project  = GameObject.Find("AR_Camera_Project");
     ar_camera_static   = GameObject.Find("AR_Camera_Static");
     ar_circle          = GameObject.Find("ARCircle");
-    ar_label           = GameObject.Find("ARLabel");
-    ar_label_offset    = GameObject.Find("ARLabelOffset");
-    ar_label_text      = ar_label.GetComponent<TextMesh>();
     ar_alert           = GameObject.Find("Alert");
     ar_timer           = GameObject.Find("Timer");
     ar_timer_text      = ar_timer.GetComponent<TextMesh>();
     stars = GameObject.Find("Stars");
     starsscale = GameObject.Find("StarsScale");
+
+    ar_labels          = new GameObject[MAX_LABELS];
+    ar_label_offsets   = new GameObject[MAX_LABELS];
+    ar_label_texts     = new TextMesh[MAX_LABELS];
+    ar_label_lines     = new LineRenderer[MAX_LABELS];
+
+    for(int i = 0; i < MAX_LABELS; i++)
+    {
+      ar_label_offsets[i] = (GameObject)Instantiate(ar_label_prefab);
+      ar_label_offsets[i].transform.parent = ar_group.transform;
+      ar_labels[i] = ar_label_offsets[i].transform.GetChild(0).gameObject;
+      ar_label_texts[i] = ar_labels[i].GetComponent<TextMesh>();
+      ar_label_lines[i] = ar_labels[i].GetComponent<LineRenderer>();
+    }
 
     ar_alert.SetActive(false);
     ar_timer.SetActive(false);
@@ -310,6 +337,12 @@ public class Main : MonoBehaviour
 
     alpha_id = Shader.PropertyToID("alpha");
     flash_alpha = 0;
+    time_mod_twelve_pi_id = Shader.PropertyToID("time_mod_twelve_pi");
+    time_mod_twelve_pi = 0;
+    jitter_id = Shader.PropertyToID("jitter");
+    jitter = 0;
+    jitter_countdown = 0;
+    jitter_state = 0;
     track_source = GameObject.Find("Script").AddComponent<AudioSource>();
     sfx_source   = GameObject.Find("Script").AddComponent<AudioSource>();
 
@@ -387,8 +420,13 @@ public class Main : MonoBehaviour
     ar_circle.transform.position = icecube[0].transform.position;
     ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
     ar_circle.transform.localScale = new Vector3(200,200,200);
-    ar_label_text.text = "Ice Cube";
-    ar_label.transform.localScale = new Vector3(10,10,10);
+    ar_label_texts[0].text = "Ice Cube";
+    ar_labels[0].transform.localScale = new Vector3(10f,10f,10f);
+    ar_labels[0].transform.localPosition = new Vector3(100f,100f,0f);
+    ar_label_lines[0].SetWidth(3f,3f);
+    ar_label_lines[0].SetPosition(0,new Vector3(-8,0,0));
+    ar_label_lines[0].SetPosition(1,new Vector3(-10,0,0));
+    ar_label_lines[0].SetPosition(2,new Vector3(-11,-5,0));
 
     helmet_light_light.color = scene0_helmet_color;
 
@@ -507,7 +545,7 @@ public class Main : MonoBehaviour
     {
     }
 
-    if(in_portal_motion > 0) in_portal_motion += Time.deltaTime;
+    if(in_portal_motion > 0) in_portal_motion += Time.deltaTime*0.8f;
     if(in_portal_motion > max_portal_motion)
     {
       in_portal_motion = 0;
@@ -528,25 +566,40 @@ public class Main : MonoBehaviour
         case 1:
           ar_circle.transform.position = voyager[0].transform.position;
           ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
-          ar_circle.transform.localScale = new Vector3(5,5,5);
-          ar_label_text.text = "Voyager";
-          ar_label.transform.localScale = new Vector3(0.5f,0.5f,0.5f);
+          ar_circle.transform.localScale = new Vector3(5f,5f,5f);
+          ar_label_texts[0].text = "Voyager";
+          ar_labels[0].transform.localScale = new Vector3(0.5f,0.5f,0.5f);
+          ar_labels[0].transform.localPosition = new Vector3(1f,1f,0f);
+          ar_label_lines[0].SetWidth(0.1f,0.1f);
+          ar_label_lines[0].SetPosition(0,new Vector3(-8,0,0));
+          ar_label_lines[0].SetPosition(1,new Vector3(-10,0,0));
+          ar_label_lines[0].SetPosition(2,new Vector3(-11,-5,0));
           helmet_light_light.color = scene1_helmet_color;
           break;
         case 2:
           ar_circle.transform.position = milky[0].transform.position;
           ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
-          ar_circle.transform.localScale = new Vector3(50,50,50);
-          ar_label_text.text = "Milky Way";
-          ar_label.transform.localScale = new Vector3(2,2,2);
+          ar_circle.transform.localScale = new Vector3(50f,50f,50f);
+          ar_label_texts[0].text = "Milky Way";
+          ar_labels[0].transform.localScale = new Vector3(3f,3f,3f);
+          ar_labels[0].transform.localPosition = new Vector3(1f,1f,0f);
+          ar_label_lines[0].SetWidth(1f,1f);
+          ar_label_lines[0].SetPosition(0,new Vector3(-10,0,0));
+          ar_label_lines[0].SetPosition(1,new Vector3(-12,0,0));
+          ar_label_lines[0].SetPosition(2,new Vector3(-17,-10,0));
           helmet_light_light.color = scene2_helmet_color;
           break;
         case 3:
           ar_circle.transform.position = blackhole[0].transform.position;
           ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
-          ar_circle.transform.localScale = new Vector3(200,200,200);
-          ar_label_text.text = "Black Hole";
-          ar_label.transform.localScale = new Vector3(10,10,10);
+          ar_circle.transform.localScale = new Vector3(200f,200f,200f);
+          ar_label_texts[0].text = "Black Hole";
+          ar_labels[0].transform.localScale = new Vector3(10f,10f,10f);
+          ar_labels[0].transform.localPosition = new Vector3(1f,1f,0f);
+          ar_label_lines[0].SetWidth(3f,3f);
+          ar_label_lines[0].SetPosition(0,new Vector3(-11,0,0));
+          ar_label_lines[0].SetPosition(1,new Vector3(-14,0,0));
+          ar_label_lines[0].SetPosition(2,new Vector3(-16,-8,0));
           ar_alert.SetActive(true);
           ar_timer.SetActive(true);
           timer_t = 0;
@@ -556,16 +609,21 @@ public class Main : MonoBehaviour
         case 4:
           ar_circle.transform.position = earth[0].transform.position;
           ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
-          ar_circle.transform.localScale = new Vector3(100,100,100);
-          ar_label_text.text = "Earth";
-          ar_label.transform.localScale = new Vector3(5,5,5);
+          ar_circle.transform.localScale = new Vector3(100f,100f,100f);
+          ar_label_texts[0].text = "Earth";
+          ar_labels[0].transform.localScale = new Vector3(5f,5f,5f);
+          ar_labels[0].transform.localPosition = new Vector3(50f,50f,0f);
+          ar_label_lines[0].SetWidth(3f,3f);
+          ar_label_lines[0].SetPosition(0,new Vector3(-9,0,0));
+          ar_label_lines[0].SetPosition(1,new Vector3(-10,0,0));
+          ar_label_lines[0].SetPosition(2,new Vector3(-11,-1,0));
           ar_alert.SetActive(false);
           ar_timer.SetActive(false);
           helmet_light_light.color = scene4_helmet_color;
           break;
       }
-      ar_label_offset.transform.localScale = ar_circle.transform.localScale;
-      ar_label.transform.localScale /= ar_circle.transform.localScale.x;
+      ar_label_offsets[0].transform.localScale = ar_circle.transform.localScale;
+      ar_labels[0].transform.localScale /= ar_circle.transform.localScale.x;
     }
     if(out_portal_motion > 0) out_portal_motion += Time.deltaTime;
     if(out_portal_motion > max_portal_motion)
@@ -621,8 +679,8 @@ public class Main : MonoBehaviour
       case 4:
         break;
     }
-    ar_label_offset.transform.position = ar_circle.transform.position;
-    ar_label_offset.transform.rotation = ar_circle.transform.rotation;
+    ar_label_offsets[0].transform.position = ar_circle.transform.position;
+    ar_label_offsets[0].transform.rotation = ar_circle.transform.rotation;
 
     if(mouse_captured)
     {
@@ -632,7 +690,6 @@ public class Main : MonoBehaviour
       {
         mouse_x += in_x;
         mouse_y += in_y;
-        camera_house.transform.rotation = Quaternion.Euler((mouse_y-Screen.height/2)*-2, (mouse_x-Screen.width/2)*2, 0);
       }
       else
       {
@@ -642,14 +699,18 @@ public class Main : MonoBehaviour
 
     Vector3 offset = new Vector3(
       -main_camera.transform.localPosition.x,
-      -main_camera.transform.localPosition.y, 
+      -main_camera.transform.localPosition.y,
       -main_camera.transform.localPosition.z);
     camera_house.transform.localPosition = offset+player_head;
+    if(cur_scene_i == (int)SCENE.EXTREME) camera_house.transform.rotation = Quaternion.Euler((mouse_y-Screen.height/2)*-2+Random.Range(-1,1), (mouse_x-Screen.width/2)*2+Random.Range(-1,1), 0+Random.Range(-1,1));
+    else                                  camera_house.transform.rotation = Quaternion.Euler((mouse_y-Screen.height/2)*-2, (mouse_x-Screen.width/2)*2, 0);
 
     look_ahead = main_camera.transform.rotation*default_look_ahead;
     lazy_look_ahead = Vector3.Lerp(lazy_look_ahead,look_ahead,0.1f);
     very_lazy_look_ahead = Vector3.Lerp(very_lazy_look_ahead,look_ahead,0.01f);
-    helmet.transform.position = main_camera.transform.position;
+    float shake = 0.001f;
+    if(cur_scene_i == (int)SCENE.EXTREME) helmet.transform.position = main_camera.transform.position+new Vector3(Random.Range(-shake,shake),Random.Range(-shake,shake),Random.Range(-shake,shake));
+    else                                  helmet.transform.position = main_camera.transform.position;
     helmet.transform.rotation = rotationFromEuler(getEuler(lazy_look_ahead));
 
     cam_euler = getCamEuler(cam_reticle.transform.position);
@@ -782,11 +843,6 @@ public class Main : MonoBehaviour
     while(scene_rots[next_scene_i] > 3.14159265f*2.0f)
       scene_rots[next_scene_i] -= (3.14159265f*2.0f);
 
-    //Matrix4x4 m = Matrix4x4.Translate(-scene_centers[cur_scene_i]);
-    //m *= Matrix4x4.Rotate(Quaternion.Euler(0f, Mathf.Rad2Deg*scene_rots[cur_scene_i], 0f));
-    //m *= Matrix4x4.Translate(scene_centers[cur_scene_i]);
-    //scene_groups[cur_spec_i,cur_scene_i].transform.localToWorldMatrix = m;
-
     scene_groups[cur_spec_i,cur_scene_i].transform.position = new Vector3(0,0,0);
     scene_groups[cur_spec_i,cur_scene_i].transform.rotation = Quaternion.Euler(0f, 0f, 0f);
 
@@ -795,11 +851,17 @@ public class Main : MonoBehaviour
     scene_groups[cur_spec_i,cur_scene_i].transform.Translate(-scene_centers[cur_scene_i]);
     main_camera_skybox.material.SetFloat("_Rotation", -Mathf.Rad2Deg*scene_rots[cur_scene_i]);
 
-    //scene_groups[cur_spec_i,cur_scene_i].transform.rotation = Quaternion.Euler(0f, Mathf.Rad2Deg*scene_rots[cur_scene_i], 0f);
-    //scene_groups[cur_spec_i,cur_scene_i].transform.position = -scene_centers[cur_scene_i];
-
-    //scene_groups[cur_spec_i,cur_scene_i].transform.position = new Vector3(Mathf.Cos(cur_movement_theta)*10.0f,0.0f,Mathf.Sin(cur_movement_theta)*10.0f);
-    //stars.transform.position = new Vector3(Mathf.Cos(cur_movement_theta)*10.0f,0.0f,Mathf.Sin(cur_movement_theta)*10.0f);
+    time_mod_twelve_pi = (time_mod_twelve_pi+Time.deltaTime)%(12.0f*3.1415926535f);
+    Shader.SetGlobalFloat(time_mod_twelve_pi_id,time_mod_twelve_pi);
+    jitter_countdown -= Time.deltaTime;
+    if(jitter_countdown <= 0.0f)
+    {
+      if(jitter_state == 1) { jitter_state = 0; jitter_countdown = Random.Range(jitter_min_downtime, jitter_max_downtime); }
+      else                  { jitter_state = 1; jitter_countdown = Random.Range(jitter_min_uptime,   jitter_max_uptime);   }
+    }
+    if(jitter_state == 1 && cur_scene_i == (int)SCENE.EXTREME) jitter += Random.Range(-0.1f,0.1f);
+    else                                                       jitter = 0;
+    Shader.SetGlobalFloat(jitter_id,jitter);
 
     if(!track_source.isPlaying)
     {

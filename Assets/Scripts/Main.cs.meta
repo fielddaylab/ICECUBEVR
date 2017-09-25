@@ -1,10 +1,15 @@
 fileFormatVersion: 2
 guid: c7399f46fd4111644af16a6c3fd8399a
-timeCreated: 1497982913
+timeCreated: 1506099013
 licenseType: Free
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - alpha_material: {fileID: 2100000, guid: cc5ad7b8644194bbeb74b46a13481cb7, type: 2}
+  - star_prefab: {fileID: 1299812747390152, guid: 87ab197597dec455b8decc685297db07,
+      type: 2}
+  - ar_label_prefab: {fileID: 1486920102742226, guid: 343e484ae853f4acab89cc6f00d31a9f,
+      type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
