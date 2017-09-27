@@ -702,13 +702,14 @@ public class Main : MonoBehaviour
       -main_camera.transform.localPosition.y,
       -main_camera.transform.localPosition.z);
     camera_house.transform.localPosition = offset+player_head;
-    if(cur_scene_i == (int)SCENE.EXTREME) camera_house.transform.rotation = Quaternion.Euler((mouse_y-Screen.height/2)*-2+Random.Range(-1,1), (mouse_x-Screen.width/2)*2+Random.Range(-1,1), 0+Random.Range(-1,1));
+    float shake = 0.5f;
+    if(cur_scene_i == (int)SCENE.EXTREME) camera_house.transform.rotation = Quaternion.Euler((mouse_y-Screen.height/2)*-2+Random.Range(-shake,shake), (mouse_x-Screen.width/2)*2+Random.Range(-shake,shake), 0+Random.Range(-shake,shake));
     else                                  camera_house.transform.rotation = Quaternion.Euler((mouse_y-Screen.height/2)*-2, (mouse_x-Screen.width/2)*2, 0);
 
     look_ahead = main_camera.transform.rotation*default_look_ahead;
     lazy_look_ahead = Vector3.Lerp(lazy_look_ahead,look_ahead,0.1f);
     very_lazy_look_ahead = Vector3.Lerp(very_lazy_look_ahead,look_ahead,0.01f);
-    float shake = 0.001f;
+    shake = 0.001f;
     if(cur_scene_i == (int)SCENE.EXTREME) helmet.transform.position = main_camera.transform.position+new Vector3(Random.Range(-shake,shake),Random.Range(-shake,shake),Random.Range(-shake,shake));
     else                                  helmet.transform.position = main_camera.transform.position;
     helmet.transform.rotation = rotationFromEuler(getEuler(lazy_look_ahead));
