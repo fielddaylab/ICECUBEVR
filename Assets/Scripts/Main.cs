@@ -40,6 +40,7 @@ public class Main : MonoBehaviour
 
   GameObject[] icecube;
   GameObject[] voyager;
+  GameObject[] planet;
   GameObject[] milky;
   GameObject[] blackhole;
   GameObject[] earth;
@@ -67,11 +68,11 @@ public class Main : MonoBehaviour
   public Color scene3_helmet_color;
   public Color scene4_helmet_color;
 
-  public int alpha_id;
+  int alpha_id;
   float flash_alpha;
-  public int time_mod_twelve_pi_id;
+  int time_mod_twelve_pi_id;
   float time_mod_twelve_pi;
-  public int jitter_id;
+  int jitter_id;
   float jitter;
   float jitter_countdown;
   int jitter_state;
@@ -97,7 +98,6 @@ public class Main : MonoBehaviour
   public AudioClip voiceover_scene3_neutrino;
   public AudioClip voiceover_scene3_done;
   public AudioClip voiceover_scene4;
-
 
   string[] skybox_file_names = new string[]
   {
@@ -333,6 +333,7 @@ public class Main : MonoBehaviour
 
     icecube = new GameObject[(int)SPEC.COUNT];
     voyager = new GameObject[(int)SPEC.COUNT];
+    planet = new GameObject[(int)SPEC.COUNT];
     milky = new GameObject[(int)SPEC.COUNT];
     blackhole = new GameObject[(int)SPEC.COUNT];
     earth = new GameObject[(int)SPEC.COUNT];
@@ -340,6 +341,7 @@ public class Main : MonoBehaviour
     {
       icecube[i] = GameObject.Find("Icecube_" + spec_names[i]);
       voyager[i] = GameObject.Find("Voyager_" + spec_names[i]);
+      planet[i] = GameObject.Find("Planet_" + spec_names[i]);
       milky[i] = GameObject.Find("Milky_" + spec_names[i]);
       blackhole[i] = GameObject.Find("BlackHole_" + spec_names[i]);
       earth[i] = GameObject.Find("Earth_" + spec_names[i]);
@@ -579,21 +581,21 @@ public class Main : MonoBehaviour
         ar_label_lines[label_i].SetPosition(2, new Vector3(-11, -5, 0));
         label_i++;
 
-        ar_label_offsets[label_i].transform.localScale = new Vector3(5f, 5f, 5f);
-        ar_label_offsets[label_i].transform.position = voyager[0].transform.position;
+        ar_label_offsets[label_i].transform.localScale = new Vector3(50f, 50f, 50f);
+        ar_label_offsets[label_i].transform.position = planet[0].transform.position;
         ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
         ar_label_texts[label_i].text = "Pluto";
-        ar_labels[label_i].transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-        ar_labels[label_i].transform.localPosition = new Vector3(1f, 1f, 0f);
+        ar_labels[label_i].transform.localScale = new Vector3(10f, 10f, 10f);
+        ar_labels[label_i].transform.localPosition = new Vector3(2f, 2f, 0f);
         ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
-        lw = 0.2f;
+        lw = 2f;
         curve = new AnimationCurve();
         curve.AddKey(0, lw);
         curve.AddKey(1, lw);
         ar_label_lines[label_i].widthCurve = curve;
-        ar_label_lines[label_i].SetPosition(0, new Vector3(-8, 0, 0));
-        ar_label_lines[label_i].SetPosition(1, new Vector3(-10, 0, 0));
-        ar_label_lines[label_i].SetPosition(2, new Vector3(-11, -5, 0));
+        ar_label_lines[label_i].SetPosition(0, new Vector3(-5,  0, 0));
+        ar_label_lines[label_i].SetPosition(1, new Vector3(-7,  0, 0));
+        ar_label_lines[label_i].SetPosition(2, new Vector3(-8, -2, 0));
         label_i++;
 
         helmet_light_light.color = scene1_helmet_color;
@@ -729,8 +731,6 @@ public class Main : MonoBehaviour
     ar_camera_project.GetComponent<Camera>().fieldOfView = fov;
     ar_camera_static.GetComponent<Camera>().fieldOfView = fov;
     portal_camera_next.GetComponent<Camera>().fieldOfView = fov;
-
-    int label_i = 0; //unity wanted me to declare this here for some reason...
 
     if(Input.GetMouseButtonDown(0))
     {
