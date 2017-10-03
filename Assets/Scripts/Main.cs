@@ -309,6 +309,12 @@ public class Main : MonoBehaviour
     ar_label_texts = new TextMesh[MAX_LABELS];
     ar_label_lines = new LineRenderer[MAX_LABELS];
 
+    float lw;
+    AnimationCurve curve;
+    lw = 0.0001f;
+    curve = new AnimationCurve();
+    curve.AddKey(0, lw);
+    curve.AddKey(1, lw);
     for(int i = 0; i < MAX_LABELS; i++)
     {
       ar_label_offsets[i] = (GameObject)Instantiate(ar_label_prefab);
@@ -316,6 +322,10 @@ public class Main : MonoBehaviour
       ar_labels[i] = ar_label_offsets[i].transform.GetChild(0).gameObject;
       ar_label_texts[i] = ar_labels[i].GetComponent<TextMesh>();
       ar_label_lines[i] = ar_labels[i].GetComponent<LineRenderer>();
+
+      ar_label_lines[i].widthCurve = curve;
+      for(int j = 0; j < 3; j++)
+        ar_label_lines[i].SetPosition(j, new Vector3(0, 0, 0));
     }
 
     ar_alert.SetActive(false);
@@ -418,26 +428,6 @@ public class Main : MonoBehaviour
     main_camera_skybox.material = skyboxes[cur_spec_i, cur_scene_i];
     portal_camera_next_skybox.material = skyboxes[cur_spec_i, next_scene_i];
 
-    ar_circle.transform.position = icecube[0].transform.position;
-    ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
-    ar_circle.transform.localScale = new Vector3(200, 200, 200);
-    ar_label_texts[0].text = "Ice Cube";
-    ar_labels[0].transform.localScale = new Vector3(10f, 10f, 10f);
-    ar_labels[0].transform.localPosition = new Vector3(100f, 100f, 0f);
-    float lw = 3f;
-    AnimationCurve curve = new AnimationCurve();
-    curve.AddKey(0, lw);
-    curve.AddKey(1, lw);
-    ar_label_lines[0].widthCurve = curve;
-    ar_label_lines[0].SetPosition(0, new Vector3(-8, 0, 0));
-    ar_label_lines[0].SetPosition(1, new Vector3(-10, 0, 0));
-    ar_label_lines[0].SetPosition(2, new Vector3(-11, -5, 0));
-
-    voiceover_audiosource.clip = voiceover_scene0;
-    voiceover_audiosource.Play();
-
-    helmet_light_light.color = scene0_helmet_color;
-
     //stars
     GameObject[] star_groups;
     GameObject star;
@@ -533,6 +523,8 @@ public class Main : MonoBehaviour
     ar_camera_static.GetComponent<Camera>().fieldOfView = fov;
     portal_camera_next.GetComponent<Camera>().fieldOfView = fov;
 
+    int label_i = 0; //unity wanted me to declare this here for some reason...
+
     if(Input.GetMouseButtonDown(0))
     {
       mouse_captured = !mouse_captured;
@@ -568,107 +560,159 @@ public class Main : MonoBehaviour
 
       AnimationCurve curve;
       float lw;
+      lw = 0.0001f;
+      curve = new AnimationCurve();
+      curve.AddKey(0, lw);
+      curve.AddKey(1, lw);
+      for(int i = 0; i < MAX_LABELS; i++)
+      {
+        ar_label_lines[i].widthCurve = curve;
+        for(int j = 0; j < 3; j++)
+          ar_label_lines[i].SetPosition(j, new Vector3(0, 0, 0));
+        ar_label_texts[i].text = "";
+      }
+
       //Prep the new scene during the scene change
+      label_i = 0;
       switch(cur_scene_i)
       {
-      case 0:
-        //See Start Function
-        break;
-      case 1:
-        ar_circle.transform.position = voyager[0].transform.position;
-        ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
-        ar_circle.transform.localScale = new Vector3(5f, 5f, 5f);
-        ar_label_texts[0].text = "Voyager";
-        ar_labels[0].transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-        ar_labels[0].transform.localPosition = new Vector3(1f, 1f, 0f);
-        lw = 0.2f;
-        curve = new AnimationCurve();
-        curve.AddKey(0, lw);
-        curve.AddKey(1, lw);
-        ar_label_lines[0].widthCurve = curve;
-        ar_label_lines[0].SetPosition(0, new Vector3(-8, 0, 0));
-        ar_label_lines[0].SetPosition(1, new Vector3(-10, 0, 0));
-        ar_label_lines[0].SetPosition(2, new Vector3(-11, -5, 0));
-        helmet_light_light.color = scene1_helmet_color;
-        voiceover_audiosource.clip = voiceover_scene1;
-        break;
-      case 2:
-        ar_circle.transform.position = milky[0].transform.position;
-        ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
-        ar_circle.transform.localScale = new Vector3(50f, 50f, 50f);
-        ar_label_texts[0].text = "Milky Way";
-        ar_labels[0].transform.localScale = new Vector3(3f, 3f, 3f);
-        ar_labels[0].transform.localPosition = new Vector3(1f, 1f, 0f);
-        lw = 1f;
-        curve = new AnimationCurve();
-        curve.AddKey(0, lw);
-        curve.AddKey(1, lw);
-        ar_label_lines[0].widthCurve = curve;
-        ar_label_lines[0].SetPosition(0, new Vector3(-10, 0, 0));
-        ar_label_lines[0].SetPosition(1, new Vector3(-12, 0, 0));
-        ar_label_lines[0].SetPosition(2, new Vector3(-17, -10, 0));
-        helmet_light_light.color = scene2_helmet_color;
-        voiceover_audiosource.clip = voiceover_scene2;
-        break;
-      case 3:
-        ar_circle.transform.position = blackhole[0].transform.position;
-        ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
-        ar_circle.transform.localScale = new Vector3(200f, 200f, 200f);
-        ar_label_texts[0].text = "Black Hole";
-        ar_labels[0].transform.localScale = new Vector3(10f, 10f, 10f);
-        ar_labels[0].transform.localPosition = new Vector3(1f, 1f, 0f);
-        lw = 3f;
-        curve = new AnimationCurve();
-        curve.AddKey(0, lw);
-        curve.AddKey(1, lw);
-        ar_label_lines[0].widthCurve = curve;
-        ar_label_lines[0].SetPosition(0, new Vector3(-11, 0, 0));
-        ar_label_lines[0].SetPosition(1, new Vector3(-14, 0, 0));
-        ar_label_lines[0].SetPosition(2, new Vector3(-16, -8, 0));
-        ar_alert.SetActive(true);
-        ar_timer.SetActive(true);
-        timer_t = 0;
-        alert_t = 0;
-        helmet_light_light.color = scene3_helmet_color;
-        voiceover_audiosource.clip = voiceover_scene3;
-        break;
-      case 4:
-        ar_circle.transform.position = earth[0].transform.position;
-        ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
-        ar_circle.transform.localScale = new Vector3(100f, 100f, 100f);
-        ar_label_texts[0].text = "Earth";
-        ar_labels[0].transform.localScale = new Vector3(5f, 5f, 5f);
-        ar_labels[0].transform.localPosition = new Vector3(50f, 50f, 0f);
-        lw = 3f;
-        curve = new AnimationCurve();
-        curve.AddKey(0, lw);
-        curve.AddKey(1, lw);
-        ar_label_lines[0].widthCurve = curve;
-        ar_label_lines[0].SetPosition(0, new Vector3(-9, 0, 0));
-        ar_label_lines[0].SetPosition(1, new Vector3(-10, 0, 0));
-        ar_label_lines[0].SetPosition(2, new Vector3(-11, -1, 0));
-        ar_alert.SetActive(false);
-        ar_timer.SetActive(false);
-        helmet_light_light.color = scene4_helmet_color;
-        voiceover_audiosource.clip = voiceover_scene4;
-        break;
+        case 0:
+          ar_label_offsets[label_i].transform.localScale = new Vector3(200f, 200f, 200f);
+          ar_label_offsets[label_i].transform.position = icecube[0].transform.position;
+          ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
+          ar_label_texts[label_i].text = "Ice Cube";
+          ar_labels[label_i].transform.localScale = new Vector3(10f, 10f, 10f);
+          ar_labels[label_i].transform.localPosition = new Vector3(100f, 100f, 0f);
+          ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
+          lw = 3f;
+          curve = new AnimationCurve();
+          curve.AddKey(0, lw);
+          curve.AddKey(1, lw);
+          ar_label_lines[label_i].widthCurve = curve;
+          ar_label_lines[label_i].SetPosition(0, new Vector3(-8,   0, 0));
+          ar_label_lines[label_i].SetPosition(1, new Vector3(-10,  0, 0));
+          ar_label_lines[label_i].SetPosition(2, new Vector3(-11, -5, 0));
+          label_i++;
+
+          helmet_light_light.color = scene0_helmet_color;
+          voiceover_audiosource.clip = voiceover_scene0;
+          break;
+        case 1:
+          ar_label_offsets[label_i].transform.localScale = new Vector3(5f, 5f, 5f);
+          ar_label_offsets[label_i].transform.position = voyager[0].transform.position;
+          ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
+          ar_label_texts[label_i].text = "Voyager";
+          ar_labels[label_i].transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+          ar_labels[label_i].transform.localPosition = new Vector3(1f, 1f, 0f);
+          ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
+          lw = 0.2f;
+          curve = new AnimationCurve();
+          curve.AddKey(0, lw);
+          curve.AddKey(1, lw);
+          ar_label_lines[label_i].widthCurve = curve;
+          ar_label_lines[label_i].SetPosition(0, new Vector3(-8, 0, 0));
+          ar_label_lines[label_i].SetPosition(1, new Vector3(-10, 0, 0));
+          ar_label_lines[label_i].SetPosition(2, new Vector3(-11, -5, 0));
+          label_i++;
+
+          ar_label_offsets[label_i].transform.localScale = new Vector3(5f, 5f, 5f);
+          ar_label_offsets[label_i].transform.position = voyager[0].transform.position;
+          ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
+          ar_label_texts[label_i].text = "Pluto";
+          ar_labels[label_i].transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+          ar_labels[label_i].transform.localPosition = new Vector3(1f, 1f, 0f);
+          ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
+          lw = 0.2f;
+          curve = new AnimationCurve();
+          curve.AddKey(0, lw);
+          curve.AddKey(1, lw);
+          ar_label_lines[label_i].widthCurve = curve;
+          ar_label_lines[label_i].SetPosition(0, new Vector3(-8, 0, 0));
+          ar_label_lines[label_i].SetPosition(1, new Vector3(-10, 0, 0));
+          ar_label_lines[label_i].SetPosition(2, new Vector3(-11, -5, 0));
+          label_i++;
+
+          helmet_light_light.color = scene1_helmet_color;
+          voiceover_audiosource.clip = voiceover_scene1;
+          break;
+        case 2:
+          ar_label_offsets[label_i].transform.localScale = new Vector3(50f, 50f, 50f);
+          ar_label_offsets[label_i].transform.position = milky[0].transform.position;
+          ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
+          ar_label_texts[label_i].text = "Milky Way";
+          ar_labels[label_i].transform.localScale = new Vector3(3f, 3f, 3f);
+          ar_labels[label_i].transform.localPosition = new Vector3(1f, 1f, 0f);
+          ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
+          lw = 1f;
+          curve = new AnimationCurve();
+          curve.AddKey(0, lw);
+          curve.AddKey(1, lw);
+          ar_label_lines[label_i].widthCurve = curve;
+          ar_label_lines[label_i].SetPosition(0, new Vector3(-10, 0, 0));
+          ar_label_lines[label_i].SetPosition(1, new Vector3(-12, 0, 0));
+          ar_label_lines[label_i].SetPosition(2, new Vector3(-17, -10, 0));
+          label_i++;
+
+          helmet_light_light.color = scene2_helmet_color;
+          voiceover_audiosource.clip = voiceover_scene2;
+          break;
+        case 3:
+          ar_label_offsets[label_i].transform.localScale = new Vector3(200f, 200f, 200f);
+          ar_label_offsets[label_i].transform.position = blackhole[0].transform.position;
+          ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
+          ar_label_texts[label_i].text = "Black Hole";
+          ar_labels[label_i].transform.localScale = new Vector3(10f, 10f, 10f);
+          ar_labels[label_i].transform.localPosition = new Vector3(1f, 1f, 0f);
+          ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
+          lw = 3f;
+          curve = new AnimationCurve();
+          curve.AddKey(0, lw);
+          curve.AddKey(1, lw);
+          ar_label_lines[label_i].widthCurve = curve;
+          ar_label_lines[label_i].SetPosition(0, new Vector3(-11, 0, 0));
+          ar_label_lines[label_i].SetPosition(1, new Vector3(-14, 0, 0));
+          ar_label_lines[label_i].SetPosition(2, new Vector3(-16, -8, 0));
+          label_i++;
+
+          ar_alert.SetActive(true);
+          ar_timer.SetActive(true);
+          timer_t = 0;
+          alert_t = 0;
+          helmet_light_light.color = scene3_helmet_color;
+          voiceover_audiosource.clip = voiceover_scene3;
+          break;
+        case 4:
+          ar_label_offsets[label_i].transform.localScale = new Vector3(100f, 100f, 100f);
+          ar_label_offsets[label_i].transform.position = earth[0].transform.position;
+          ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
+          ar_label_texts[label_i].text = "Earth";
+          ar_labels[label_i].transform.localScale = new Vector3(5f, 5f, 5f);
+          ar_labels[label_i].transform.localPosition = new Vector3(50f, 50f, 0f);
+          ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
+          lw = 3f;
+          curve = new AnimationCurve();
+          curve.AddKey(0, lw);
+          curve.AddKey(1, lw);
+          ar_label_lines[label_i].widthCurve = curve;
+          ar_label_lines[label_i].SetPosition(0, new Vector3(-9,   0, 0));
+          ar_label_lines[label_i].SetPosition(1, new Vector3(-10,  0, 0));
+          ar_label_lines[label_i].SetPosition(2, new Vector3(-11, -1, 0));
+          label_i++;
+
+          ar_alert.SetActive(false);
+          ar_timer.SetActive(false);
+          helmet_light_light.color = scene4_helmet_color;
+          voiceover_audiosource.clip = voiceover_scene4;
+          break;
       }
-      ar_label_offsets[0].transform.localScale = ar_circle.transform.localScale;
-      ar_labels[0].transform.localScale /= ar_circle.transform.localScale.x;
 
       //Start playing the Audio
-      if(voiceover_audiosource.isPlaying)
-        voiceover_audiosource.Stop();
+      if(voiceover_audiosource.isPlaying) voiceover_audiosource.Stop();
       voiceover_audiosource.Play();
 
-
     }
-    if(out_portal_motion > 0)
-      out_portal_motion += Time.deltaTime;
-    if(out_portal_motion > max_portal_motion)
-    {
-      out_portal_motion = 0;
-    }
+    if(out_portal_motion > 0)                 out_portal_motion += Time.deltaTime;
+    if(out_portal_motion > max_portal_motion) out_portal_motion = 0;
 
     if(in_portal_motion > 0)
     {
@@ -687,42 +731,42 @@ public class Main : MonoBehaviour
     }
 
     //Run every frame updating the current scene
+    label_i = 0;
     switch(cur_scene_i)
     {
-    case 0:
-      break;
-    case 1:
-      ar_circle.transform.position = voyager[0].transform.position;
-      ar_circle.transform.rotation = rotationFromEuler(getCamEuler(ar_circle.transform.position));
-      for(int i = 1; i < voyager.Length; i++)
-      {
-        voyager[i].transform.position = voyager[0].transform.position;
-      }
-      break;
-    case 2:
-      break;
-    case 3:
-      alert_t += Time.deltaTime;
-      timer_t += Time.deltaTime;
-      if(Mathf.Floor(alert_t) % 2 == 1)
-        ar_alert.SetActive(false);
-      else
-        ar_alert.SetActive(true);
-      float seconds_left = 20 - timer_t;
-      if(seconds_left > 0)
-      {
-        ar_timer_text.text = "00:" + Mathf.Floor(seconds_left) + ":" + Mathf.Floor((seconds_left - Mathf.Floor(seconds_left)) * 100);
-      }
-      else
-      {
-        ar_timer_text.text = "00:00:00";
-      }
-      break;
-    case 4:
-      break;
+      case 0:
+        break;
+      case 1:
+        for(int i = 1; i < voyager.Length; i++)
+        {
+          voyager[i].transform.position = voyager[0].transform.position;
+        }
+        ar_label_offsets[label_i].transform.position = voyager[0].transform.position;
+        ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
+        label_i++;
+        break;
+      case 2:
+        break;
+      case 3:
+        alert_t += Time.deltaTime;
+        timer_t += Time.deltaTime;
+        if(Mathf.Floor(alert_t) % 2 == 1)
+          ar_alert.SetActive(false);
+        else
+          ar_alert.SetActive(true);
+        float seconds_left = 20 - timer_t;
+        if(seconds_left > 0)
+        {
+          ar_timer_text.text = "00:" + Mathf.Floor(seconds_left) + ":" + Mathf.Floor((seconds_left - Mathf.Floor(seconds_left)) * 100);
+        }
+        else
+        {
+          ar_timer_text.text = "00:00:00";
+        }
+        break;
+      case 4:
+        break;
     }
-    ar_label_offsets[0].transform.position = ar_circle.transform.position;
-    ar_label_offsets[0].transform.rotation = ar_circle.transform.rotation;
 
     if(mouse_captured)
     {
