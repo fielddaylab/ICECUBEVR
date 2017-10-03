@@ -721,6 +721,22 @@ public class Main : MonoBehaviour
     }
   }
 
+  void SetSpec(SPEC spec)
+  {
+    cur_spec_i = (int)spec;
+    switch(spec)
+    {
+      case SPEC.GAM: spec_sel_reticle.transform.position = spec_gam_reticle.transform.position; break;
+      case SPEC.VIZ: spec_sel_reticle.transform.position = spec_viz_reticle.transform.position; break;
+      case SPEC.NEU: spec_sel_reticle.transform.position = spec_neu_reticle.transform.position; break;
+    }
+
+    main_camera.GetComponent<Camera>().cullingMask = (1 << layers[cur_spec_i, cur_scene_i]) | (1 << default_layer);
+    portal_camera_next.GetComponent<Camera>().cullingMask = (1 << layers[cur_spec_i, next_scene_i]);
+    main_camera_skybox.material = skyboxes[cur_spec_i, cur_scene_i];
+    portal_camera_next_skybox.material = skyboxes[cur_spec_i, next_scene_i];
+  }
+
   void Update()
   {
     float aspect = main_camera.GetComponent<Camera>().aspect;
@@ -759,6 +775,7 @@ public class Main : MonoBehaviour
       out_portal_motion = Time.deltaTime;
       cur_scene_i = next_scene_i;
       next_scene_i = (next_scene_i + 1) % ((int)SCENE.COUNT);
+      SetSpec(SPEC.VIZ);
       SetupScene();
     }
     if(out_portal_motion > 0)                 out_portal_motion += Time.deltaTime;
@@ -859,14 +876,10 @@ public class Main : MonoBehaviour
     float distance = Vector3.Distance(gaze_reticle.transform.position, cam_reticle.transform.position);
     if(gaze_t_numb <= 0 && distance < 0.3)
     {
-      if(gaze_t_since < 0)
-        gaze_t_since = Time.deltaTime;
-      else
-        gaze_t_since += Time.deltaTime;
-      if(gaze_t_in < gaze_t_max)
-        gaze_t_in += Time.deltaTime;
-      if(gaze_t_in >= gaze_t_max)
-        gaze_t_numb = gaze_t_max * 2;
+      if(gaze_t_since < 0)        gaze_t_since = Time.deltaTime;
+      else                        gaze_t_since += Time.deltaTime;
+      if(gaze_t_in < gaze_t_max)  gaze_t_in += Time.deltaTime;
+      if(gaze_t_in >= gaze_t_max) gaze_t_numb = gaze_t_max * 2;
 
       //advance
       if(gaze_t_in >= gaze_t_max)
@@ -881,79 +894,45 @@ public class Main : MonoBehaviour
     }
     else
     {
-      if(gaze_t_since > 0)
-        gaze_t_since = -Time.deltaTime;
-      else
-        gaze_t_since -= Time.deltaTime;
-      if(gaze_t_in > 0)
-        gaze_t_in -= Time.deltaTime;
+      if(gaze_t_since > 0) gaze_t_since = -Time.deltaTime;
+      else                 gaze_t_since -= Time.deltaTime;
+      if(gaze_t_in > 0)    gaze_t_in -= Time.deltaTime;
     }
-    if(gaze_t_in > 0)
-      gaze_t_run += Time.deltaTime;
-    else
-      gaze_t_run = 0;
-    if(gaze_t_numb > 0)
-      gaze_t_numb -= Time.deltaTime;
+    if(gaze_t_in > 0)   gaze_t_run += Time.deltaTime;
+    else                gaze_t_run = 0;
+    if(gaze_t_numb > 0) gaze_t_numb -= Time.deltaTime;
 
     float distance_viz = Vector3.Distance(spec_viz_reticle.transform.position, cam_reticle.transform.position);
     float distance_gam = Vector3.Distance(spec_gam_reticle.transform.position, cam_reticle.transform.position);
     float distance_neu = Vector3.Distance(spec_neu_reticle.transform.position, cam_reticle.transform.position);
     if(spec_t_numb <= 0 && (distance_gam < 0.3 || distance_viz < 0.3 || distance_neu < 0.3))
     {
-      if(spec_t_since < 0)
-        spec_t_since = Time.deltaTime;
-      else
-        spec_t_since += Time.deltaTime;
-      if(spec_t_in < spec_t_max)
-        spec_t_in += Time.deltaTime;
-      if(spec_t_in >= spec_t_max)
-        spec_t_numb = spec_t_max * 2;
+      if(spec_t_since < 0)        spec_t_since = Time.deltaTime;
+      else                        spec_t_since += Time.deltaTime;
+      if(spec_t_in < spec_t_max)  spec_t_in += Time.deltaTime;
+      if(spec_t_in >= spec_t_max) spec_t_numb = spec_t_max * 2;
 
       if(spec_t_in >= spec_t_max)
       {
-        if(distance_gam <= distance_viz && distance_gam <= distance_neu)
-        {
-          cur_spec_i = (int)SPEC.GAM;
-          spec_sel_reticle.transform.position = spec_gam_reticle.transform.position;
-        }
-        if(distance_viz <= distance_gam && distance_viz <= distance_neu)
-        {
-          cur_spec_i = (int)SPEC.VIZ;
-          spec_sel_reticle.transform.position = spec_viz_reticle.transform.position;
-        }
-        if(distance_neu <= distance_gam && distance_neu <= distance_viz)
-        {
-          cur_spec_i = (int)SPEC.NEU;
-          spec_sel_reticle.transform.position = spec_neu_reticle.transform.position;
-        }
-        main_camera.GetComponent<Camera>().cullingMask = (1 << layers[cur_spec_i, cur_scene_i]) | (1 << default_layer);
-        portal_camera_next.GetComponent<Camera>().cullingMask = (1 << layers[cur_spec_i, next_scene_i]);
-        main_camera_skybox.material = skyboxes[cur_spec_i, cur_scene_i];
-        portal_camera_next_skybox.material = skyboxes[cur_spec_i, next_scene_i];
+        if(distance_gam <= distance_viz && distance_gam <= distance_neu) SetSpec(SPEC.GAM);
+        if(distance_viz <= distance_gam && distance_viz <= distance_neu) SetSpec(SPEC.VIZ);
+        if(distance_neu <= distance_gam && distance_neu <= distance_viz) SetSpec(SPEC.NEU);
       }
     }
     else
     {
-      if(spec_t_since > 0)
-        spec_t_since = -Time.deltaTime;
-      else
-        spec_t_since -= Time.deltaTime;
-      if(spec_t_in > 0)
-        spec_t_in -= Time.deltaTime;
+      if(spec_t_since > 0) spec_t_since = -Time.deltaTime;
+      else                 spec_t_since -= Time.deltaTime;
+      if(spec_t_in > 0)    spec_t_in -= Time.deltaTime;
     }
-    if(spec_t_in > 0)
-      spec_t_run += Time.deltaTime;
-    else
-      spec_t_run = 0;
-    if(spec_t_numb > 0)
-      spec_t_numb -= Time.deltaTime;
+    if(spec_t_in > 0)   spec_t_run += Time.deltaTime;
+    else                spec_t_run = 0;
+    if(spec_t_numb > 0) spec_t_numb -= Time.deltaTime;
 
     scene_rots[cur_scene_i] += scene_rot_deltas[cur_scene_i] * Time.deltaTime;
-    while(scene_rots[cur_scene_i] > 3.14159265f * 2.0f)
-      scene_rots[cur_scene_i] -= (3.14159265f * 2.0f);
+    while(scene_rots[cur_scene_i] > 3.14159265f * 2.0f) scene_rots[cur_scene_i] -= (3.14159265f * 2.0f);
     scene_rots[next_scene_i] += scene_rot_deltas[next_scene_i] * Time.deltaTime;
-    while(scene_rots[next_scene_i] > 3.14159265f * 2.0f)
-      scene_rots[next_scene_i] -= (3.14159265f * 2.0f);
+    while(scene_rots[next_scene_i] > 3.14159265f * 2.0f) scene_rots[next_scene_i] -= (3.14159265f * 2.0f);
 
     scene_groups[cur_spec_i, cur_scene_i].transform.position = new Vector3(0, 0, 0);
     scene_groups[cur_spec_i, cur_scene_i].transform.rotation = Quaternion.Euler(0f, 0f, 0f);
