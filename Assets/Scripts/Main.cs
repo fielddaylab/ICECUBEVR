@@ -281,6 +281,13 @@ public class Main : MonoBehaviour
         voiceovers_played[i,j] = false;
       }
     }
+    //auto skip these
+    voiceovers_played[(int)SCENE.ICE,(int)SPEC.NEU]     = true;
+    voiceovers_played[(int)SCENE.ICE,(int)SPEC.GAM]     = true;
+    voiceovers_played[(int)SCENE.NOTHING,(int)SPEC.NEU] = true;
+    voiceovers_played[(int)SCENE.NOTHING,(int)SPEC.GAM] = true;
+    voiceovers_played[(int)SCENE.EARTH,(int)SPEC.NEU]   = true;
+    voiceovers_played[(int)SCENE.EARTH,(int)SPEC.GAM]   = true;
 
     string[,] skybox_files = new string[(int)SCENE.COUNT, (int)SPEC.COUNT];
     for(int i = 0; i < (int)SCENE.COUNT; i++)
@@ -891,7 +898,7 @@ public class Main : MonoBehaviour
     cam_spinner.transform.localRotation = Quaternion.Euler(0, 0, rot);
 
     float distance = Vector3.Distance(gaze_reticle.transform.position, cam_reticle.transform.position);
-    if(gaze_t_numb <= 0 && distance < 0.3)
+    if(gaze_t_numb <= 0 && distance < 0.3 && voiceovers_played[cur_scene_i,(int)SPEC.COUNT])
     {
       if(gaze_t_since < 0)        gaze_t_since = Time.deltaTime;
       else                        gaze_t_since += Time.deltaTime;
