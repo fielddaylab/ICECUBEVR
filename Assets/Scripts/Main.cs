@@ -67,6 +67,7 @@ public class Main : MonoBehaviour
   public Color scene2_helmet_color;
   public Color scene3_helmet_color;
   public Color scene4_helmet_color;
+  Color[] helmet_colors; //wrangle into array in Start for easier accessibility
 
   int alpha_id;
   float flash_alpha;
@@ -86,18 +87,8 @@ public class Main : MonoBehaviour
 
   AudioSource voiceover_audiosource;
   AudioSource sfx_audiosource;
-
-  public AudioClip voiceover_scene0;
-  public AudioClip voiceover_scene1;
-  public AudioClip voiceover_scene1_xray;
-  public AudioClip voiceover_scene1_neutrino;
-  public AudioClip voiceover_scene1_done;
-  public AudioClip voiceover_scene2;
-  public AudioClip voiceover_scene3;
-  public AudioClip voiceover_scene3_xray;
-  public AudioClip voiceover_scene3_neutrino;
-  public AudioClip voiceover_scene3_done;
-  public AudioClip voiceover_scene4;
+  string[,] voiceover_files;
+  AudioClip[,] voiceovers;
 
   string[] skybox_file_names = new string[]
   {
@@ -135,14 +126,6 @@ public class Main : MonoBehaviour
     0.005f, //earth
   };
 
-  enum SPEC
-  {
-    VIZ,
-    GAM,
-    NEU,
-    COUNT
-  };
-
   enum SCENE
   {
     ICE,
@@ -150,6 +133,14 @@ public class Main : MonoBehaviour
     NOTHING,
     EXTREME,
     EARTH,
+    COUNT
+  };
+
+  enum SPEC
+  {
+    VIZ,
+    GAM,
+    NEU,
     COUNT
   };
 
@@ -208,25 +199,6 @@ public class Main : MonoBehaviour
 
   void Start()
   {
-    spec_names = new string[(int)SPEC.COUNT];
-    for(int i = 0; i < (int)SPEC.COUNT; i++)
-    {
-      string name = "";
-      switch(i)
-      {
-        case (int)SPEC.VIZ:
-          name = "Viz";
-          break;
-        case (int)SPEC.GAM:
-          name = "Gam";
-          break;
-        case (int)SPEC.NEU:
-          name = "Neu";
-          break;
-      }
-      spec_names[i] = name;
-    }
-
     scene_names = new string[(int)SCENE.COUNT];
     for(int i = 0; i < (int)SCENE.COUNT; i++)
     {
@@ -252,25 +224,69 @@ public class Main : MonoBehaviour
       scene_names[i] = name;
     }
 
-    layer_names = new string[(int)SPEC.COUNT, (int)SCENE.COUNT];
+    spec_names = new string[(int)SPEC.COUNT];
     for(int i = 0; i < (int)SPEC.COUNT; i++)
-      for(int j = 0; j < (int)SCENE.COUNT; j++)
-        layer_names[i, j] = "Set_" + scene_names[j] + "_" + spec_names[i];
+    {
+      string name = "";
+      switch(i)
+      {
+        case (int)SPEC.VIZ:
+          name = "Viz";
+          break;
+        case (int)SPEC.GAM:
+          name = "Gam";
+          break;
+        case (int)SPEC.NEU:
+          name = "Neu";
+          break;
+      }
+      spec_names[i] = name;
+    }
 
-    scene_groups = new GameObject[(int)SPEC.COUNT, (int)SCENE.COUNT];
-    for(int i = 0; i < (int)SPEC.COUNT; i++)
-      for(int j = 0; j < (int)SCENE.COUNT; j++)
-        scene_groups[i, j] = GameObject.Find(layer_names[i, j]);
+    layer_names = new string[(int)SCENE.COUNT, (int)SPEC.COUNT];
+    for(int i = 0; i < (int)SCENE.COUNT; i++)
+      for(int j = 0; j < (int)SPEC.COUNT; j++)
+        layer_names[i,j] = "Set_" + scene_names[i] + "_" + spec_names[j];
 
-    layers = new int[(int)SPEC.COUNT, (int)SCENE.COUNT];
-    for(int i = 0; i < (int)SPEC.COUNT; i++)
-      for(int j = 0; j < (int)SCENE.COUNT; j++)
-        layers[i, j] = LayerMask.NameToLayer(layer_names[i, j]);
+    scene_groups = new GameObject[(int)SCENE.COUNT, (int)SPEC.COUNT];
+    for(int i = 0; i < (int)SCENE.COUNT; i++)
+      for(int j = 0; j < (int)SPEC.COUNT; j++)
+        scene_groups[i,j] = GameObject.Find(layer_names[i,j]);
 
-    string[,] skybox_files = new string[(int)SPEC.COUNT, (int)SCENE.COUNT];
-    for(int i = 0; i < (int)SPEC.COUNT; i++)
-      for(int j = 0; j < (int)SCENE.COUNT; j++)
-        skybox_files[i, j] = spec_names[i] + "/" + skybox_file_names[j];
+    layers = new int[(int)SCENE.COUNT, (int)SPEC.COUNT];
+    for(int i = 0; i < (int)SCENE.COUNT; i++)
+      for(int j = 0; j < (int)SPEC.COUNT; j++)
+        layers[i,j] = LayerMask.NameToLayer(layer_names[i,j]);
+
+    voiceover_files = new string[(int)SCENE.COUNT,(int)SPEC.COUNT+1];
+    for(int i = 0; i < (int)SCENE.COUNT; i++)
+    {
+      for(int j = 0; j < (int)SPEC.COUNT+1; j++)
+      {
+        if(j == (int)SPEC.COUNT) voiceover_files[i,j] = "Voiceover/End/"+scene_names[i]+".mp3";
+        else                     voiceover_files[i,j] = "Voiceover/"+spec_names[j]+"/"+scene_names[i]+".mp3";
+      }
+    }
+    voiceovers = new AudioClip[(int)SCENE.COUNT,(int)SPEC.COUNT+1];
+    for(int i = 0; i < (int)SCENE.COUNT; i++)
+    {
+      for(int j = 0; j < (int)SPEC.COUNT+1; j++)
+      {
+        voiceovers[i,j] = Resources.Load<AudioClip>(voiceover_files[i,j]);
+      }
+    }
+
+    string[,] skybox_files = new string[(int)SCENE.COUNT, (int)SPEC.COUNT];
+    for(int i = 0; i < (int)SCENE.COUNT; i++)
+      for(int j = 0; j < (int)SPEC.COUNT; j++)
+        skybox_files[i,j] = "Skybox/"+spec_names[j]+"/"+skybox_file_names[i];
+
+    helmet_colors = new Color[(int)SCENE.COUNT];
+    helmet_colors[0] = scene0_helmet_color;
+    helmet_colors[1] = scene1_helmet_color;
+    helmet_colors[2] = scene2_helmet_color;
+    helmet_colors[3] = scene3_helmet_color;
+    helmet_colors[4] = scene4_helmet_color;
 
     default_layer = LayerMask.NameToLayer("Default");
 
@@ -331,27 +347,27 @@ public class Main : MonoBehaviour
     ar_alert.SetActive(false);
     ar_timer.SetActive(false);
 
-    icecube = new GameObject[(int)SPEC.COUNT];
-    voyager = new GameObject[(int)SPEC.COUNT];
-    planet = new GameObject[(int)SPEC.COUNT];
-    milky = new GameObject[(int)SPEC.COUNT];
+    icecube   = new GameObject[(int)SPEC.COUNT];
+    voyager   = new GameObject[(int)SPEC.COUNT];
+    planet    = new GameObject[(int)SPEC.COUNT];
+    milky     = new GameObject[(int)SPEC.COUNT];
     blackhole = new GameObject[(int)SPEC.COUNT];
-    earth = new GameObject[(int)SPEC.COUNT];
+    earth     = new GameObject[(int)SPEC.COUNT];
     for(int i = 0; i < (int)SPEC.COUNT; i++)
     {
-      icecube[i] = GameObject.Find("Icecube_" + spec_names[i]);
-      voyager[i] = GameObject.Find("Voyager_" + spec_names[i]);
-      planet[i] = GameObject.Find("Planet_" + spec_names[i]);
-      milky[i] = GameObject.Find("Milky_" + spec_names[i]);
+      icecube[i]   = GameObject.Find("Icecube_"   + spec_names[i]);
+      voyager[i]   = GameObject.Find("Voyager_"   + spec_names[i]);
+      planet[i]    = GameObject.Find("Planet_"    + spec_names[i]);
+      milky[i]     = GameObject.Find("Milky_"     + spec_names[i]);
       blackhole[i] = GameObject.Find("BlackHole_" + spec_names[i]);
-      earth[i] = GameObject.Find("Earth_" + spec_names[i]);
+      earth[i]     = GameObject.Find("Earth_"     + spec_names[i]);
     }
 
-    scene_centers[(int)SCENE.ICE] = icecube[0].transform.position;
-    scene_centers[(int)SCENE.VOYAGER] = voyager[0].transform.position;
-    scene_centers[(int)SCENE.NOTHING] = milky[0].transform.position;
+    scene_centers[(int)SCENE.ICE]     = icecube[  0].transform.position;
+    scene_centers[(int)SCENE.VOYAGER] = voyager[  0].transform.position;
+    scene_centers[(int)SCENE.NOTHING] = milky[    0].transform.position;
     scene_centers[(int)SCENE.EXTREME] = blackhole[0].transform.position;
-    scene_centers[(int)SCENE.EARTH] = earth[0].transform.position;
+    scene_centers[(int)SCENE.EARTH]   = earth[    0].transform.position;
 
     alpha_id = Shader.PropertyToID("alpha");
     flash_alpha = 0;
@@ -424,12 +440,12 @@ public class Main : MonoBehaviour
     spec_euler.x = -3.141592f / 3f;
     spec_projection.transform.rotation = rotationFromEuler(spec_euler);
 
-    skyboxes = new Material[(int)SPEC.COUNT, (int)SCENE.COUNT];
-    for(int i = 0; i < (int)SPEC.COUNT; i++)
-      for(int j = 0; j < (int)SCENE.COUNT; j++)
-        skyboxes[i, j] = Resources.Load<Material>(skybox_files[i, j]);
-    main_camera_skybox.material = skyboxes[cur_spec_i, cur_scene_i];
-    portal_camera_next_skybox.material = skyboxes[cur_spec_i, next_scene_i];
+    skyboxes = new Material[(int)SCENE.COUNT, (int)SPEC.COUNT];
+    for(int i = 0; i < (int)SCENE.COUNT; i++)
+      for(int j = 0; j < (int)SPEC.COUNT; j++)
+        skyboxes[i,j] = Resources.Load<Material>(skybox_files[i,j]);
+    main_camera_skybox.material = skyboxes[cur_scene_i, cur_spec_i];
+    portal_camera_next_skybox.material = skyboxes[next_scene_i, (int)SPEC.VIZ];
 
     //stars
     GameObject[] star_groups;
@@ -519,10 +535,9 @@ public class Main : MonoBehaviour
 
   void SetupScene()
   {
-    main_camera.GetComponent<Camera>().cullingMask = (1 << layers[cur_spec_i, cur_scene_i]) | (1 << default_layer);
-    portal_camera_next.GetComponent<Camera>().cullingMask = (1 << layers[cur_spec_i, next_scene_i]);
+    SetSpec(SPEC.VIZ);
 
-    main_camera_skybox.material = skyboxes[cur_spec_i, cur_scene_i];
+    main_camera_skybox.material = skyboxes[cur_scene_i, cur_spec_i];
 
     AnimationCurve curve;
     float lw;
@@ -558,9 +573,6 @@ public class Main : MonoBehaviour
         ar_label_lines[label_i].SetPosition(1, new Vector3(-10,  0, 0));
         ar_label_lines[label_i].SetPosition(2, new Vector3(-11, -5, 0));
         label_i++;
-
-        helmet_light_light.color = scene0_helmet_color;
-        voiceover_audiosource.clip = voiceover_scene0;
         break;
 
       case 1:
@@ -597,9 +609,6 @@ public class Main : MonoBehaviour
         ar_label_lines[label_i].SetPosition(1, new Vector3(-7,  0, 0));
         ar_label_lines[label_i].SetPosition(2, new Vector3(-8, -2, 0));
         label_i++;
-
-        helmet_light_light.color = scene1_helmet_color;
-        voiceover_audiosource.clip = voiceover_scene1;
         break;
 
       case 2:
@@ -619,9 +628,6 @@ public class Main : MonoBehaviour
         ar_label_lines[label_i].SetPosition(1, new Vector3(-12, 0, 0));
         ar_label_lines[label_i].SetPosition(2, new Vector3(-17, -10, 0));
         label_i++;
-
-        helmet_light_light.color = scene2_helmet_color;
-        voiceover_audiosource.clip = voiceover_scene2;
         break;
 
       case 3:
@@ -646,8 +652,6 @@ public class Main : MonoBehaviour
         ar_timer.SetActive(true);
         timer_t = 0;
         alert_t = 0;
-        helmet_light_light.color = scene3_helmet_color;
-        voiceover_audiosource.clip = voiceover_scene3;
         break;
 
       case 4:
@@ -670,19 +674,18 @@ public class Main : MonoBehaviour
 
         ar_alert.SetActive(false);
         ar_timer.SetActive(false);
-        helmet_light_light.color = scene4_helmet_color;
-        voiceover_audiosource.clip = voiceover_scene4;
         break;
     }
 
-    //Start playing the Audio
+    helmet_light_light.color = helmet_colors[cur_scene_i];
+    voiceover_audiosource.clip = voiceovers[cur_scene_i,(int)SPEC.VIZ];
+
     if(voiceover_audiosource.isPlaying) voiceover_audiosource.Stop();
     voiceover_audiosource.Play();
   }
 
   void UpdateScene()
   {
-    //Run every frame updating the current scene
     int label_i = 0;
     switch(cur_scene_i)
     {
@@ -731,10 +734,10 @@ public class Main : MonoBehaviour
       case SPEC.NEU: spec_sel_reticle.transform.position = spec_neu_reticle.transform.position; break;
     }
 
-    main_camera.GetComponent<Camera>().cullingMask = (1 << layers[cur_spec_i, cur_scene_i]) | (1 << default_layer);
-    portal_camera_next.GetComponent<Camera>().cullingMask = (1 << layers[cur_spec_i, next_scene_i]);
-    main_camera_skybox.material = skyboxes[cur_spec_i, cur_scene_i];
-    portal_camera_next_skybox.material = skyboxes[cur_spec_i, next_scene_i];
+    main_camera.GetComponent<Camera>().cullingMask = (1 << layers[cur_scene_i, cur_spec_i]) | (1 << default_layer);
+    portal_camera_next.GetComponent<Camera>().cullingMask = (1 << layers[next_scene_i, (int)SPEC.VIZ]);
+    main_camera_skybox.material = skyboxes[cur_scene_i, cur_spec_i];
+    portal_camera_next_skybox.material = skyboxes[next_scene_i, (int)SPEC.VIZ];
   }
 
   void Update()
@@ -775,7 +778,6 @@ public class Main : MonoBehaviour
       out_portal_motion = Time.deltaTime;
       cur_scene_i = next_scene_i;
       next_scene_i = (next_scene_i + 1) % ((int)SCENE.COUNT);
-      SetSpec(SPEC.VIZ);
       SetupScene();
     }
     if(out_portal_motion > 0)                 out_portal_motion += Time.deltaTime;
@@ -888,7 +890,6 @@ public class Main : MonoBehaviour
         {
           in_portal_motion = Time.deltaTime;
           scene_rots[next_scene_i] = 0; //set rot at start of scene transition
-          portal_camera_next_skybox.material = skyboxes[cur_spec_i, next_scene_i];
         }
       }
     }
@@ -934,12 +935,12 @@ public class Main : MonoBehaviour
     scene_rots[next_scene_i] += scene_rot_deltas[next_scene_i] * Time.deltaTime;
     while(scene_rots[next_scene_i] > 3.14159265f * 2.0f) scene_rots[next_scene_i] -= (3.14159265f * 2.0f);
 
-    scene_groups[cur_spec_i, cur_scene_i].transform.position = new Vector3(0, 0, 0);
-    scene_groups[cur_spec_i, cur_scene_i].transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+    scene_groups[cur_scene_i, cur_spec_i].transform.position = new Vector3(0, 0, 0);
+    scene_groups[cur_scene_i, cur_spec_i].transform.rotation = Quaternion.Euler(0f, 0f, 0f);
 
-    scene_groups[cur_spec_i, cur_scene_i].transform.Translate(scene_centers[cur_scene_i]);
-    scene_groups[cur_spec_i, cur_scene_i].transform.Rotate(0f, Mathf.Rad2Deg * scene_rots[cur_scene_i], 0f);
-    scene_groups[cur_spec_i, cur_scene_i].transform.Translate(-scene_centers[cur_scene_i]);
+    scene_groups[cur_scene_i, cur_spec_i].transform.Translate(scene_centers[cur_scene_i]);
+    scene_groups[cur_scene_i, cur_spec_i].transform.Rotate(0f, Mathf.Rad2Deg * scene_rots[cur_scene_i], 0f);
+    scene_groups[cur_scene_i, cur_spec_i].transform.Translate(-scene_centers[cur_scene_i]);
     main_camera_skybox.material.SetFloat("_Rotation", -Mathf.Rad2Deg * scene_rots[cur_scene_i]);
 
     time_mod_twelve_pi = (time_mod_twelve_pi + Time.deltaTime) % (12.0f * 3.1415926535f);
