@@ -89,6 +89,7 @@ public class Main : MonoBehaviour
   AudioSource sfx_audiosource;
   string[,] voiceover_files;
   AudioClip[,] voiceovers;
+  bool[,] voiceovers_played;
 
   string[] skybox_file_names = new string[]
   {
@@ -270,11 +271,13 @@ public class Main : MonoBehaviour
       }
     }
     voiceovers = new AudioClip[(int)SCENE.COUNT,(int)SPEC.COUNT+1];
+    voiceovers_played = new bool[(int)SCENE.COUNT,(int)SPEC.COUNT+1];
     for(int i = 0; i < (int)SCENE.COUNT; i++)
     {
       for(int j = 0; j < (int)SPEC.COUNT+1; j++)
       {
         voiceovers[i,j] = Resources.Load<AudioClip>(voiceover_files[i,j]);
+        voiceovers_played[i,j] = false;
       }
     }
 
@@ -683,10 +686,14 @@ public class Main : MonoBehaviour
     }
 
     helmet_light_light.color = helmet_colors[cur_scene_i];
-    voiceover_audiosource.clip = voiceovers[cur_scene_i,(int)SPEC.VIZ];
 
-    if(voiceover_audiosource.isPlaying) voiceover_audiosource.Stop();
-    voiceover_audiosource.Play();
+    if(!voiceovers_played[cur_scene_i,(int)SPEC.VIZ])
+    {
+      if(voiceover_audiosource.isPlaying) voiceover_audiosource.Stop();
+      voiceover_audiosource.clip = voiceovers[cur_scene_i,(int)SPEC.VIZ];
+      voiceover_audiosource.Play();
+      voiceovers_played[cur_scene_i,(int)SPEC.VIZ] = true;
+    }
   }
 
   void UpdateScene()
@@ -927,9 +934,13 @@ public class Main : MonoBehaviour
 
         if(old_spec != cur_spec_i)
         {
-          if(voiceover_audiosource.isPlaying) voiceover_audiosource.Stop();
-          voiceover_audiosource.clip = voiceovers[cur_scene_i,cur_spec_i];
-          voiceover_audiosource.Play();
+          if(!voiceovers_played[cur_scene_i,cur_spec_i])
+          {
+            if(voiceover_audiosource.isPlaying) voiceover_audiosource.Stop();
+            voiceover_audiosource.clip = voiceovers[cur_scene_i,cur_spec_i];
+            voiceover_audiosource.Play();
+            voiceovers_played[cur_scene_i,cur_spec_i] = true;
+          }
         }
       }
     }
