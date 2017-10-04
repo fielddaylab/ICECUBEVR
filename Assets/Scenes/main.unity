@@ -564,22 +564,13 @@ MonoBehaviour:
     type: 2}
   ar_label_prefab: {fileID: 1486920102742226, guid: 343e484ae853f4acab89cc6f00d31a9f,
     type: 2}
+  ar_progress_prefab: {fileID: 1187901120155258, guid: 89a27608346844f149790f9b3ec5c919,
+    type: 2}
   scene0_helmet_color: {r: 1, g: 1, b: 1, a: 0}
   scene1_helmet_color: {r: 1, g: 0.93235296, b: 0.78676474, a: 0}
   scene2_helmet_color: {r: 1, g: 1, b: 1, a: 0}
   scene3_helmet_color: {r: 0, g: 0, b: 0, a: 0}
   scene4_helmet_color: {r: 0.6764706, g: 0.81257606, b: 1, a: 0}
-  voiceover_scene0: {fileID: 0}
-  voiceover_scene1: {fileID: 0}
-  voiceover_scene1_xray: {fileID: 0}
-  voiceover_scene1_neutrino: {fileID: 0}
-  voiceover_scene1_done: {fileID: 0}
-  voiceover_scene2: {fileID: 0}
-  voiceover_scene3: {fileID: 0}
-  voiceover_scene3_xray: {fileID: 0}
-  voiceover_scene3_neutrino: {fileID: 0}
-  voiceover_scene3_done: {fileID: 0}
-  voiceover_scene4: {fileID: 0}
 --- !u!4 &253639470
 Transform:
   m_ObjectHideFlags: 0

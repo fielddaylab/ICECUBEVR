@@ -37,6 +37,9 @@ public class Main : MonoBehaviour
   GameObject[] ar_label_offsets;
   TextMesh[] ar_label_texts;
   LineRenderer[] ar_label_lines;
+  GameObject[] ar_progresses;
+  GameObject[] ar_progress_offsets;
+  LineRenderer[] ar_progress_lines;
 
   GameObject[] icecube;
   GameObject[] voyager;
@@ -61,6 +64,7 @@ public class Main : MonoBehaviour
   public Material alpha_material;
   public GameObject star_prefab;
   public GameObject ar_label_prefab;
+  public GameObject ar_progress_prefab;
 
   public Color scene0_helmet_color;
   public Color scene1_helmet_color;
@@ -154,6 +158,8 @@ public class Main : MonoBehaviour
   string[] scene_names;
   string[,] layer_names;
   GameObject[,] scene_groups;
+  float[,] ta; //"time alive" (timed amt in scene/spectrum pairs)
+  float scan_t = 5f; //time required before you can consider a spectrum "scanned"
   int default_layer;
 
   bool mouse_captured;
@@ -301,6 +307,11 @@ public class Main : MonoBehaviour
     helmet_colors[3] = scene3_helmet_color;
     helmet_colors[4] = scene4_helmet_color;
 
+    ta = new float[(int)SCENE.COUNT, (int)SPEC.COUNT];
+    for(int i = 0; i < (int)SCENE.COUNT; i++)
+      for(int j = 0; j < (int)SPEC.COUNT; j++)
+        ta[i,j] = 0;
+
     default_layer = LayerMask.NameToLayer("Default");
 
     camera_house = GameObject.Find("CameraHouse");
@@ -333,10 +344,15 @@ public class Main : MonoBehaviour
     stars = GameObject.Find("Stars");
     starsscale = GameObject.Find("StarsScale");
 
-    ar_labels = new GameObject[MAX_LABELS];
-    ar_label_offsets = new GameObject[MAX_LABELS];
-    ar_label_texts = new TextMesh[MAX_LABELS];
-    ar_label_lines = new LineRenderer[MAX_LABELS];
+    ar_labels         = new GameObject[MAX_LABELS];
+    ar_label_offsets  = new GameObject[MAX_LABELS];
+    ar_label_texts    = new TextMesh[MAX_LABELS];
+    ar_label_lines    = new LineRenderer[MAX_LABELS];
+
+    //technically isn't connected to max labels, but as there's a label per line, it's at least upper bound
+    ar_progresses       = new GameObject[MAX_LABELS];
+    ar_progress_offsets = new GameObject[MAX_LABELS];
+    ar_progress_lines   = new LineRenderer[MAX_LABELS];
 
     float lw;
     AnimationCurve curve;
@@ -355,6 +371,15 @@ public class Main : MonoBehaviour
       ar_label_lines[i].widthCurve = curve;
       for(int j = 0; j < 3; j++)
         ar_label_lines[i].SetPosition(j, new Vector3(0, 0, 0));
+
+      ar_progress_offsets[i] = (GameObject)Instantiate(ar_progress_prefab);
+      ar_progress_offsets[i].transform.parent = ar_group.transform;
+      ar_progresses[i] = ar_progress_offsets[i].transform.GetChild(0).gameObject;
+      ar_progress_lines[i] = ar_progresses[i].GetComponent<LineRenderer>();
+
+      ar_progress_lines[i].widthCurve = curve;
+      for(int j = 0; j < 2; j++)
+        ar_progress_lines[i].SetPosition(j, new Vector3(0, 0, 0));
     }
 
     ar_alert.SetActive(false);
@@ -568,6 +593,10 @@ public class Main : MonoBehaviour
       for(int j = 0; j < 3; j++)
         ar_label_lines[i].SetPosition(j, new Vector3(0, 0, 0));
       ar_label_texts[i].text = "";
+
+      ar_progress_lines[i].widthCurve = curve;
+      for(int j = 0; j < 2; j++)
+        ar_progress_lines[i].SetPosition(j, new Vector3(0, 0, 0));
     }
 
     int label_i = 0;
@@ -648,6 +677,97 @@ public class Main : MonoBehaviour
         break;
 
       case 3:
+        float bar_y = -3;
+        float bar_x = -11;
+        float bar_w = 23;
+
+        ar_label_offsets[label_i].transform.localScale = new Vector3(200f, 200f, 200f);
+        ar_label_offsets[label_i].transform.position = blackhole[0].transform.position;
+        ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
+        ar_progress_offsets[label_i].transform.localScale = ar_label_offsets[label_i].transform.localScale;
+        ar_progress_offsets[label_i].transform.position   = ar_label_offsets[label_i].transform.position;
+        ar_progress_offsets[label_i].transform.rotation   = ar_label_offsets[label_i].transform.rotation;
+        ar_label_texts[label_i].text = "Visible Scan";
+        ar_labels[label_i].transform.localScale = new Vector3(10f, 10f, 10f);
+        ar_labels[label_i].transform.localPosition = new Vector3(-1.2f, 1f, 0f);
+        ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
+        ar_progresses[label_i].transform.localScale    = ar_labels[label_i].transform.localScale;
+        ar_progresses[label_i].transform.localPosition = ar_labels[label_i].transform.localPosition;
+        lw = 3f;
+        curve = new AnimationCurve();
+        curve.AddKey(0, lw);
+        curve.AddKey(1, lw);
+        ar_label_lines[label_i].widthCurve = curve;
+        ar_label_lines[label_i].SetPosition(0, new Vector3(11, 0, 0));
+        ar_label_lines[label_i].SetPosition(1, new Vector3(14, 0, 0));
+        ar_label_lines[label_i].SetPosition(2, new Vector3(16, -8, 0));
+        lw = 10f;
+        curve = new AnimationCurve();
+        curve.AddKey(0, lw);
+        curve.AddKey(1, lw);
+        ar_progress_lines[label_i].widthCurve = curve;
+        ar_progress_lines[label_i].SetPosition(0, new Vector3(bar_x, bar_y, 0));
+        ar_progress_lines[label_i].SetPosition(1, new Vector3(bar_x+bar_w*Mathf.Min(1,(ta[cur_scene_i,(int)SPEC.VIZ]/scan_t)), bar_y, 0));
+        label_i++;
+
+        ar_label_offsets[label_i].transform.localScale = new Vector3(200f, 200f, 200f);
+        ar_label_offsets[label_i].transform.position = blackhole[0].transform.position;
+        ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
+        ar_progress_offsets[label_i].transform.localScale = ar_label_offsets[label_i].transform.localScale;
+        ar_progress_offsets[label_i].transform.position   = ar_label_offsets[label_i].transform.position;
+        ar_progress_offsets[label_i].transform.rotation   = ar_label_offsets[label_i].transform.rotation;
+        ar_label_texts[label_i].text = "Gamma Scan";
+        ar_labels[label_i].transform.localScale = new Vector3(10f, 10f, 10f);
+        ar_labels[label_i].transform.localPosition = new Vector3(-1.5f, 0f, 0f);
+        ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
+        ar_progresses[label_i].transform.localScale    = ar_labels[label_i].transform.localScale;
+        ar_progresses[label_i].transform.localPosition = ar_labels[label_i].transform.localPosition;
+        lw = 3f;
+        curve = new AnimationCurve();
+        curve.AddKey(0, lw);
+        curve.AddKey(1, lw);
+        ar_label_lines[label_i].widthCurve = curve;
+        ar_label_lines[label_i].SetPosition(0, new Vector3(11, 0, 0));
+        ar_label_lines[label_i].SetPosition(1, new Vector3(14, 0, 0));
+        ar_label_lines[label_i].SetPosition(2, new Vector3(16, 0, 0));
+        lw = 10f;
+        curve = new AnimationCurve();
+        curve.AddKey(0, lw);
+        curve.AddKey(1, lw);
+        ar_progress_lines[label_i].widthCurve = curve;
+        ar_progress_lines[label_i].SetPosition(0, new Vector3(bar_x, bar_y, 0));
+        ar_progress_lines[label_i].SetPosition(1, new Vector3(bar_x+bar_w*Mathf.Min(1f,(ta[cur_scene_i,(int)SPEC.GAM]/scan_t)), bar_y, 0));
+        label_i++;
+
+        ar_label_offsets[label_i].transform.localScale = new Vector3(200f, 200f, 200f);
+        ar_label_offsets[label_i].transform.position = blackhole[0].transform.position;
+        ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
+        ar_progress_offsets[label_i].transform.localScale = ar_label_offsets[label_i].transform.localScale;
+        ar_progress_offsets[label_i].transform.position   = ar_label_offsets[label_i].transform.position;
+        ar_progress_offsets[label_i].transform.rotation   = ar_label_offsets[label_i].transform.rotation;
+        ar_label_texts[label_i].text = "Neutrino Scan";
+        ar_labels[label_i].transform.localScale = new Vector3(10f, 10f, 10f);
+        ar_labels[label_i].transform.localPosition = new Vector3(-1.2f, -1f, 0f);
+        ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
+        ar_progresses[label_i].transform.localScale    = ar_labels[label_i].transform.localScale;
+        ar_progresses[label_i].transform.localPosition = ar_labels[label_i].transform.localPosition;
+        lw = 3f;
+        curve = new AnimationCurve();
+        curve.AddKey(0, lw);
+        curve.AddKey(1, lw);
+        ar_label_lines[label_i].widthCurve = curve;
+        ar_label_lines[label_i].SetPosition(0, new Vector3(11, 0, 0));
+        ar_label_lines[label_i].SetPosition(1, new Vector3(14, 0, 0));
+        ar_label_lines[label_i].SetPosition(2, new Vector3(16, 8, 0));
+        lw = 10f;
+        curve = new AnimationCurve();
+        curve.AddKey(0, lw);
+        curve.AddKey(1, lw);
+        ar_progress_lines[label_i].widthCurve = curve;
+        ar_progress_lines[label_i].SetPosition(0, new Vector3(bar_x, bar_y, 0));
+        ar_progress_lines[label_i].SetPosition(1, new Vector3(bar_x+bar_w*Mathf.Min(1,(ta[cur_scene_i,(int)SPEC.NEU]/scan_t)), bar_y, 0));
+        label_i++;
+
         ar_label_offsets[label_i].transform.localScale = new Vector3(200f, 200f, 200f);
         ar_label_offsets[label_i].transform.position = blackhole[0].transform.position;
         ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
@@ -708,6 +828,8 @@ public class Main : MonoBehaviour
 
   void UpdateScene()
   {
+    ta[cur_scene_i,cur_spec_i] += Time.deltaTime;
+
     int label_i = 0;
     switch(cur_scene_i)
     {
@@ -735,6 +857,11 @@ public class Main : MonoBehaviour
         if(seconds_left > 0)
         {
           ar_timer_text.text = "00:" + Mathf.Floor(seconds_left) + ":" + Mathf.Floor((seconds_left - Mathf.Floor(seconds_left)) * 100);
+          float bar_y = -3;
+          float bar_x = -11;
+          float bar_w = 23;
+          for(int i = 0; i < (int)SPEC.COUNT; i++)
+            ar_progress_lines[i].SetPosition(1, new Vector3(bar_x+bar_w*Mathf.Min(1,(ta[cur_scene_i,i]/scan_t)), bar_y, 0));
         }
         else
         {
