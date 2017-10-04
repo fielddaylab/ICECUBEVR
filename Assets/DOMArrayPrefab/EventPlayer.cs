@@ -107,9 +107,7 @@ public class EventPlayer : MonoBehaviour {
 
         if(eventDirectory.Length > 0)
         {
-            Debug.Log(eventDirectory);
             string[] files = System.IO.Directory.GetFiles(eventDirectory);
-            Debug.Log(files.Length);
             //GameObject[] sources = GameObject.FindGameObjectsWithTag("NeutrinoSource");
             //int numSources = sources.Length;
             //Debug.Log("Num sources: " + numSources);
@@ -120,7 +118,6 @@ public class EventPlayer : MonoBehaviour {
                     EventVis e = new EventVis();
                     e.eventData = new List<EventData>();
                     e.fileName = file;
-                    Debug.Log(file);
                     StreamReader sr = new StreamReader(e.fileName, Encoding.Default);
                     string s = sr.ReadLine();
                     int lineCount = 0;
@@ -265,7 +262,6 @@ public class EventPlayer : MonoBehaviour {
 
         if(events.Count > 0)
         {
-            Debug.Log(events.Count);
             eventsPlaying = new EventPlayback[events.Count];
             for(int e = 0; e < events.Count; ++e)
             {
