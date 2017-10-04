@@ -86,6 +86,7 @@ public class Main : MonoBehaviour
   float timer_t;
 
   AudioSource voiceover_audiosource;
+  bool voiceover_was_playing;
   AudioSource sfx_audiosource;
   string[,] voiceover_files;
   AudioClip[,] voiceovers;
@@ -384,6 +385,7 @@ public class Main : MonoBehaviour
     jitter_state = 0;
 
     voiceover_audiosource = GameObject.Find("Script").AddComponent<AudioSource>();
+    voiceover_was_playing = false;
     sfx_audiosource = GameObject.Find("Script").AddComponent<AudioSource>();
 
     default_portal_scale = portal.transform.localScale;
@@ -692,6 +694,7 @@ public class Main : MonoBehaviour
       if(voiceover_audiosource.isPlaying) voiceover_audiosource.Stop();
       voiceover_audiosource.clip = voiceovers[cur_scene_i,(int)SPEC.VIZ];
       voiceover_audiosource.Play();
+      voiceover_was_playing = true;
       voiceovers_played[cur_scene_i,(int)SPEC.VIZ] = true;
     }
   }
@@ -939,6 +942,7 @@ public class Main : MonoBehaviour
             if(voiceover_audiosource.isPlaying) voiceover_audiosource.Stop();
             voiceover_audiosource.clip = voiceovers[cur_scene_i,cur_spec_i];
             voiceover_audiosource.Play();
+            voiceover_was_playing = true;
             voiceovers_played[cur_scene_i,cur_spec_i] = true;
           }
         }
@@ -988,6 +992,25 @@ public class Main : MonoBehaviour
     else
       jitter = 0;
     Shader.SetGlobalFloat(jitter_id, jitter);
+
+    if(voiceover_was_playing)
+    {
+      if(!voiceover_audiosource.isPlaying)
+      {
+        bool play_end = !voiceovers_played[cur_scene_i,(int)SPEC.COUNT];
+        for(int i = 0; play_end && i < (int)SPEC.COUNT; i++)
+        {
+          if(!voiceovers_played[cur_scene_i,i]) play_end = false;
+        }
+        if(play_end)
+        {
+          voiceover_audiosource.clip = voiceovers[cur_scene_i,(int)SPEC.COUNT];
+          voiceover_audiosource.Play();
+          voiceover_was_playing = true;
+          voiceovers_played[cur_scene_i,(int)SPEC.COUNT] = true;
+        }
+      }
+    }
 
   }
 }
