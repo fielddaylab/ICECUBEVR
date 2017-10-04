@@ -1055,7 +1055,7 @@ public class Main : MonoBehaviour
     float distance_viz = Vector3.Distance(spec_viz_reticle.transform.position, cam_reticle.transform.position);
     float distance_gam = Vector3.Distance(spec_gam_reticle.transform.position, cam_reticle.transform.position);
     float distance_neu = Vector3.Distance(spec_neu_reticle.transform.position, cam_reticle.transform.position);
-    if(spec_t_numb <= 0 && (distance_gam < 0.3 || distance_viz < 0.3 || distance_neu < 0.3))
+    if(spec_t_numb <= 0 && (distance_gam < 0.5 || distance_viz < 0.5 || distance_neu < 0.5))
     {
       if(spec_t_since < 0)        spec_t_since = Time.deltaTime;
       else                        spec_t_since += Time.deltaTime;
