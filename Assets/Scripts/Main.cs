@@ -163,13 +163,15 @@ public class Main : MonoBehaviour
   float out_portal_motion;
   float max_portal_motion;
 
-  float gaze_t_max;
+  float gaze_t_max; //The time required to confirm a gaze
+  float gaze_t_max_numb; //The time required to wait before confirming another gaze
   float gaze_t_since; //if positive, time since entered. if negative, time since exited.
   float gaze_t_in; //grows to max when in, shrinks to 0 when out
   float gaze_t_run; //grows while not fully out. 0 when fully out
   float gaze_t_numb; //countdown when distance should be ignored
 
   float spec_t_max; //The time required to select a button
+  float spec_t_max_numb; //The time required to wait before selecting another button
   float spec_t_since; //if positive, time since entered. if negative, time since exited.
   float spec_t_in; //grows to max when in, shrinks to 0 when out
   float spec_t_run; //grows while not fully out. 0 when fully out
@@ -411,13 +413,15 @@ public class Main : MonoBehaviour
     out_portal_motion = 0;
     max_portal_motion = 1;
 
-    gaze_t_max = 2;
+    gaze_t_max = 2f;
+    gaze_t_max_numb = 4f;
     gaze_t_since = 0;
     gaze_t_in = 0;
     gaze_t_run = 0;
     gaze_t_numb = 0;
 
-    spec_t_max = 0.01f;
+    spec_t_max = 1f;
+    spec_t_max_numb = 5f;
     spec_t_since = 0;
     spec_t_in = 0;
     spec_t_run = 0;
@@ -536,6 +540,7 @@ public class Main : MonoBehaviour
   void SetupScene()
   {
     SetSpec(SPEC.VIZ);
+    spec_t_numb = spec_t_max_numb;
 
     main_camera_skybox.material = skyboxes[cur_scene_i, cur_spec_i];
 
@@ -830,7 +835,7 @@ public class Main : MonoBehaviour
 
     look_ahead = main_camera.transform.rotation * default_look_ahead;
     lazy_look_ahead = Vector3.Lerp(lazy_look_ahead, look_ahead, 0.1f);
-    very_lazy_look_ahead = Vector3.Lerp(very_lazy_look_ahead, look_ahead, 0.01f);
+    very_lazy_look_ahead = Vector3.Lerp(very_lazy_look_ahead, look_ahead, 0.002f);
     shake = 0.001f;
     if(cur_scene_i == (int)SCENE.EXTREME)
       helmet.transform.position = main_camera.transform.position + new Vector3(Random.Range(-shake, shake), Random.Range(-shake, shake), Random.Range(-shake, shake));
@@ -881,7 +886,7 @@ public class Main : MonoBehaviour
       if(gaze_t_since < 0)        gaze_t_since = Time.deltaTime;
       else                        gaze_t_since += Time.deltaTime;
       if(gaze_t_in < gaze_t_max)  gaze_t_in += Time.deltaTime;
-      if(gaze_t_in >= gaze_t_max) gaze_t_numb = gaze_t_max * 2;
+      if(gaze_t_in >= gaze_t_max) gaze_t_numb = gaze_t_max_numb;
 
       //advance
       if(gaze_t_in >= gaze_t_max)
@@ -911,7 +916,7 @@ public class Main : MonoBehaviour
       if(spec_t_since < 0)        spec_t_since = Time.deltaTime;
       else                        spec_t_since += Time.deltaTime;
       if(spec_t_in < spec_t_max)  spec_t_in += Time.deltaTime;
-      if(spec_t_in >= spec_t_max) spec_t_numb = spec_t_max * 2;
+      if(spec_t_in >= spec_t_max) spec_t_numb = spec_t_max_numb;
 
       if(spec_t_in >= spec_t_max)
       {
