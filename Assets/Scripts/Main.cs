@@ -915,9 +915,17 @@ public class Main : MonoBehaviour
 
       if(spec_t_in >= spec_t_max)
       {
+        int old_spec = cur_spec_i;
         if(distance_gam <= distance_viz && distance_gam <= distance_neu) SetSpec(SPEC.GAM);
         if(distance_viz <= distance_gam && distance_viz <= distance_neu) SetSpec(SPEC.VIZ);
         if(distance_neu <= distance_gam && distance_neu <= distance_viz) SetSpec(SPEC.NEU);
+
+        if(old_spec != cur_spec_i)
+        {
+          if(voiceover_audiosource.isPlaying) voiceover_audiosource.Stop();
+          voiceover_audiosource.clip = voiceovers[cur_scene_i,cur_spec_i];
+          voiceover_audiosource.Play();
+        }
       }
     }
     else
