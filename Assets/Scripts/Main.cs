@@ -263,8 +263,8 @@ public class Main : MonoBehaviour
     {
       for(int j = 0; j < (int)SPEC.COUNT+1; j++)
       {
-        if(j == (int)SPEC.COUNT) voiceover_files[i,j] = "Voiceover/End/"+scene_names[i]+".mp3";
-        else                     voiceover_files[i,j] = "Voiceover/"+spec_names[j]+"/"+scene_names[i]+".mp3";
+        if(j == (int)SPEC.COUNT) voiceover_files[i,j] = "Voiceover/End/"+scene_names[i];
+        else                     voiceover_files[i,j] = "Voiceover/"+spec_names[j]+"/"+scene_names[i];
       }
     }
     voiceovers = new AudioClip[(int)SCENE.COUNT,(int)SPEC.COUNT+1];
