@@ -874,6 +874,7 @@ public class Main : MonoBehaviour
         }
         else
         {
+          SetupScene();
           ar_timer_text.text = "00:00:00";
         }
         break;
