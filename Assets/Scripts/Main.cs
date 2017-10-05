@@ -189,6 +189,7 @@ public class Main : MonoBehaviour
   Vector3 anti_gaze_pt;
   Vector2 cam_euler;
   Vector2 gaze_cam_euler;
+  Vector2 anti_gaze_cam_euler;
   Vector2 spec_euler;
 
   Vector2 getEuler(Vector3 v)
@@ -434,7 +435,8 @@ public class Main : MonoBehaviour
     very_lazy_look_ahead = default_look_ahead;
     player_head = new Vector3(0, 2, 0);
 
-    next_scene_i = 0;
+    next_scene_i = (int)SCENE.ICE;
+    next_scene_i = (int)SCENE.EXTREME;
     cur_scene_i = next_scene_i;
     next_scene_i = (next_scene_i + 1) % ((int)SCENE.COUNT);
     cur_spec_i = 0;
@@ -470,12 +472,10 @@ public class Main : MonoBehaviour
     cam_euler = getCamEuler(cam_reticle.transform.position);
     gaze_cam_euler = getCamEuler(gaze_pt);
     anti_gaze_pt = (gaze_pt * -1) + new Vector3(50f, 0, 0);
+    anti_gaze_cam_euler = getCamEuler(anti_gaze_pt);
 
     eyeray.GetComponent<LineRenderer>().SetPosition(0, anti_gaze_pt);
     eyeray.GetComponent<LineRenderer>().SetPosition(1, gaze_pt);
-
-    gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
-    portal_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
 
     spec_euler = cam_euler;
     spec_euler.x = -3.141592f / 3f;
@@ -602,7 +602,7 @@ public class Main : MonoBehaviour
     int label_i = 0;
     switch(cur_scene_i)
     {
-      case 0:
+      case (int)SCENE.ICE:
         ar_label_offsets[label_i].transform.localScale = new Vector3(10f, 10f, 10f);
         ar_label_offsets[label_i].transform.position = icecube[0].transform.position;
         ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
@@ -621,9 +621,11 @@ public class Main : MonoBehaviour
         label_i++;
 
         spec_projection.SetActive(false);
+        gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
+        portal_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
         break;
 
-      case 1:
+      case (int)SCENE.VOYAGER:
         ar_label_offsets[label_i].transform.localScale = new Vector3(5f, 5f, 5f);
         ar_label_offsets[label_i].transform.position = voyager[0].transform.position;
         ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
@@ -661,7 +663,7 @@ public class Main : MonoBehaviour
         spec_projection.SetActive(true);
         break;
 
-      case 2:
+      case (int)SCENE.NOTHING:
         ar_label_offsets[label_i].transform.localScale = new Vector3(50f, 50f, 50f);
         ar_label_offsets[label_i].transform.position = milky[0].transform.position;
         ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
@@ -680,7 +682,7 @@ public class Main : MonoBehaviour
         label_i++;
         break;
 
-      case 3:
+      case (int)SCENE.EXTREME:
         float bar_y = -3;
         float bar_x = -11;
         float bar_w = 23;
@@ -789,13 +791,15 @@ public class Main : MonoBehaviour
         ar_label_lines[label_i].SetPosition(2, new Vector3(-16, -8, 0));
         label_i++;
 
+        gaze_projection.transform.rotation = rotationFromEuler(anti_gaze_cam_euler);
+        portal_projection.transform.rotation = rotationFromEuler(anti_gaze_cam_euler);
         ar_alert.SetActive(true);
         ar_timer.SetActive(true);
         timer_t = 0;
         alert_t = 0;
         break;
 
-      case 4:
+      case (int)SCENE.EARTH:
         ar_label_offsets[label_i].transform.localScale = new Vector3(8f, 8f, 8f);
         ar_label_offsets[label_i].transform.position = earth[0].transform.position;
         ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
@@ -838,9 +842,9 @@ public class Main : MonoBehaviour
     int label_i = 0;
     switch(cur_scene_i)
     {
-      case 0:
+      case (int)SCENE.ICE:
         break;
-      case 1:
+      case (int)SCENE.VOYAGER:
         for(int i = 1; i < voyager.Length; i++)
         {
           voyager[i].transform.position = voyager[0].transform.position;
@@ -849,9 +853,9 @@ public class Main : MonoBehaviour
         ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
         label_i++;
         break;
-      case 2:
+      case (int)SCENE.NOTHING:
         break;
-      case 3:
+      case (int)SCENE.EXTREME:
         alert_t += Time.deltaTime;
         timer_t += Time.deltaTime;
         if(Mathf.Floor(alert_t) % 2 == 1)
@@ -873,7 +877,7 @@ public class Main : MonoBehaviour
           ar_timer_text.text = "00:00:00";
         }
         break;
-      case 4:
+      case (int)SCENE.EARTH:
         break;
     }
   }
