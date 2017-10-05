@@ -43,8 +43,10 @@ public class Main : MonoBehaviour
 
   GameObject[] icecube;
   GameObject[] voyager;
-  GameObject[] planet;
+  GameObject[] pluto;
+  GameObject[] vearth;
   GameObject[] milky;
+  GameObject[] nearth;
   GameObject[] blackhole;
   GameObject[] earth;
   GameObject stars;
@@ -72,6 +74,9 @@ public class Main : MonoBehaviour
   public Color scene3_helmet_color;
   public Color scene4_helmet_color;
   Color[] helmet_colors; //wrangle into array in Start for easier accessibility
+
+  public float extreme_camera_shake = 0.2f;
+  public float extreme_helmet_shake = 0.001f;
 
   int alpha_id;
   float flash_alpha;
@@ -170,6 +175,10 @@ public class Main : MonoBehaviour
   float in_portal_motion;
   float out_portal_motion;
   float max_portal_motion;
+
+  float in_fail_motion;
+  float out_fail_motion;
+  float max_fail_motion;
 
   float gaze_t_max; //The time required to confirm a gaze
   float gaze_t_max_numb; //The time required to wait before confirming another gaze
@@ -286,8 +295,10 @@ public class Main : MonoBehaviour
       {
         voiceovers[i,j] = Resources.Load<AudioClip>(voiceover_files[i,j]);
         voiceovers_played[i,j] = false;
+        //voiceovers_played[i,j] = true;
       }
     }
+
     //auto skip these
     voiceovers_played[(int)SCENE.ICE,(int)SPEC.NEU]     = true;
     voiceovers_played[(int)SCENE.ICE,(int)SPEC.GAM]     = true;
@@ -388,16 +399,20 @@ public class Main : MonoBehaviour
 
     icecube   = new GameObject[(int)SPEC.COUNT];
     voyager   = new GameObject[(int)SPEC.COUNT];
-    planet    = new GameObject[(int)SPEC.COUNT];
+    pluto     = new GameObject[(int)SPEC.COUNT];
+    vearth    = new GameObject[(int)SPEC.COUNT];
     milky     = new GameObject[(int)SPEC.COUNT];
+    nearth    = new GameObject[(int)SPEC.COUNT];
     blackhole = new GameObject[(int)SPEC.COUNT];
     earth     = new GameObject[(int)SPEC.COUNT];
     for(int i = 0; i < (int)SPEC.COUNT; i++)
     {
       icecube[i]   = GameObject.Find("Icecube_"   + spec_names[i]);
       voyager[i]   = GameObject.Find("Voyager_"   + spec_names[i]);
-      planet[i]    = GameObject.Find("Planet_"    + spec_names[i]);
+      pluto[i]     = GameObject.Find("Pluto_"     + spec_names[i]);
+      vearth[i]    = GameObject.Find("VEarth_"    + spec_names[i]);
       milky[i]     = GameObject.Find("Milky_"     + spec_names[i]);
+      nearth[i]    = GameObject.Find("Nearth_"    + spec_names[i]);
       blackhole[i] = GameObject.Find("BlackHole_" + spec_names[i]);
       earth[i]     = GameObject.Find("Earth_"     + spec_names[i]);
     }
@@ -436,7 +451,7 @@ public class Main : MonoBehaviour
     player_head = new Vector3(0, 2, 0);
 
     next_scene_i = (int)SCENE.ICE;
-    next_scene_i = (int)SCENE.EXTREME;
+    //next_scene_i = (int)SCENE.NOTHING;
     cur_scene_i = next_scene_i;
     next_scene_i = (next_scene_i + 1) % ((int)SCENE.COUNT);
     cur_spec_i = 0;
@@ -451,6 +466,10 @@ public class Main : MonoBehaviour
     in_portal_motion = 0;
     out_portal_motion = 0;
     max_portal_motion = 1;
+
+    in_fail_motion = 0;
+    out_fail_motion = 0;
+    max_fail_motion = 1;
 
     gaze_t_max = 2f;
     gaze_t_max_numb = 4f;
@@ -576,7 +595,7 @@ public class Main : MonoBehaviour
 
   void SetupScene()
   {
-    SetSpec(SPEC.VIZ);
+    SetSpec((int)SPEC.VIZ);
     spec_t_numb = spec_t_max_numb;
 
     main_camera_skybox.material = skyboxes[cur_scene_i, cur_spec_i];
@@ -644,10 +663,27 @@ public class Main : MonoBehaviour
         label_i++;
 
         ar_label_offsets[label_i].transform.localScale = new Vector3(50f, 50f, 50f);
-        ar_label_offsets[label_i].transform.position = planet[0].transform.position;
+        ar_label_offsets[label_i].transform.position = pluto[0].transform.position;
         ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
         ar_label_texts[label_i].text = "Pluto";
         ar_labels[label_i].transform.localScale = new Vector3(10f, 10f, 10f);
+        ar_labels[label_i].transform.localPosition = new Vector3(2f, 2f, 0f);
+        ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
+        lw = 2f;
+        curve = new AnimationCurve();
+        curve.AddKey(0, lw);
+        curve.AddKey(1, lw);
+        ar_label_lines[label_i].widthCurve = curve;
+        ar_label_lines[label_i].SetPosition(0, new Vector3(-5,  0, 0));
+        ar_label_lines[label_i].SetPosition(1, new Vector3(-7,  0, 0));
+        ar_label_lines[label_i].SetPosition(2, new Vector3(-8, -2, 0));
+        label_i++;
+
+        ar_label_offsets[label_i].transform.localScale = new Vector3(20f, 20f, 20f);
+        ar_label_offsets[label_i].transform.position = vearth[0].transform.position;
+        ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
+        ar_label_texts[label_i].text = "Earth";
+        ar_labels[label_i].transform.localScale = new Vector3(5f, 5f, 5f);
         ar_labels[label_i].transform.localPosition = new Vector3(2f, 2f, 0f);
         ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
         lw = 2f;
@@ -680,6 +716,24 @@ public class Main : MonoBehaviour
         ar_label_lines[label_i].SetPosition(1, new Vector3(-12, 0, 0));
         ar_label_lines[label_i].SetPosition(2, new Vector3(-17, -10, 0));
         label_i++;
+
+        ar_label_offsets[label_i].transform.localScale = new Vector3(50f, 50f, 50f);
+        ar_label_offsets[label_i].transform.position = nearth[0].transform.position;
+        ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
+        ar_label_texts[label_i].text = "Earth";
+        ar_labels[label_i].transform.localScale = new Vector3(3f, 3f, 3f);
+        ar_labels[label_i].transform.localPosition = new Vector3(1f, 1f, 0f);
+        ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
+        lw = 1f;
+        curve = new AnimationCurve();
+        curve.AddKey(0, lw);
+        curve.AddKey(1, lw);
+        ar_label_lines[label_i].widthCurve = curve;
+        ar_label_lines[label_i].SetPosition(0, new Vector3(-10, 0, 0));
+        ar_label_lines[label_i].SetPosition(1, new Vector3(-12, 0, 0));
+        ar_label_lines[label_i].SetPosition(2, new Vector3(-17, -10, 0));
+        label_i++;
+
         break;
 
       case (int)SCENE.EXTREME:
@@ -713,7 +767,7 @@ public class Main : MonoBehaviour
         curve.AddKey(1, lw);
         ar_progress_lines[label_i].widthCurve = curve;
         ar_progress_lines[label_i].SetPosition(0, new Vector3(bar_x, bar_y, 0));
-        ar_progress_lines[label_i].SetPosition(1, new Vector3(bar_x+bar_w*Mathf.Min(1,(ta[cur_scene_i,(int)SPEC.VIZ]/scan_t)), bar_y, 0));
+        ar_progress_lines[label_i].SetPosition(1, new Vector3(bar_x, bar_y, 0));
         label_i++;
 
         ar_label_offsets[label_i].transform.localScale = new Vector3(200f, 200f, 200f);
@@ -742,7 +796,7 @@ public class Main : MonoBehaviour
         curve.AddKey(1, lw);
         ar_progress_lines[label_i].widthCurve = curve;
         ar_progress_lines[label_i].SetPosition(0, new Vector3(bar_x, bar_y, 0));
-        ar_progress_lines[label_i].SetPosition(1, new Vector3(bar_x+bar_w*Mathf.Min(1f,(ta[cur_scene_i,(int)SPEC.GAM]/scan_t)), bar_y, 0));
+        ar_progress_lines[label_i].SetPosition(1, new Vector3(bar_x, bar_y, 0));
         label_i++;
 
         ar_label_offsets[label_i].transform.localScale = new Vector3(200f, 200f, 200f);
@@ -771,7 +825,7 @@ public class Main : MonoBehaviour
         curve.AddKey(1, lw);
         ar_progress_lines[label_i].widthCurve = curve;
         ar_progress_lines[label_i].SetPosition(0, new Vector3(bar_x, bar_y, 0));
-        ar_progress_lines[label_i].SetPosition(1, new Vector3(bar_x+bar_w*Mathf.Min(1,(ta[cur_scene_i,(int)SPEC.NEU]/scan_t)), bar_y, 0));
+        ar_progress_lines[label_i].SetPosition(1, new Vector3(bar_x, bar_y, 0));
         label_i++;
 
         ar_label_offsets[label_i].transform.localScale = new Vector3(200f, 200f, 200f);
@@ -790,6 +844,11 @@ public class Main : MonoBehaviour
         ar_label_lines[label_i].SetPosition(1, new Vector3(-14, 0, 0));
         ar_label_lines[label_i].SetPosition(2, new Vector3(-16, -8, 0));
         label_i++;
+
+        for(int j = 0; j < (int)SPEC.COUNT; j++)
+          ta[(int)SCENE.EXTREME,j] = 0;
+        for(int j = 0; j < (int)SPEC.COUNT+1; j++)
+          voiceovers_played[(int)SCENE.EXTREME,j] = false;
 
         gaze_projection.transform.rotation = rotationFromEuler(anti_gaze_cam_euler);
         portal_projection.transform.rotation = rotationFromEuler(anti_gaze_cam_euler);
@@ -862,7 +921,7 @@ public class Main : MonoBehaviour
           ar_alert.SetActive(false);
         else
           ar_alert.SetActive(true);
-        float seconds_left = 20 - timer_t;
+        float seconds_left = 60 - timer_t;
         if(seconds_left > 0)
         {
           ar_timer_text.text = "00:" + Mathf.Floor(seconds_left) + ":" + Mathf.Floor((seconds_left - Mathf.Floor(seconds_left)) * 100);
@@ -872,10 +931,10 @@ public class Main : MonoBehaviour
           for(int i = 0; i < (int)SPEC.COUNT; i++)
             ar_progress_lines[i].SetPosition(1, new Vector3(bar_x+bar_w*Mathf.Min(1,(ta[cur_scene_i,i]/scan_t)), bar_y, 0));
         }
-        else
+        else if(in_fail_motion == 0)
         {
-          SetupScene();
-          ar_timer_text.text = "00:00:00";
+          in_fail_motion = 0.0001f;
+          ar_timer_text.text = "XX:XX:XX";
         }
         break;
       case (int)SCENE.EARTH:
@@ -883,14 +942,14 @@ public class Main : MonoBehaviour
     }
   }
 
-  void SetSpec(SPEC spec)
+  void SetSpec(int spec)
   {
-    cur_spec_i = (int)spec;
+    cur_spec_i = spec;
     switch(spec)
     {
-      case SPEC.GAM: spec_sel_reticle.transform.position = spec_gam_reticle.transform.position; break;
-      case SPEC.VIZ: spec_sel_reticle.transform.position = spec_viz_reticle.transform.position; break;
-      case SPEC.NEU: spec_sel_reticle.transform.position = spec_neu_reticle.transform.position; break;
+      case (int)SPEC.GAM: spec_sel_reticle.transform.position = spec_gam_reticle.transform.position; break;
+      case (int)SPEC.VIZ: spec_sel_reticle.transform.position = spec_viz_reticle.transform.position; break;
+      case (int)SPEC.NEU: spec_sel_reticle.transform.position = spec_neu_reticle.transform.position; break;
     }
 
     main_camera.GetComponent<Camera>().cullingMask = (1 << layers[cur_scene_i, cur_spec_i]) | (1 << default_layer);
@@ -933,8 +992,9 @@ public class Main : MonoBehaviour
     if(in_portal_motion > 0) in_portal_motion += Time.deltaTime * 0.8f;
     if(in_portal_motion > max_portal_motion)
     {
+      out_portal_motion = in_portal_motion-max_portal_motion;
+      if(out_portal_motion <= 0) out_portal_motion = 0.00001f;
       in_portal_motion = 0;
-      out_portal_motion = Time.deltaTime;
       cur_scene_i = next_scene_i;
       next_scene_i = (next_scene_i + 1) % ((int)SCENE.COUNT);
       SetupScene();
@@ -957,6 +1017,19 @@ public class Main : MonoBehaviour
       portal.transform.localPosition = default_portal_position;
       portal.transform.localScale = new Vector3(0, 0, 0);
     }
+
+    if(in_fail_motion > 0) in_fail_motion += Time.deltaTime * 0.2f;
+    if(in_fail_motion > max_fail_motion)
+    {
+      out_fail_motion = in_fail_motion-max_fail_motion;
+      if(out_fail_motion <= 0) out_fail_motion = 0.00001f;
+      in_fail_motion = 0;
+      next_scene_i = cur_scene_i;
+      scene_rots[next_scene_i] = 0;
+      SetupScene();
+    }
+    if(out_fail_motion > 0)               out_fail_motion += Time.deltaTime;
+    if(out_fail_motion > max_fail_motion) out_fail_motion = 0;
 
     UpdateScene();
 
@@ -981,18 +1054,16 @@ public class Main : MonoBehaviour
                        -main_camera.transform.localPosition.y,
                        -main_camera.transform.localPosition.z);
     camera_house.transform.localPosition = offset + player_head;
-    float shake = 0.5f;
     if(cur_scene_i == (int)SCENE.EXTREME)
-      camera_house.transform.rotation = Quaternion.Euler((mouse_y - Screen.height / 2) * -2 + Random.Range(-shake, shake), (mouse_x - Screen.width / 2) * 2 + Random.Range(-shake, shake), 0 + Random.Range(-shake, shake));
+      camera_house.transform.rotation = Quaternion.Euler((mouse_y - Screen.height / 2) * -2 + Random.Range(-extreme_camera_shake, extreme_camera_shake), (mouse_x - Screen.width / 2) * 2 + Random.Range(-extreme_camera_shake, extreme_camera_shake), 0 + Random.Range(-extreme_camera_shake, extreme_camera_shake));
     else
       camera_house.transform.rotation = Quaternion.Euler((mouse_y - Screen.height / 2) * -2, (mouse_x - Screen.width / 2) * 2, 0);
 
     look_ahead = main_camera.transform.rotation * default_look_ahead;
     lazy_look_ahead = Vector3.Lerp(lazy_look_ahead, look_ahead, 0.1f);
     very_lazy_look_ahead = Vector3.Lerp(very_lazy_look_ahead, look_ahead, 0.002f);
-    shake = 0.001f;
     if(cur_scene_i == (int)SCENE.EXTREME)
-      helmet.transform.position = main_camera.transform.position + new Vector3(Random.Range(-shake, shake), Random.Range(-shake, shake), Random.Range(-shake, shake));
+      helmet.transform.position = main_camera.transform.position + new Vector3(Random.Range(-extreme_helmet_shake, extreme_helmet_shake), Random.Range(-extreme_helmet_shake, extreme_helmet_shake), Random.Range(-extreme_helmet_shake, extreme_helmet_shake));
     else
       helmet.transform.position = main_camera.transform.position;
     helmet.transform.rotation = rotationFromEuler(getEuler(lazy_look_ahead));
@@ -1015,6 +1086,15 @@ public class Main : MonoBehaviour
     else if(out_portal_motion > 0)
     {
       flash_alpha = 1.0f - ((float)out_portal_motion / max_portal_motion);
+    }
+    else if(in_fail_motion > 0)
+    {
+      float t = (float)in_fail_motion / max_fail_motion;
+      flash_alpha = t * t * t * t * t;
+    }
+    else if(out_fail_motion > 0)
+    {
+      flash_alpha = 1.0f - ((float)out_fail_motion / max_fail_motion);
     }
     else
       flash_alpha = 0;
@@ -1075,9 +1155,9 @@ public class Main : MonoBehaviour
       if(spec_t_in >= spec_t_max)
       {
         int old_spec = cur_spec_i;
-        if(distance_gam <= distance_viz && distance_gam <= distance_neu) SetSpec(SPEC.GAM);
-        if(distance_viz <= distance_gam && distance_viz <= distance_neu) SetSpec(SPEC.VIZ);
-        if(distance_neu <= distance_gam && distance_neu <= distance_viz) SetSpec(SPEC.NEU);
+        if(distance_gam <= distance_viz && distance_gam <= distance_neu) SetSpec((int)SPEC.GAM);
+        if(distance_viz <= distance_gam && distance_viz <= distance_neu) SetSpec((int)SPEC.VIZ);
+        if(distance_neu <= distance_gam && distance_neu <= distance_viz) SetSpec((int)SPEC.NEU);
 
         if(old_spec != cur_spec_i)
         {
