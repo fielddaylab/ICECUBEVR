@@ -619,6 +619,8 @@ public class Main : MonoBehaviour
         ar_label_lines[label_i].SetPosition(1, new Vector3(-10,  0, 0));
         ar_label_lines[label_i].SetPosition(2, new Vector3(-11, -5, 0));
         label_i++;
+
+        spec_projection.SetActive(false);
         break;
 
       case 1:
@@ -655,6 +657,8 @@ public class Main : MonoBehaviour
         ar_label_lines[label_i].SetPosition(1, new Vector3(-7,  0, 0));
         ar_label_lines[label_i].SetPosition(2, new Vector3(-8, -2, 0));
         label_i++;
+
+        spec_projection.SetActive(true);
         break;
 
       case 2:
@@ -811,6 +815,7 @@ public class Main : MonoBehaviour
 
         ar_alert.SetActive(false);
         ar_timer.SetActive(false);
+        spec_projection.SetActive(false);
         break;
     }
 
@@ -1055,7 +1060,7 @@ public class Main : MonoBehaviour
     float distance_viz = Vector3.Distance(spec_viz_reticle.transform.position, cam_reticle.transform.position);
     float distance_gam = Vector3.Distance(spec_gam_reticle.transform.position, cam_reticle.transform.position);
     float distance_neu = Vector3.Distance(spec_neu_reticle.transform.position, cam_reticle.transform.position);
-    if(spec_t_numb <= 0 && (distance_gam < 0.5 || distance_viz < 0.5 || distance_neu < 0.5))
+    if(spec_projection.active && spec_t_numb <= 0 && (distance_gam < 0.5 || distance_viz < 0.5 || distance_neu < 0.5))
     {
       if(spec_t_since < 0)        spec_t_since = Time.deltaTime;
       else                        spec_t_since += Time.deltaTime;
