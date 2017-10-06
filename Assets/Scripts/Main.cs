@@ -4,6 +4,22 @@ using UnityEngine;
 
 public class Main : MonoBehaviour
 {
+  string[] credit_strings = new string[]
+  {
+    "", //needs empty string at beginning so it starts off empty
+    "Me",
+    "You",
+    "Him",
+    "Her",
+    "Them",
+    "Everybody",
+    "Else",
+    "", //needs empty string at end so it eventually shuts up
+  };
+  int credits_i;
+  float credits_t;
+  float max_credits_t = 5f;
+
   GameObject camera_house;
   GameObject main_camera;
   GameObject dom_camera;
@@ -31,6 +47,8 @@ public class Main : MonoBehaviour
   GameObject ar_alert;
   GameObject ar_timer;
   TextMesh ar_timer_text;
+  GameObject credits;
+  TextMesh credits_text;
 
   int MAX_LABELS = 5;
   GameObject[] ar_labels;
@@ -361,6 +379,8 @@ public class Main : MonoBehaviour
     ar_alert = GameObject.Find("Alert");
     ar_timer = GameObject.Find("Timer");
     ar_timer_text = ar_timer.GetComponent<TextMesh>();
+    credits = GameObject.Find("Credits");
+    credits_text = credits.GetComponent<TextMesh>();
     //stars = GameObject.Find("Stars");
     //starsscale = GameObject.Find("StarsScale");
 
@@ -461,7 +481,7 @@ public class Main : MonoBehaviour
     player_head = new Vector3(0, 2, 0);
 
     next_scene_i = (int)SCENE.ICE;
-    //next_scene_i = (int)SCENE.EARTH;
+    next_scene_i = (int)SCENE.EARTH;
     cur_scene_i = next_scene_i;
     next_scene_i = (next_scene_i + 1) % ((int)SCENE.COUNT);
     cur_spec_i = 0;
@@ -601,6 +621,9 @@ public class Main : MonoBehaviour
     }
     Destroy(star, 0f);
 */
+
+    credits_i = 0;
+    credits_t = 0f;
 
     SetupScene();
   }
@@ -982,6 +1005,14 @@ public class Main : MonoBehaviour
         }
         break;
       case (int)SCENE.EARTH:
+        credits_t += Time.deltaTime;
+        if(credits_t > max_credits_t)
+        {
+          credits_t = 0;
+          credits_i++;
+          if(credits_i < credit_strings.Length)
+            credits_text.text = credit_strings[credits_i];
+        }
         break;
     }
   }
