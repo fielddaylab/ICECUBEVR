@@ -48,6 +48,7 @@ public class Main : MonoBehaviour
   GameObject[] milky;
   GameObject[] nearth;
   GameObject[] blackhole;
+  GameObject[] esun;
   GameObject[] earth;
   GameObject stars;
   GameObject starsscale;
@@ -77,6 +78,13 @@ public class Main : MonoBehaviour
 
   public float extreme_camera_shake = 0.2f;
   public float extreme_helmet_shake = 0.001f;
+
+  public float label_offset_local_scale = 8f;
+  public float label_local_scale = 5f;
+  public Vector3 label_local_position = new Vector3(10,10,0f);
+  public Vector3 line_0 = new Vector3(-8,0,0);
+  public Vector3 line_1 = new Vector3(-12,0,0);
+  public Vector3 line_2 = new Vector3(-14,-4,0);
 
   int alpha_id;
   float flash_alpha;
@@ -295,7 +303,7 @@ public class Main : MonoBehaviour
       {
         voiceovers[i,j] = Resources.Load<AudioClip>(voiceover_files[i,j]);
         voiceovers_played[i,j] = false;
-        //voiceovers_played[i,j] = true;
+        voiceovers_played[i,j] = true;
       }
     }
 
@@ -404,6 +412,7 @@ public class Main : MonoBehaviour
     milky     = new GameObject[(int)SPEC.COUNT];
     nearth    = new GameObject[(int)SPEC.COUNT];
     blackhole = new GameObject[(int)SPEC.COUNT];
+    esun      = new GameObject[(int)SPEC.COUNT];
     earth     = new GameObject[(int)SPEC.COUNT];
     for(int i = 0; i < (int)SPEC.COUNT; i++)
     {
@@ -414,6 +423,7 @@ public class Main : MonoBehaviour
       milky[i]     = GameObject.Find("Milky_"     + spec_names[i]);
       nearth[i]    = GameObject.Find("Nearth_"    + spec_names[i]);
       blackhole[i] = GameObject.Find("BlackHole_" + spec_names[i]);
+      esun[i]      = GameObject.Find("ESun_"      + spec_names[i]);
       earth[i]     = GameObject.Find("Earth_"     + spec_names[i]);
     }
 
@@ -451,7 +461,7 @@ public class Main : MonoBehaviour
     player_head = new Vector3(0, 2, 0);
 
     next_scene_i = (int)SCENE.ICE;
-    //next_scene_i = (int)SCENE.NOTHING;
+    next_scene_i = (int)SCENE.EARTH;
     cur_scene_i = next_scene_i;
     next_scene_i = (next_scene_i + 1) % ((int)SCENE.COUNT);
     cur_spec_i = 0;
@@ -862,9 +872,9 @@ public class Main : MonoBehaviour
         ar_label_offsets[label_i].transform.localScale = new Vector3(8f, 8f, 8f);
         ar_label_offsets[label_i].transform.position = earth[0].transform.position;
         ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
-        ar_label_texts[label_i].text = "Earth";
+        ar_label_texts[label_i].text = "Ice Cube";
         ar_labels[label_i].transform.localScale = new Vector3(5f, 5f, 5f);
-        ar_labels[label_i].transform.localPosition = new Vector3(10f, 10f, 0f);
+        ar_labels[label_i].transform.localPosition = new Vector3(2.25f, 3f, 0f);
         ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
         lw = 3f;
         curve = new AnimationCurve();
@@ -872,6 +882,23 @@ public class Main : MonoBehaviour
         curve.AddKey(1, lw);
         ar_label_lines[label_i].widthCurve = curve;
         ar_label_lines[label_i].SetPosition(0, new Vector3( -8,  0, 0));
+        ar_label_lines[label_i].SetPosition(1, new Vector3(-12,  0, 0));
+        ar_label_lines[label_i].SetPosition(2, new Vector3(-14, -4, 0));
+        label_i++;
+
+        ar_label_offsets[label_i].transform.localScale = new Vector3(8f, 8f, 8f);
+        ar_label_offsets[label_i].transform.position = esun[0].transform.position;
+        ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
+        ar_label_texts[label_i].text = "Sun";
+        ar_labels[label_i].transform.localScale = new Vector3(9f, 9f, 9f);
+        ar_labels[label_i].transform.localPosition = new Vector3(17f, 10f, 0f);
+        ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
+        lw = 3f;
+        curve = new AnimationCurve();
+        curve.AddKey(0, lw);
+        curve.AddKey(1, lw);
+        ar_label_lines[label_i].widthCurve = curve;
+        ar_label_lines[label_i].SetPosition(0, new Vector3( -4,  0, 0));
         ar_label_lines[label_i].SetPosition(1, new Vector3(-12,  0, 0));
         ar_label_lines[label_i].SetPosition(2, new Vector3(-14, -4, 0));
         label_i++;
@@ -896,6 +923,20 @@ public class Main : MonoBehaviour
 
   void UpdateScene()
   {
+    /*
+      //HACK
+      ar_label_offsets[1].transform.localScale = new Vector3(label_offset_local_scale, label_offset_local_scale, label_offset_local_scale); //scales the offset- NOT THE SIZE OF ANYTHING (this is dumb)
+      ar_label_offsets[1].transform.position = esun[0].transform.position;
+      ar_label_offsets[1].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[1].transform.position));
+      ar_label_texts[1].text = "Sun";
+      ar_labels[1].transform.localScale = new Vector3(label_local_scale, label_local_scale, label_local_scale); //scales the thing
+      ar_labels[1].transform.localPosition = label_local_position; //move the whole thing
+      ar_labels[1].transform.localScale /= ar_label_offsets[1].transform.localScale.x;
+      ar_label_lines[1].SetPosition(0, line_0);
+      ar_label_lines[1].SetPosition(1, line_1);
+      ar_label_lines[1].SetPosition(2, line_2);
+    */
+
     ta[cur_scene_i,cur_spec_i] += Time.deltaTime;
 
     int label_i = 0;

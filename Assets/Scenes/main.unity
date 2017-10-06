@@ -648,6 +648,12 @@ MonoBehaviour:
   scene4_helmet_color: {r: 0.6764706, g: 0.81257606, b: 1, a: 0}
   extreme_camera_shake: 0.2
   extreme_helmet_shake: 0.001
+  label_offset_local_scale: 8
+  label_local_scale: 5
+  label_local_position: {x: 10, y: 10, z: 0}
+  line_0: {x: -8, y: 0, z: 0}
+  line_1: {x: -12, y: 0, z: 0}
+  line_2: {x: -14, y: -4, z: 0}
 --- !u!4 &253639470
 Transform:
   m_ObjectHideFlags: 0
@@ -942,7 +948,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1164195167296064, guid: 8520e9289f03c194592d7c0e643c0ed5, type: 2}
       propertyPath: m_Name
-      value: Sun4_Viz
+      value: ESun_Viz
       objectReference: {fileID: 0}
     - target: {fileID: 108304473541883658, guid: 8520e9289f03c194592d7c0e643c0ed5,
         type: 2}
@@ -1205,7 +1211,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1164195167296064, guid: 8520e9289f03c194592d7c0e643c0ed5, type: 2}
       propertyPath: m_Name
-      value: Sun4_Neu
+      value: ESun_Neu
       objectReference: {fileID: 0}
     - target: {fileID: 1636771432017898, guid: 8520e9289f03c194592d7c0e643c0ed5, type: 2}
       propertyPath: m_Layer
@@ -2780,7 +2786,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1164195167296064, guid: 8520e9289f03c194592d7c0e643c0ed5, type: 2}
       propertyPath: m_Name
-      value: Sun1_Viz
+      value: VSun_Viz
       objectReference: {fileID: 0}
     - target: {fileID: 1164195167296064, guid: 8520e9289f03c194592d7c0e643c0ed5, type: 2}
       propertyPath: m_Layer
@@ -4233,15 +4239,15 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4538711698413744, guid: 4bd587846e94e47ff9a3fb214af8ba03, type: 2}
       propertyPath: m_LocalScale.x
-      value: 0.1
+      value: 0.01
       objectReference: {fileID: 0}
     - target: {fileID: 4538711698413744, guid: 4bd587846e94e47ff9a3fb214af8ba03, type: 2}
       propertyPath: m_LocalScale.y
-      value: 0.1
+      value: 0.01
       objectReference: {fileID: 0}
     - target: {fileID: 4538711698413744, guid: 4bd587846e94e47ff9a3fb214af8ba03, type: 2}
       propertyPath: m_LocalScale.z
-      value: 0.1
+      value: 0.01
       objectReference: {fileID: 0}
     - target: {fileID: 1570498465134624, guid: 4bd587846e94e47ff9a3fb214af8ba03, type: 2}
       propertyPath: m_Layer
@@ -4340,7 +4346,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1164195167296064, guid: 8520e9289f03c194592d7c0e643c0ed5, type: 2}
       propertyPath: m_Name
-      value: Sun1_Neu
+      value: VSun_Neu
       objectReference: {fileID: 0}
     - target: {fileID: 1164195167296064, guid: 8520e9289f03c194592d7c0e643c0ed5, type: 2}
       propertyPath: m_Layer
@@ -9060,7 +9066,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1164195167296064, guid: 8520e9289f03c194592d7c0e643c0ed5, type: 2}
       propertyPath: m_Name
-      value: Sun1_Gam
+      value: VSun_Gam
       objectReference: {fileID: 0}
     - target: {fileID: 1164195167296064, guid: 8520e9289f03c194592d7c0e643c0ed5, type: 2}
       propertyPath: m_Layer
@@ -14122,7 +14128,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1164195167296064, guid: 8520e9289f03c194592d7c0e643c0ed5, type: 2}
       propertyPath: m_Name
-      value: Sun4_Gam
+      value: ESun_Gam
       objectReference: {fileID: 0}
     - target: {fileID: 1636771432017898, guid: 8520e9289f03c194592d7c0e643c0ed5, type: 2}
       propertyPath: m_Layer
