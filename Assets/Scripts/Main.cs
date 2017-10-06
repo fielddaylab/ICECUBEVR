@@ -27,7 +27,6 @@ public class Main : MonoBehaviour
   GameObject ar_group;
   GameObject ar_camera_project;
   GameObject ar_camera_static;
-  GameObject ar_circle;
   GameObject ar_alert;
   GameObject ar_timer;
   TextMesh ar_timer_text;
@@ -50,8 +49,8 @@ public class Main : MonoBehaviour
   GameObject[] blackhole;
   GameObject[] esun;
   GameObject[] earth;
-  GameObject stars;
-  GameObject starsscale;
+  //GameObject stars;
+  //GameObject starsscale;
 
   Vector3 default_portal_scale;
   Vector3 default_portal_position;
@@ -104,7 +103,7 @@ public class Main : MonoBehaviour
 
   AudioSource voiceover_audiosource;
   bool voiceover_was_playing;
-  AudioSource sfx_audiosource;
+  //AudioSource sfx_audiosource;
   string[,] voiceover_files;
   AudioClip[,] voiceovers;
   bool[,] voiceovers_played;
@@ -357,12 +356,11 @@ public class Main : MonoBehaviour
     ar_group = GameObject.Find("AR");
     ar_camera_project = GameObject.Find("AR_Camera_Project");
     ar_camera_static = GameObject.Find("AR_Camera_Static");
-    ar_circle = GameObject.Find("ARCircle");
     ar_alert = GameObject.Find("Alert");
     ar_timer = GameObject.Find("Timer");
     ar_timer_text = ar_timer.GetComponent<TextMesh>();
-    stars = GameObject.Find("Stars");
-    starsscale = GameObject.Find("StarsScale");
+    //stars = GameObject.Find("Stars");
+    //starsscale = GameObject.Find("StarsScale");
 
     ar_labels         = new GameObject[MAX_LABELS];
     ar_label_offsets  = new GameObject[MAX_LABELS];
@@ -444,7 +442,7 @@ public class Main : MonoBehaviour
 
     voiceover_audiosource = GameObject.Find("Script").AddComponent<AudioSource>();
     voiceover_was_playing = false;
-    sfx_audiosource = GameObject.Find("Script").AddComponent<AudioSource>();
+    //sfx_audiosource = GameObject.Find("Script").AddComponent<AudioSource>();
 
     default_portal_scale = portal.transform.localScale;
     default_portal_position = portal.transform.position;
@@ -517,6 +515,7 @@ public class Main : MonoBehaviour
     main_camera_skybox.material = skyboxes[cur_scene_i, cur_spec_i];
     portal_camera_next_skybox.material = skyboxes[next_scene_i, (int)SPEC.VIZ];
 
+/*
     //stars
     GameObject[] star_groups;
     GameObject star;
@@ -599,6 +598,7 @@ public class Main : MonoBehaviour
       n_stars -= n_stars_in_group;
     }
     Destroy(star, 0f);
+*/
 
     SetupScene();
   }
@@ -749,7 +749,6 @@ public class Main : MonoBehaviour
       case (int)SCENE.EXTREME:
         float bar_y = -3;
         float bar_x = -11;
-        float bar_w = 23;
 
         ar_label_offsets[label_i].transform.localScale = new Vector3(200f, 200f, 200f);
         ar_label_offsets[label_i].transform.position = blackhole[0].transform.position;
@@ -1186,7 +1185,7 @@ public class Main : MonoBehaviour
     float distance_viz = Vector3.Distance(spec_viz_reticle.transform.position, cam_reticle.transform.position);
     float distance_gam = Vector3.Distance(spec_gam_reticle.transform.position, cam_reticle.transform.position);
     float distance_neu = Vector3.Distance(spec_neu_reticle.transform.position, cam_reticle.transform.position);
-    if(spec_projection.active && spec_t_numb <= 0 && (distance_gam < 0.5 || distance_viz < 0.5 || distance_neu < 0.5))
+    if(spec_projection.activeInHierarchy && spec_t_numb <= 0 && (distance_gam < 0.5 || distance_viz < 0.5 || distance_neu < 0.5))
     {
       if(spec_t_since < 0)        spec_t_since = Time.deltaTime;
       else                        spec_t_since += Time.deltaTime;
