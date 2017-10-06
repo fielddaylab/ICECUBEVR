@@ -46,6 +46,7 @@ public class DomArrayGenerator : MonoBehaviour {
       tableDom.transform.localScale.Set(10.0f, 10.0f, 10.0f);
       tableDom.GetComponent<DOMController>().stringNum = domUnitNum;
       tableDom.GetComponent<DOMController>().domNum = domNum;
+      tableDom.layer = LayerMask.NameToLayer("Set_DOM");
 
       if(domNum <= 60)
       {
