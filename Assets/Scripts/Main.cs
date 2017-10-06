@@ -421,7 +421,7 @@ public class Main : MonoBehaviour
       pluto[i]     = GameObject.Find("Pluto_"     + spec_names[i]);
       vearth[i]    = GameObject.Find("VEarth_"    + spec_names[i]);
       milky[i]     = GameObject.Find("Milky_"     + spec_names[i]);
-      nearth[i]    = GameObject.Find("Nearth_"    + spec_names[i]);
+      nearth[i]    = GameObject.Find("NEarth_"    + spec_names[i]);
       blackhole[i] = GameObject.Find("BlackHole_" + spec_names[i]);
       esun[i]      = GameObject.Find("ESun_"      + spec_names[i]);
       earth[i]     = GameObject.Find("Earth_"     + spec_names[i]);
