@@ -6,6 +6,7 @@ public class Main : MonoBehaviour
 {
   GameObject camera_house;
   GameObject main_camera;
+  GameObject dom_camera;
   Skybox main_camera_skybox;
   GameObject portal_projection;
   GameObject portal;
@@ -336,6 +337,7 @@ public class Main : MonoBehaviour
     camera_house = GameObject.Find("CameraHouse");
     main_camera = GameObject.Find("Main Camera");
     main_camera_skybox = main_camera.GetComponent<Skybox>();
+    dom_camera = GameObject.Find("DOM_Camera");
     portal_projection = GameObject.Find("Portal_Projection");
     portal = GameObject.Find("Portal");
     portal_camera_next = GameObject.Find("Portal_Camera_Next");
@@ -652,6 +654,7 @@ public class Main : MonoBehaviour
         spec_projection.SetActive(false);
         gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
         portal_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
+        dom_camera.SetActive(true);
         break;
 
       case (int)SCENE.VOYAGER:
@@ -707,6 +710,7 @@ public class Main : MonoBehaviour
         label_i++;
 
         spec_projection.SetActive(true);
+        dom_camera.SetActive(false);
         break;
 
       case (int)SCENE.NOTHING:
