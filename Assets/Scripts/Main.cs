@@ -481,7 +481,7 @@ public class Main : MonoBehaviour
     player_head = new Vector3(0, 2, 0);
 
     next_scene_i = (int)SCENE.ICE;
-    next_scene_i = (int)SCENE.EARTH;
+    //next_scene_i = (int)SCENE.EARTH;
     cur_scene_i = next_scene_i;
     next_scene_i = (next_scene_i + 1) % ((int)SCENE.COUNT);
     cur_spec_i = 0;
