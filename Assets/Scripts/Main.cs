@@ -1364,8 +1364,8 @@ public class Main : MonoBehaviour
       }
     }
 
-    Vector3 nvec_start = new Vector3(0,0,0);
-    Vector3 nvec_end   = new Vector3(1,1,1);
+    Vector3 nvec_start = new Vector3(-0.2f,-0.2f,-0.2f);
+    Vector3 nvec_end   = new Vector3(1.2f,1.2f,1.2f);
     float nvec_t = nwave_t;
     Vector3 nvec_cur = Vector3.Lerp(nvec_start,nvec_end,nvec_t);
     Vector3 nvec_comp = new Vector3(0,0,0);
