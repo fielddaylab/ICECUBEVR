@@ -20,6 +20,8 @@ public class Main : MonoBehaviour
   float credits_t;
   float max_credits_t = 5f;
 
+  float twopi = 3.14159265f*2f;
+
   GameObject camera_house;
   GameObject main_camera;
   GameObject dom_camera;
@@ -41,6 +43,7 @@ public class Main : MonoBehaviour
   GameObject spec_neu_reticle;
   GameObject spec_sel_reticle;
   GameObject eyeray;
+  GameObject dom;
   GameObject ar_group;
   GameObject ar_camera_project;
   GameObject ar_camera_static;
@@ -71,6 +74,13 @@ public class Main : MonoBehaviour
   //GameObject stars;
   //GameObject starsscale;
 
+  int dom_w = 10;
+  int dom_h = 10;
+  int dom_d = 10;
+  float default_dom_s;
+  float[,,] dom_s;
+  GameObject[,,] dom_bulbs;
+
   Vector3 default_portal_scale;
   Vector3 default_portal_position;
   Vector3 default_look_ahead;
@@ -86,6 +96,8 @@ public class Main : MonoBehaviour
   public GameObject star_prefab;
   public GameObject ar_label_prefab;
   public GameObject ar_progress_prefab;
+  public GameObject dom_string_prefab;
+  public GameObject dom_bulb_prefab;
 
   public Color scene0_helmet_color;
   public Color scene1_helmet_color;
@@ -373,6 +385,7 @@ public class Main : MonoBehaviour
     spec_neu_reticle = GameObject.Find("Spec_Neu_Reticle");
     spec_sel_reticle = GameObject.Find("Spec_Sel_Reticle");
     eyeray = GameObject.Find("Ray");
+    dom = GameObject.Find("MyDom");
     ar_group = GameObject.Find("AR");
     ar_camera_project = GameObject.Find("AR_Camera_Project");
     ar_camera_static = GameObject.Find("AR_Camera_Static");
@@ -536,6 +549,42 @@ public class Main : MonoBehaviour
         skyboxes[i,j] = Resources.Load<Material>(skybox_files[i,j]);
     main_camera_skybox.material = skyboxes[cur_scene_i, cur_spec_i];
     portal_camera_next_skybox.material = skyboxes[next_scene_i, (int)SPEC.VIZ];
+
+    //dom
+    GameObject dom_string;
+    GameObject dom_bulb;
+    //kill placement cube
+    GameObject c = dom.transform.GetChild(0).gameObject;
+    c.transform.parent = null;
+    Destroy(c);
+
+    dom_s = new float[dom_w,dom_h,dom_d];
+    dom_bulbs = new GameObject[dom_w,dom_h,dom_d];
+
+    for(int i = 0; i < dom_w; i++)
+    {
+      for(int j = 0; j < dom_d; j++)
+      {
+        float x = -0.5f+((float)i/(dom_w-1f));
+        float z = -0.5f+((float)j/(dom_d-1f));
+        dom_string = (GameObject)Instantiate(dom_string_prefab);
+        dom_string.transform.SetParent(dom.transform);
+        dom_string.transform.localPosition = new Vector3(x,0,z);
+        dom_string.transform.localScale = dom_string.transform.localScale*dom.transform.localScale.x; //unity...
+
+        for(int k = 0; k < dom_h; k++)
+        {
+          float y = -0.5f+((float)k/(dom_h-1f));
+          dom_bulb = (GameObject)Instantiate(dom_bulb_prefab);
+          dom_bulb.transform.SetParent(dom.transform);
+          dom_bulb.transform.localPosition = new Vector3(x,y,z);
+          dom_bulb.transform.localScale = dom_bulb.transform.localScale*dom.transform.localScale.x; //unity...
+          default_dom_s = dom_bulb.transform.localScale.x;
+          dom_s[i,k,j] = 1;
+          dom_bulbs[i,k,j] = dom_bulb;
+        }
+      }
+    }
 
 /*
     //stars
@@ -1033,8 +1082,12 @@ public class Main : MonoBehaviour
     portal_camera_next_skybox.material = skyboxes[next_scene_i, (int)SPEC.VIZ];
   }
 
+  float nwave_t = 0;
   void Update()
   {
+    nwave_t += Time.deltaTime;
+    while(nwave_t > 1) nwave_t -= 1f;
+
     float aspect = main_camera.GetComponent<Camera>().aspect;
     float fov = main_camera.GetComponent<Camera>().fieldOfView;
     ar_camera_project.GetComponent<Camera>().aspect = aspect;
@@ -1307,6 +1360,38 @@ public class Main : MonoBehaviour
           voiceover_audiosource.Play();
           voiceover_was_playing = true;
           voiceovers_played[cur_scene_i,(int)SPEC.COUNT] = true;
+        }
+      }
+    }
+
+    Vector3 nvec_start = new Vector3(0,0,0);
+    Vector3 nvec_end   = new Vector3(1,1,1);
+    float nvec_t = nwave_t;
+    Vector3 nvec_cur = Vector3.Lerp(nvec_start,nvec_end,nvec_t);
+    Vector3 nvec_comp = new Vector3(0,0,0);
+    for(int i = 0; i < dom_w; i++)
+    {
+      for(int j = 0; j < dom_h; j++)
+      {
+        for(int k = 0; k < dom_d; k++)
+        {
+          nvec_comp = new Vector3((float)i/(dom_w-1),(float)j/(dom_h-1),(float)k/(dom_d-1));
+          float f = Vector3.Distance(nvec_cur,nvec_comp);
+          f = (0.2f-f)*5f;
+          dom_s[i,j,k] = Mathf.Clamp(f,0,1);
+          //dom_s[i,j,k] = Mathf.Sin((((float)i/dom_w)+nwave_t)*twopi)*Mathf.Sin((float)j/dom_h*twopi)*Mathf.Sin((float)k/dom_d*twopi);
+        }
+      }
+    }
+
+    for(int i = 0; i < dom_w; i++)
+    {
+      for(int j = 0; j < dom_h; j++)
+      {
+        for(int k = 0; k < dom_d; k++)
+        {
+          float s = dom_s[i,j,k]*default_dom_s;
+          dom_bulbs[i,j,k].transform.localScale = new Vector3(s,s,s);
         }
       }
     }

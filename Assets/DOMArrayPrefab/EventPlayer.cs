@@ -10,9 +10,6 @@ public class EventPlayer : MonoBehaviour
   public string eventDirectory;
   public string newEventFile;
 
-  public GameObject sparks;
-  List<GameObject> sparkList = new List<GameObject>();
-
   public float playSpeed = 0.01f;
   private float eventFrequency = 10.0f;
   public float totalEnergy = 0.0f;
@@ -27,8 +24,6 @@ public class EventPlayer : MonoBehaviour
   private bool donePlaying = false;
   private bool isSwiped = false;
   private float timer = 2.0f;
-
-  public LineRenderer truePath;
 
   public struct EventData
   {
@@ -252,17 +247,6 @@ public class EventPlayer : MonoBehaviour
 
   void Update ()
   {
-    for(int j = 0; j < sparkList.Count; ++j)
-    {
-      GameObject s = sparkList[j];
-      sparkList[j].transform.Translate(0f, 20f, 0f);
-      if(sparkList[j].transform.position.y > -47f)
-      {
-        sparkList.RemoveAt(j);
-        DestroyObject(s);
-      }
-    }
-
     if(donePlaying && !isSwiped)
     {
       timer -= Time.deltaTime;
@@ -303,12 +287,6 @@ public class EventPlayer : MonoBehaviour
       eventsPlaying[currEventNumber].eventIndex = 0;
       eventsPlaying[currEventNumber].isPlaying = true;
       eventsPlaying[currEventNumber].isDetected = false;
-
-      if(truePath)
-      {
-        truePath.SetPosition(0, events[currEventNumber].startPos);
-        truePath.SetPosition(1, events[currEventNumber].endPos);
-      }
     }
 
     if(IsEventPlaying())
@@ -333,14 +311,6 @@ public class EventPlayer : MonoBehaviour
             toAdd.timeFrac = fTimeFrac;
 
             eventsPlaying [currEventNumber].ActivatedDoms.Add (toAdd);
-
-            if(sparks)
-            {
-              GameObject spark = Instantiate(sparks, transform);
-              spark.transform.position = d.transform.position;
-              spark.GetComponent<ParticleSystem>().Play();
-              sparkList.Add(spark);
-            }
 
             AudioSource asource = dc.GetComponent<AudioSource>();
             if(asource && asource.isActiveAndEnabled)

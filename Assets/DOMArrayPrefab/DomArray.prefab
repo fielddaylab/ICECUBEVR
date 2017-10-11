@@ -101,11 +101,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   eventDirectory: Assets/DOMArrayPrefab/eventData/
   newEventFile: 
-  sparks: {fileID: 0}
   playSpeed: 0.01
   totalEnergy: 0
   lastEventNumber: -1
-  truePath: {fileID: 0}
 --- !u!114 &114542862148372160
 MonoBehaviour:
   m_ObjectHideFlags: 1

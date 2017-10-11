@@ -7,7 +7,6 @@ public class DomArrayGenerator : MonoBehaviour {
 
   public GameObject domObject;
   public string geometryFile = "Icecube_Geometry_Data.txt";
-  private const float BELOW_ICE = -1950.0f;
 
   private const int NUM_STRINGS = 86;
   private const int NUM_DOMS_PER_STRING = 64;
@@ -25,36 +24,25 @@ public class DomArrayGenerator : MonoBehaviour {
     {
       string[] data = line.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
 
-      string stringIndex = data [0];
-      string domIndex = data [1];
-      string xVal = data [2];
-      string yVal = data [3];
-      string zVal = data [4];
-
-      int domUnitNum = Convert.ToInt32(stringIndex)-1;
-      int domNum = Convert.ToInt32(domIndex)-1;
-      float xFloat = float.Parse(xVal);
-      float yFloat = float.Parse (yVal);
-      float zFloat = float.Parse (zVal);
+      int domUnitNum = Convert.ToInt32(data[0])-1;
+      int domNum     = Convert.ToInt32(data[1])-1;
+      Vector3 domPos = new Vector3(float.Parse(data[2]),float.Parse(data[4]),float.Parse(data[3])); //x,z,y
 
       GameObject tableDom = (GameObject)Instantiate(domObject);
-
-      Vector3 domPos = new Vector3(xFloat, BELOW_ICE + zFloat, yFloat);
+      tableDom.transform.SetParent(transform);
 
       tableDom.transform.position = domPos;
-      tableDom.transform.SetParent(transform);
       tableDom.transform.localScale.Set(10.0f, 10.0f, 10.0f);
       tableDom.GetComponent<DOMController>().stringNum = domUnitNum;
       tableDom.GetComponent<DOMController>().domNum = domNum;
-      tableDom.layer = LayerMask.NameToLayer("Set_DOM");
 
       if(domNum <= 60)
       {
-        if(domNum == 0) pos[0] = new Vector3(xFloat, BELOW_ICE + zFloat, yFloat);
+        if(domNum == 0) pos[0] = domPos;
         pos[1] = pos[0];
       }
 
-      DOMArray[domUnitNum, domNum] = tableDom;
+      DOMArray[domUnitNum,domNum] = tableDom;
     }
 
     reader.Close();
