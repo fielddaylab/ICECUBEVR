@@ -567,10 +567,12 @@ public class Main : MonoBehaviour
       {
         float x = -0.5f+((float)i/(dom_w-1f));
         float z = -0.5f+((float)j/(dom_d-1f));
+        /*
         dom_string = (GameObject)Instantiate(dom_string_prefab);
         dom_string.transform.SetParent(dom.transform);
         dom_string.transform.localPosition = new Vector3(x,0,z);
         dom_string.transform.localScale = dom_string.transform.localScale*dom.transform.localScale.x; //unity...
+        */
 
         for(int k = 0; k < dom_h; k++)
         {
@@ -1378,7 +1380,7 @@ public class Main : MonoBehaviour
           nvec_comp = new Vector3((float)i/(dom_w-1),(float)j/(dom_h-1),(float)k/(dom_d-1));
           float f = Vector3.Distance(nvec_cur,nvec_comp);
           f = (0.2f-f)*5f;
-          dom_s[i,j,k] = Mathf.Clamp(f,0,1);
+          dom_s[i,j,k] = Mathf.Clamp(f,0.1f,1f);
           //dom_s[i,j,k] = Mathf.Sin((((float)i/dom_w)+nwave_t)*twopi)*Mathf.Sin((float)j/dom_h*twopi)*Mathf.Sin((float)k/dom_d*twopi);
         }
       }

@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 4661979851429768}
   - component: {fileID: 33045859206943486}
   - component: {fileID: 23347655286998118}
-  m_Layer: 26
+  m_Layer: 31
   m_Name: dom_bulb
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -54,7 +54,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 86a18337f937649b9b4c621f139e1f0d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
