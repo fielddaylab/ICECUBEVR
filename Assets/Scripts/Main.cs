@@ -729,11 +729,13 @@ public class Main : MonoBehaviour
         ar_label_lines[label_i].SetPosition(2, new Vector3(-11, -5, 0));
         label_i++;
 
-        spec_projection.SetActive(false);
         gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
         portal_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
+
+        spec_projection.SetActive(false);
         eyeray.SetActive(false);
         gaze_reticle.SetActive(false);
+
         break;
 
       case (int)SCENE.VOYAGER:
@@ -788,7 +790,6 @@ public class Main : MonoBehaviour
         ar_label_lines[label_i].SetPosition(2, new Vector3(-8, -2, 0));
         label_i++;
 
-        spec_projection.SetActive(true);
         break;
 
       case (int)SCENE.NOTHING:
@@ -986,7 +987,6 @@ public class Main : MonoBehaviour
 
         ar_alert.SetActive(false);
         ar_timer.SetActive(false);
-        spec_projection.SetActive(false);
         break;
     }
 
@@ -1055,9 +1055,18 @@ public class Main : MonoBehaviour
             gaze_reticle.SetActive(true);
           }
         }
-
         break;
       case (int)SCENE.VOYAGER:
+        float spec_t = 5f;
+
+        if(cur_ta >= spec_t)
+        {
+          if(old_ta < spec_t) //newly here
+          {
+            spec_projection.SetActive(true);
+          }
+        }
+
         for(int i = 1; i < voyager.Length; i++)
         {
           voyager[i].transform.position = voyager[0].transform.position;
