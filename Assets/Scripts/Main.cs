@@ -24,7 +24,6 @@ public class Main : MonoBehaviour
 
   GameObject camera_house;
   GameObject main_camera;
-  GameObject dom_camera;
   Skybox main_camera_skybox;
   GameObject portal_projection;
   GameObject portal;
@@ -77,6 +76,10 @@ public class Main : MonoBehaviour
   int dom_w = 10;
   int dom_h = 10;
   int dom_d = 10;
+  float dom_oyoff = 0f;
+  float dom_yoff = -1000f;
+  float dom_yvel = 0f;
+  float dom_yacc = 0f;
   float default_dom_s;
   float[,,] dom_s;
   GameObject[,,] dom_bulbs;
@@ -367,7 +370,6 @@ public class Main : MonoBehaviour
     camera_house = GameObject.Find("CameraHouse");
     main_camera = GameObject.Find("Main Camera");
     main_camera_skybox = main_camera.GetComponent<Skybox>();
-    dom_camera = GameObject.Find("DOM_Camera");
     portal_projection = GameObject.Find("Portal_Projection");
     portal = GameObject.Find("Portal");
     portal_camera_next = GameObject.Find("Portal_Camera_Next");
@@ -386,6 +388,8 @@ public class Main : MonoBehaviour
     spec_sel_reticle = GameObject.Find("Spec_Sel_Reticle");
     eyeray = GameObject.Find("Ray");
     dom = GameObject.Find("MyDom");
+    dom_oyoff = dom.transform.position.y;
+    dom.transform.position = new Vector3(dom.transform.position.x,dom_oyoff+dom_yoff,dom.transform.position.z);
     ar_group = GameObject.Find("AR");
     ar_camera_project = GameObject.Find("AR_Camera_Project");
     ar_camera_static = GameObject.Find("AR_Camera_Static");
@@ -728,7 +732,8 @@ public class Main : MonoBehaviour
         spec_projection.SetActive(false);
         gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
         portal_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
-        dom_camera.SetActive(true);
+        eyeray.SetActive(false);
+        gaze_reticle.SetActive(false);
         break;
 
       case (int)SCENE.VOYAGER:
@@ -784,7 +789,6 @@ public class Main : MonoBehaviour
         label_i++;
 
         spec_projection.SetActive(true);
-        dom_camera.SetActive(false);
         break;
 
       case (int)SCENE.NOTHING:
@@ -1014,12 +1018,44 @@ public class Main : MonoBehaviour
       ar_label_lines[1].SetPosition(2, line_2);
     */
 
+    float old_ta = ta[cur_scene_i,cur_spec_i];
     ta[cur_scene_i,cur_spec_i] += Time.deltaTime;
+    float cur_ta = ta[cur_scene_i,cur_spec_i];
 
     int label_i = 0;
     switch(cur_scene_i)
     {
       case (int)SCENE.ICE:
+        float grid_t = 1f;
+        float pulse_t = 3f;
+        float beam_t = 5f;
+
+        if(cur_ta < pulse_t) nwave_t_10 = 0;
+
+        if(cur_ta >= grid_t)
+        {
+          if(old_ta < grid_t) //newly here
+            dom_yacc = 0.5f;
+          if(dom_yacc != 0)
+          {
+            dom_yvel += dom_yacc;
+            dom_yoff += dom_yvel;
+            if(dom_yoff > 0) { dom_yoff *= -1f; dom_yvel *= -0.5f; }
+            dom_yvel *= 0.96f;
+            if(Mathf.Abs(dom_yoff) < 1 && Mathf.Abs(dom_yvel) < 1) { dom_yoff = 0; dom_yvel = 0; dom_yacc = 0; }
+            dom.transform.position = new Vector3(dom.transform.position.x,dom_oyoff+dom_yoff,dom.transform.position.z);
+          }
+        }
+
+        if(cur_ta >= beam_t)
+        {
+          if(old_ta < beam_t) //newly here
+          {
+            eyeray.SetActive(true);
+            gaze_reticle.SetActive(true);
+          }
+        }
+
         break;
       case (int)SCENE.VOYAGER:
         for(int i = 1; i < voyager.Length; i++)
@@ -1084,11 +1120,14 @@ public class Main : MonoBehaviour
     portal_camera_next_skybox.material = skyboxes[next_scene_i, (int)SPEC.VIZ];
   }
 
-  float nwave_t = 0;
+  float nwave_t_1 = 0;
+  float nwave_t_10 = 0;
   void Update()
   {
-    nwave_t += Time.deltaTime;
-    while(nwave_t > 1) nwave_t -= 1f;
+    nwave_t_1  += Time.deltaTime;
+    nwave_t_10 += Time.deltaTime;
+    while(nwave_t_1  > 1)  nwave_t_1  -= 1f;
+    while(nwave_t_10 > 10) nwave_t_10 -= 10f;
 
     float aspect = main_camera.GetComponent<Camera>().aspect;
     float fov = main_camera.GetComponent<Camera>().fieldOfView;
@@ -1366,9 +1405,10 @@ public class Main : MonoBehaviour
       }
     }
 
-    Vector3 nvec_start = new Vector3(-0.2f,-0.2f,-0.2f);
-    Vector3 nvec_end   = new Vector3(1.2f,1.2f,1.2f);
-    float nvec_t = nwave_t;
+    Vector3 nvec_start = new Vector3(1.2f,1.2f,-0.2f);
+    Vector3 nvec_dir   = new Vector3(-1f,-1f,1f).normalized;
+    Vector3 nvec_end   = nvec_start+nvec_dir*10f;
+    float nvec_t = nwave_t_10/10;
     Vector3 nvec_cur = Vector3.Lerp(nvec_start,nvec_end,nvec_t);
     Vector3 nvec_comp = new Vector3(0,0,0);
     for(int i = 0; i < dom_w; i++)
@@ -1381,7 +1421,7 @@ public class Main : MonoBehaviour
           float f = Vector3.Distance(nvec_cur,nvec_comp);
           f = (0.2f-f)*5f;
           dom_s[i,j,k] = Mathf.Clamp(f,0.1f,1f);
-          //dom_s[i,j,k] = Mathf.Sin((((float)i/dom_w)+nwave_t)*twopi)*Mathf.Sin((float)j/dom_h*twopi)*Mathf.Sin((float)k/dom_d*twopi);
+          //dom_s[i,j,k] = Mathf.Sin((((float)i/dom_w)+nwave_t_10)*twopi)*Mathf.Sin((float)j/dom_h*twopi)*Mathf.Sin((float)k/dom_d*twopi);
         }
       }
     }
