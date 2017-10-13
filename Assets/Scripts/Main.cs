@@ -690,6 +690,8 @@ public class Main : MonoBehaviour
 
     main_camera_skybox.material = skyboxes[cur_scene_i, cur_spec_i];
 
+    gaze_reticle.SetActive(false);
+
     AnimationCurve curve;
     float lw;
     lw = 0.0001f;
@@ -734,7 +736,6 @@ public class Main : MonoBehaviour
 
         spec_projection.SetActive(false);
         eyeray.SetActive(false);
-        gaze_reticle.SetActive(false);
 
         break;
 
@@ -790,6 +791,7 @@ public class Main : MonoBehaviour
         ar_label_lines[label_i].SetPosition(2, new Vector3(-8, -2, 0));
         label_i++;
 
+        dom.SetActive(false);
         break;
 
       case (int)SCENE.NOTHING:
@@ -1027,8 +1029,8 @@ public class Main : MonoBehaviour
     {
       case (int)SCENE.ICE:
         float grid_t = 1f;
-        float pulse_t = 3f;
-        float beam_t = 5f;
+        float pulse_t = 5f;
+        float beam_t = 8f;
 
         if(cur_ta < pulse_t) nwave_t_10 = 0;
 
@@ -1048,13 +1050,15 @@ public class Main : MonoBehaviour
         }
 
         if(cur_ta >= beam_t)
-        {
           if(old_ta < beam_t) //newly here
-          {
             eyeray.SetActive(true);
+
+        if(!gaze_reticle.activeSelf)
+        {
+          if(voiceovers_played[cur_scene_i,(int)SPEC.COUNT])
             gaze_reticle.SetActive(true);
-          }
         }
+
         break;
       case (int)SCENE.VOYAGER:
         float spec_t = 5f;
@@ -1067,6 +1071,12 @@ public class Main : MonoBehaviour
           }
         }
 
+        if(!gaze_reticle.activeSelf)
+        {
+          if(voiceovers_played[cur_scene_i,(int)SPEC.COUNT])
+            gaze_reticle.SetActive(true);
+        }
+
         for(int i = 1; i < voyager.Length; i++)
         {
           voyager[i].transform.position = voyager[0].transform.position;
@@ -1074,8 +1084,16 @@ public class Main : MonoBehaviour
         ar_label_offsets[label_i].transform.position = voyager[0].transform.position;
         ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
         label_i++;
+
         break;
       case (int)SCENE.NOTHING:
+
+        if(!gaze_reticle.activeSelf)
+        {
+          if(voiceovers_played[cur_scene_i,(int)SPEC.COUNT])
+            gaze_reticle.SetActive(true);
+        }
+
         break;
       case (int)SCENE.EXTREME:
         alert_t += Time.deltaTime;
@@ -1099,6 +1117,13 @@ public class Main : MonoBehaviour
           in_fail_motion = 0.0001f;
           ar_timer_text.text = "XX:XX:XX";
         }
+
+        if(!gaze_reticle.activeSelf)
+        {
+          if(voiceovers_played[cur_scene_i,(int)SPEC.COUNT])
+            gaze_reticle.SetActive(true);
+        }
+
         break;
       case (int)SCENE.EARTH:
         credits_t += Time.deltaTime;
@@ -1109,6 +1134,13 @@ public class Main : MonoBehaviour
           if(credits_i < credit_strings.Length)
             credits_text.text = credit_strings[credits_i];
         }
+
+        if(!gaze_reticle.activeSelf)
+        {
+          if(voiceovers_played[cur_scene_i,(int)SPEC.COUNT])
+            gaze_reticle.SetActive(true);
+        }
+
         break;
     }
   }
