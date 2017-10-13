@@ -6,7 +6,7 @@ using UnityEngine;
 public class Maintenance : MonoBehaviour
 {
   enum SPEC { VIZ, GAM, NEU, COUNT };
-  enum SCENE { ICE, VOYAGER, NOTHING, EXTREME, EARTH, COUNT };
+  enum SCENE { ICE, VOYAGER, NOTHING, EXTREME, EARTH, CREDITS, COUNT };
   string[] spec_names;
   string[] scene_names;
   string[,] layer_names;
@@ -66,6 +66,7 @@ public class Maintenance : MonoBehaviour
         case (int)SCENE.NOTHING: name = "Nothing"; break;
         case (int)SCENE.EXTREME: name = "Extreme"; break;
         case (int)SCENE.EARTH:   name = "Earth"; break;
+        case (int)SCENE.CREDITS: name = "Credits"; break;
       }
       scene_names[i] = name;
     }

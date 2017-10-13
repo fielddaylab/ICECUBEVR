@@ -142,14 +142,6 @@ public class Main : MonoBehaviour
   AudioClip[,] voiceovers;
   bool[,] voiceovers_played;
 
-  string[] skybox_file_names = new string[]
-  {
-    "Classic Skybox/sky12", //ice
-    "GalaxyBox2/Skybox2_1/Skybox2_1", //voyager
-    "GalaxyBox2/Skybox2_4/Skybox2_4", //nothing
-    "GalaxyBox2/Skybox2_1/Skybox2_1", //extreme
-    "GalaxyBox2/Skybox2_1/Skybox2_1", //earth
-  };
   string[,] skybox_files;
   Material[,] skyboxes;
 
@@ -160,6 +152,7 @@ public class Main : MonoBehaviour
     new Vector3(0f, 0f, 0f), //nothing
     new Vector3(0f, 0f, 0f), //extreme
     new Vector3(0f, 0f, 0f), //earth
+    new Vector3(0f, 0f, 0f), //credits
   };
   float[] scene_rots = new float[]
   {
@@ -168,6 +161,7 @@ public class Main : MonoBehaviour
     0f, //nothing
     0f, //extreme
     0f, //earth
+    0f, //credits
   };
   float[] scene_rot_deltas = new float[]
   {
@@ -176,6 +170,7 @@ public class Main : MonoBehaviour
     0.01f, //nothing
     0.01f, //extreme
     0.005f, //earth
+    0.0f, //credits
   };
 
   enum SCENE
@@ -185,6 +180,7 @@ public class Main : MonoBehaviour
     NOTHING,
     EXTREME,
     EARTH,
+    CREDITS,
     COUNT
   };
 
@@ -281,6 +277,9 @@ public class Main : MonoBehaviour
         case (int)SCENE.EARTH:
           name = "Earth";
           break;
+        case (int)SCENE.CREDITS:
+          name = "Credits";
+          break;
       }
       scene_names[i] = name;
     }
@@ -351,7 +350,7 @@ public class Main : MonoBehaviour
     string[,] skybox_files = new string[(int)SCENE.COUNT, (int)SPEC.COUNT];
     for(int i = 0; i < (int)SCENE.COUNT; i++)
       for(int j = 0; j < (int)SPEC.COUNT; j++)
-        skybox_files[i,j] = "Skybox/"+spec_names[j]+"/"+skybox_file_names[i];
+        skybox_files[i,j] = "Skybox/"+spec_names[j]+"/"+scene_names[i]+"/"+scene_names[i];
 
     helmet_colors = new Color[(int)SCENE.COUNT];
     helmet_colors[0] = scene0_helmet_color;
@@ -469,6 +468,7 @@ public class Main : MonoBehaviour
     scene_centers[(int)SCENE.NOTHING] = milky[    0].transform.position;
     scene_centers[(int)SCENE.EXTREME] = blackhole[0].transform.position;
     scene_centers[(int)SCENE.EARTH]   = earth[    0].transform.position;
+    scene_centers[(int)SCENE.CREDITS] = new Vector3(0,0,0);
 
     alpha_id = Shader.PropertyToID("alpha");
     flash_alpha = 0;
@@ -713,7 +713,9 @@ public class Main : MonoBehaviour
     int label_i = 0;
     switch(cur_scene_i)
     {
+
       case (int)SCENE.ICE:
+
         ar_label_offsets[label_i].transform.localScale = new Vector3(10f, 10f, 10f);
         ar_label_offsets[label_i].transform.position = icecube[0].transform.position;
         ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
@@ -740,6 +742,7 @@ public class Main : MonoBehaviour
         break;
 
       case (int)SCENE.VOYAGER:
+
         ar_label_offsets[label_i].transform.localScale = new Vector3(5f, 5f, 5f);
         ar_label_offsets[label_i].transform.position = voyager[0].transform.position;
         ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
@@ -795,6 +798,7 @@ public class Main : MonoBehaviour
         break;
 
       case (int)SCENE.NOTHING:
+
         ar_label_offsets[label_i].transform.localScale = new Vector3(50f, 50f, 50f);
         ar_label_offsets[label_i].transform.position = milky[0].transform.position;
         ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
@@ -832,6 +836,7 @@ public class Main : MonoBehaviour
         break;
 
       case (int)SCENE.EXTREME:
+
         float bar_y = -3;
         float bar_x = -11;
 
@@ -953,6 +958,7 @@ public class Main : MonoBehaviour
         break;
 
       case (int)SCENE.EARTH:
+
         ar_label_offsets[label_i].transform.localScale = new Vector3(8f, 8f, 8f);
         ar_label_offsets[label_i].transform.position = earth[0].transform.position;
         ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
@@ -990,6 +996,11 @@ public class Main : MonoBehaviour
         ar_alert.SetActive(false);
         ar_timer.SetActive(false);
         break;
+
+      case (int)SCENE.CREDITS:
+
+        break;
+
     }
 
     helmet_light_light.color = helmet_colors[cur_scene_i];
@@ -1027,7 +1038,9 @@ public class Main : MonoBehaviour
     int label_i = 0;
     switch(cur_scene_i)
     {
+
       case (int)SCENE.ICE:
+
         float grid_t = 1f;
         float pulse_t = 5f;
         float beam_t = 8f;
@@ -1060,7 +1073,9 @@ public class Main : MonoBehaviour
         }
 
         break;
+
       case (int)SCENE.VOYAGER:
+
         float spec_t = 5f;
 
         if(cur_ta >= spec_t)
@@ -1086,6 +1101,7 @@ public class Main : MonoBehaviour
         label_i++;
 
         break;
+
       case (int)SCENE.NOTHING:
 
         if(!gaze_reticle.activeSelf)
@@ -1095,7 +1111,9 @@ public class Main : MonoBehaviour
         }
 
         break;
+
       case (int)SCENE.EXTREME:
+
         alert_t += Time.deltaTime;
         timer_t += Time.deltaTime;
         if(Mathf.Floor(alert_t) % 2 == 1)
@@ -1125,7 +1143,19 @@ public class Main : MonoBehaviour
         }
 
         break;
+
       case (int)SCENE.EARTH:
+
+        if(!gaze_reticle.activeSelf)
+        {
+          if(voiceovers_played[cur_scene_i,(int)SPEC.COUNT])
+            gaze_reticle.SetActive(true);
+        }
+
+        break;
+
+      case (int)SCENE.CREDITS:
+
         credits_t += Time.deltaTime;
         if(credits_t > max_credits_t)
         {
@@ -1142,6 +1172,7 @@ public class Main : MonoBehaviour
         }
 
         break;
+
     }
   }
 
