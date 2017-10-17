@@ -60,6 +60,7 @@ public class Main : MonoBehaviour
   GameObject[] ar_progresses;
   GameObject[] ar_progress_offsets;
   LineRenderer[] ar_progress_lines;
+  GameObject[] ar_checks;
 
   GameObject[] icecube;
   GameObject[] voyager;
@@ -101,6 +102,7 @@ public class Main : MonoBehaviour
   public GameObject ar_progress_prefab;
   public GameObject dom_string_prefab;
   public GameObject dom_bulb_prefab;
+  public GameObject ar_check_prefab;
 
   public Color scene0_helmet_color;
   public Color scene1_helmet_color;
@@ -404,6 +406,7 @@ public class Main : MonoBehaviour
     ar_label_offsets  = new GameObject[MAX_LABELS];
     ar_label_texts    = new TextMesh[MAX_LABELS];
     ar_label_lines    = new LineRenderer[MAX_LABELS];
+    ar_checks         = new GameObject[MAX_LABELS];
 
     //technically isn't connected to max labels, but as there's a label per line, it's at least upper bound
     ar_progresses       = new GameObject[MAX_LABELS];
@@ -427,6 +430,9 @@ public class Main : MonoBehaviour
       ar_label_lines[i].widthCurve = curve;
       for(int j = 0; j < 3; j++)
         ar_label_lines[i].SetPosition(j, new Vector3(0, 0, 0));
+
+      ar_checks[i] = (GameObject)Instantiate(ar_check_prefab);
+      ar_checks[i].transform.parent = ar_labels[i].transform;
 
       ar_progress_offsets[i] = (GameObject)Instantiate(ar_progress_prefab);
       ar_progress_offsets[i].transform.parent = ar_group.transform;
@@ -704,6 +710,8 @@ public class Main : MonoBehaviour
       for(int j = 0; j < 3; j++)
         ar_label_lines[i].SetPosition(j, new Vector3(0, 0, 0));
       ar_label_texts[i].text = "";
+
+      ar_checks[i].SetActive(false);
 
       ar_progress_lines[i].widthCurve = curve;
       for(int j = 0; j < 2; j++)
@@ -1128,7 +1136,11 @@ public class Main : MonoBehaviour
           float bar_x = -11;
           float bar_w = 23;
           for(int i = 0; i < (int)SPEC.COUNT; i++)
-            ar_progress_lines[i].SetPosition(1, new Vector3(bar_x+bar_w*Mathf.Min(1,(ta[cur_scene_i,i]/scan_t)), bar_y, 0));
+          {
+            float t = Mathf.Min(1,(ta[cur_scene_i,i]/scan_t));
+            ar_progress_lines[i].SetPosition(1, new Vector3(bar_x+bar_w*t, bar_y, 0));
+            if(t == 1) ar_checks[i].SetActive(true);
+          }
         }
         else if(in_fail_motion == 0)
         {

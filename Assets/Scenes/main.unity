@@ -658,6 +658,8 @@ MonoBehaviour:
     type: 2}
   dom_bulb_prefab: {fileID: 1900122954093648, guid: 1e09b8659d670435395802f7a93d3292,
     type: 2}
+  ar_check_prefab: {fileID: 1357402303603168, guid: fdcac7dcf24ab454995a0f27cac7e6c3,
+    type: 2}
   scene0_helmet_color: {r: 1, g: 1, b: 1, a: 0}
   scene1_helmet_color: {r: 1, g: 0.93235296, b: 0.78676474, a: 0}
   scene2_helmet_color: {r: 1, g: 1, b: 1, a: 0}
