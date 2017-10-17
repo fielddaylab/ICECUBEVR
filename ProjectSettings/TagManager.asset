@@ -3,7 +3,8 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - DOM
   layers:
   - Default
   - TransparentFX
@@ -18,23 +19,23 @@ TagManager:
   - Set_Nothing_Viz
   - Set_Extreme_Viz
   - Set_Earth_Viz
+  - Set_Credits_Viz
   - Set_Ice_Gam
   - Set_Voyager_Gam
   - Set_Nothing_Gam
   - Set_Extreme_Gam
   - Set_Earth_Gam
+  - Set_Credits_Gam
   - Set_Ice_Neu
   - Set_Voyager_Neu
   - Set_Nothing_Neu
   - Set_Extreme_Neu
   - Set_Earth_Neu
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Set_Credits_Neu
+  - Set_DOM
   - 
   - Set_None
+  - Set_AR_Result
   - Set_AR_Static
   - Set_AR_Project
   m_SortingLayers:
