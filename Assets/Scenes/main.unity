@@ -4902,8 +4902,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 1}
   m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
   m_Children: []
-  m_Father: {fileID: 1381870177}
-  m_RootOrder: 2
+  m_Father: {fileID: 1297939397}
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!102 &1214153736
 TextMesh:
@@ -5153,6 +5153,7 @@ Transform:
   - {fileID: 830923161}
   - {fileID: 977165232}
   - {fileID: 190562020}
+  - {fileID: 1214153735}
   m_Father: {fileID: 1381870177}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5352,7 +5353,6 @@ Transform:
   m_Children:
   - {fileID: 1461861748}
   - {fileID: 1297939397}
-  - {fileID: 1214153735}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
