@@ -139,10 +139,14 @@ public class Main : MonoBehaviour
 
   AudioSource voiceover_audiosource;
   bool voiceover_was_playing;
-  //AudioSource sfx_audiosource;
   string[,] voiceover_files;
   AudioClip[,] voiceovers;
   bool[,] voiceovers_played;
+  AudioSource music_audiosource;
+  bool music_was_playing;
+  string[,] music_files;
+  AudioClip[,] musics;
+  //AudioSource sfx_audiosource;
 
   string[,] skybox_files;
   Material[,] skyboxes;
@@ -349,6 +353,23 @@ public class Main : MonoBehaviour
     voiceovers_played[(int)SCENE.EARTH,(int)SPEC.NEU]   = true;
     voiceovers_played[(int)SCENE.EARTH,(int)SPEC.GAM]   = true;
 
+    music_files = new string[(int)SCENE.COUNT,(int)SPEC.COUNT];
+    for(int i = 0; i < (int)SCENE.COUNT; i++)
+    {
+      for(int j = 0; j < (int)SPEC.COUNT; j++)
+      {
+        music_files[i,j] = "Music/"+spec_names[j]+"/"+scene_names[i];
+      }
+    }
+    musics = new AudioClip[(int)SCENE.COUNT,(int)SPEC.COUNT];
+    for(int i = 0; i < (int)SCENE.COUNT; i++)
+    {
+      for(int j = 0; j < (int)SPEC.COUNT; j++)
+      {
+        musics[i,j] = Resources.Load<AudioClip>(music_files[i,j]);
+      }
+    }
+
     string[,] skybox_files = new string[(int)SCENE.COUNT, (int)SPEC.COUNT];
     for(int i = 0; i < (int)SCENE.COUNT; i++)
       for(int j = 0; j < (int)SPEC.COUNT; j++)
@@ -487,6 +508,8 @@ public class Main : MonoBehaviour
 
     voiceover_audiosource = GameObject.Find("Script").AddComponent<AudioSource>();
     voiceover_was_playing = false;
+    music_audiosource = GameObject.Find("Script").AddComponent<AudioSource>();
+    music_was_playing = false;
     //sfx_audiosource = GameObject.Find("Script").AddComponent<AudioSource>();
 
     default_portal_scale = portal.transform.localScale;
@@ -504,7 +527,7 @@ public class Main : MonoBehaviour
     player_head = new Vector3(0, 2, 0);
 
     next_scene_i = (int)SCENE.ICE;
-    next_scene_i = (int)SCENE.EXTREME;
+    //next_scene_i = (int)SCENE.EARTH;
     cur_scene_i = next_scene_i;
     next_scene_i = (next_scene_i + 1) % ((int)SCENE.COUNT);
     cur_spec_i = 0;
@@ -553,6 +576,7 @@ public class Main : MonoBehaviour
     {
       vearth[i].transform.position = anti_gaze_pt;
       nearth[i].transform.position = anti_gaze_pt;
+      earth[i].transform.position = anti_gaze_pt.normalized*600;
     }
 
     spec_euler = cam_euler;
@@ -730,14 +754,14 @@ public class Main : MonoBehaviour
 
       case (int)SCENE.ICE:
 
-        ar_label_offsets[label_i].transform.localScale = new Vector3(10f, 10f, 10f);
+        ar_label_offsets[label_i].transform.localScale = new Vector3(3f, 3f, 3f);
         ar_label_offsets[label_i].transform.position = icecube[0].transform.position;
         ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
         ar_label_texts[label_i].text = "Ice Cube";
-        ar_labels[label_i].transform.localScale = new Vector3(10f, 10f, 10f);
-        ar_labels[label_i].transform.localPosition = new Vector3(10f, 10f, 0f);
+        ar_labels[label_i].transform.localScale = new Vector3(3f, 3f, 3f);
+        ar_labels[label_i].transform.localPosition = new Vector3(20f, 20f, 0f);
         ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
-        lw = 3f;
+        lw = 1f;
         curve = new AnimationCurve();
         curve.AddKey(0, lw);
         curve.AddKey(1, lw);
@@ -1027,6 +1051,10 @@ public class Main : MonoBehaviour
       voiceover_was_playing = true;
       voiceovers_played[cur_scene_i,(int)SPEC.VIZ] = true;
     }
+    if(music_audiosource.isPlaying) music_audiosource.Stop();
+    music_audiosource.clip = musics[cur_scene_i,(int)SPEC.VIZ];
+    music_audiosource.Play();
+    music_was_playing = true;
   }
 
   void UpdateScene()
@@ -1428,6 +1456,10 @@ public class Main : MonoBehaviour
             voiceover_was_playing = true;
             voiceovers_played[cur_scene_i,cur_spec_i] = true;
           }
+          if(music_audiosource.isPlaying) music_audiosource.Stop();
+          music_audiosource.clip = musics[cur_scene_i,cur_spec_i];
+          music_audiosource.Play();
+          music_was_playing = true;
         }
       }
     }
@@ -1492,6 +1524,15 @@ public class Main : MonoBehaviour
           voiceover_was_playing = true;
           voiceovers_played[cur_scene_i,(int)SPEC.COUNT] = true;
         }
+      }
+    }
+    if(music_was_playing)
+    {
+      if(!music_audiosource.isPlaying)
+      {
+        music_audiosource.clip = musics[cur_scene_i,cur_spec_i];
+        music_audiosource.Play();
+        music_was_playing = true;
       }
     }
 
