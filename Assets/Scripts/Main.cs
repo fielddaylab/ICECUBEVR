@@ -504,7 +504,7 @@ public class Main : MonoBehaviour
     player_head = new Vector3(0, 2, 0);
 
     next_scene_i = (int)SCENE.ICE;
-    //next_scene_i = (int)SCENE.VOYAGER;
+    next_scene_i = (int)SCENE.NOTHING;
     cur_scene_i = next_scene_i;
     next_scene_i = (next_scene_i + 1) % ((int)SCENE.COUNT);
     cur_spec_i = 0;
@@ -543,11 +543,17 @@ public class Main : MonoBehaviour
     gaze_pt *= 1000;
     cam_euler = getCamEuler(cam_reticle.transform.position);
     gaze_cam_euler = getCamEuler(gaze_pt);
-    anti_gaze_pt = (gaze_pt * -1) + new Vector3(50f, 0, 0);
+    anti_gaze_pt = new Vector3(-330f, -350f, 575f);
     anti_gaze_cam_euler = getCamEuler(anti_gaze_pt);
 
     eyeray.GetComponent<LineRenderer>().SetPosition(0, anti_gaze_pt);
     eyeray.GetComponent<LineRenderer>().SetPosition(1, gaze_pt);
+
+    for(int i = 0; i < (int)SPEC.COUNT; i++)
+    {
+      vearth[i].transform.position = anti_gaze_pt;
+      nearth[i].transform.position = anti_gaze_pt;
+    }
 
     spec_euler = cam_euler;
     spec_euler.x = -3.141592f / 3f;
@@ -751,38 +757,38 @@ public class Main : MonoBehaviour
 
       case (int)SCENE.VOYAGER:
 
-        ar_label_offsets[label_i].transform.localScale = new Vector3(5f, 5f, 5f);
+        ar_label_offsets[label_i].transform.localScale = new Vector3(1f, 1f, 1f);
         ar_label_offsets[label_i].transform.position = voyager[0].transform.position;
         ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
         ar_label_texts[label_i].text = "Voyager";
-        ar_labels[label_i].transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-        ar_labels[label_i].transform.localPosition = new Vector3(1f, 1f, 0f);
+        ar_labels[label_i].transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+        ar_labels[label_i].transform.localPosition = new Vector3(3f, 3f, 0f);
         ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
-        lw = 0.2f;
+        lw = 0.05f;
         curve = new AnimationCurve();
         curve.AddKey(0, lw);
         curve.AddKey(1, lw);
         ar_label_lines[label_i].widthCurve = curve;
         ar_label_lines[label_i].SetPosition(0, new Vector3(-8, 0, 0));
         ar_label_lines[label_i].SetPosition(1, new Vector3(-10, 0, 0));
-        ar_label_lines[label_i].SetPosition(2, new Vector3(-11, -5, 0));
+        ar_label_lines[label_i].SetPosition(2, new Vector3(-13, -5, 0));
         label_i++;
 
-        ar_label_offsets[label_i].transform.localScale = new Vector3(50f, 50f, 50f);
+        ar_label_offsets[label_i].transform.localScale = new Vector3(10f, 10f, 10f);
         ar_label_offsets[label_i].transform.position = pluto[0].transform.position;
         ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
         ar_label_texts[label_i].text = "Pluto";
-        ar_labels[label_i].transform.localScale = new Vector3(10f, 10f, 10f);
-        ar_labels[label_i].transform.localPosition = new Vector3(2f, 2f, 0f);
+        ar_labels[label_i].transform.localScale = new Vector3(2f, 2f, 2f);
+        ar_labels[label_i].transform.localPosition = new Vector3(7f, -7f, 0f);
         ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
-        lw = 2f;
+        lw = 1f;
         curve = new AnimationCurve();
         curve.AddKey(0, lw);
         curve.AddKey(1, lw);
         ar_label_lines[label_i].widthCurve = curve;
-        ar_label_lines[label_i].SetPosition(0, new Vector3(-5,  0, 0));
-        ar_label_lines[label_i].SetPosition(1, new Vector3(-7,  0, 0));
-        ar_label_lines[label_i].SetPosition(2, new Vector3(-8, -2, 0));
+        ar_label_lines[label_i].SetPosition(0, new Vector3(-5, 0, 0));
+        ar_label_lines[label_i].SetPosition(1, new Vector3(-7, 0, 0));
+        ar_label_lines[label_i].SetPosition(2, new Vector3(-8, 4, 0));
         label_i++;
 
         ar_label_offsets[label_i].transform.localScale = new Vector3(20f, 20f, 20f);
@@ -807,11 +813,11 @@ public class Main : MonoBehaviour
 
       case (int)SCENE.NOTHING:
 
-        ar_label_offsets[label_i].transform.localScale = new Vector3(50f, 50f, 50f);
+        ar_label_offsets[label_i].transform.localScale = new Vector3(10f, 10f, 10f);
         ar_label_offsets[label_i].transform.position = milky[0].transform.position;
         ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
         ar_label_texts[label_i].text = "Milky Way";
-        ar_labels[label_i].transform.localScale = new Vector3(3f, 3f, 3f);
+        ar_labels[label_i].transform.localScale = new Vector3(1f, 1f, 1f);
         ar_labels[label_i].transform.localPosition = new Vector3(1f, 1f, 0f);
         ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
         lw = 1f;
@@ -828,7 +834,7 @@ public class Main : MonoBehaviour
         ar_label_offsets[label_i].transform.position = nearth[0].transform.position;
         ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
         ar_label_texts[label_i].text = "Earth";
-        ar_labels[label_i].transform.localScale = new Vector3(3f, 3f, 3f);
+        ar_labels[label_i].transform.localScale = new Vector3(2f, 2f, 2f);
         ar_labels[label_i].transform.localPosition = new Vector3(1f, 1f, 0f);
         ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
         lw = 1f;
@@ -836,9 +842,9 @@ public class Main : MonoBehaviour
         curve.AddKey(0, lw);
         curve.AddKey(1, lw);
         ar_label_lines[label_i].widthCurve = curve;
-        ar_label_lines[label_i].SetPosition(0, new Vector3(-10, 0, 0));
-        ar_label_lines[label_i].SetPosition(1, new Vector3(-12, 0, 0));
-        ar_label_lines[label_i].SetPosition(2, new Vector3(-17, -10, 0));
+        ar_label_lines[label_i].SetPosition(0, new Vector3(10, 0, 0));
+        ar_label_lines[label_i].SetPosition(1, new Vector3(12, 0, 0));
+        ar_label_lines[label_i].SetPosition(2, new Vector3(17, -10, 0));
         label_i++;
 
         break;
