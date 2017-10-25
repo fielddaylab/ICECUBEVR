@@ -97,6 +97,8 @@ public class Main : MonoBehaviour
   Vector3 satellite_position;
   Vector3 satellite_velocity;
 
+  public int starting_scene = 0;
+
   public Material alpha_material;
   public GameObject star_prefab;
   public GameObject ar_label_prefab;
@@ -115,12 +117,77 @@ public class Main : MonoBehaviour
   public float extreme_camera_shake = 0.2f;
   public float extreme_helmet_shake = 0.001f;
 
-  public float label_offset_local_scale = 8f;
-  public float label_local_scale = 5f;
-  public Vector3 label_local_position = new Vector3(10,10,0f);
-  public Vector3 line_0 = new Vector3(-8,0,0);
-  public Vector3 line_1 = new Vector3(-12,0,0);
-  public Vector3 line_2 = new Vector3(-14,-4,0);
+  [Range(0.0f, 1.0f)]
+  public float ice_viz_voice_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float ice_gam_voice_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float ice_neu_voice_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float ice_end_voice_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float voyager_viz_voice_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float voyager_gam_voice_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float voyager_neu_voice_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float voyager_end_voice_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float nothing_viz_voice_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float nothing_gam_voice_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float nothing_neu_voice_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float nothing_end_voice_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float extreme_viz_voice_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float extreme_gam_voice_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float extreme_neu_voice_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float extreme_end_voice_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float earth_viz_voice_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float earth_gam_voice_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float earth_neu_voice_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float earth_end_voice_vol = 1.0f;
+
+  [Range(0.0f, 1.0f)]
+  public float ice_viz_music_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float ice_gam_music_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float ice_neu_music_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float voyager_viz_music_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float voyager_gam_music_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float voyager_neu_music_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float nothing_viz_music_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float nothing_gam_music_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float nothing_neu_music_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float extreme_viz_music_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float extreme_gam_music_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float extreme_neu_music_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float earth_viz_music_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float earth_gam_music_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float earth_neu_music_vol = 1.0f;
 
   int alpha_id;
   float flash_alpha;
@@ -143,11 +210,58 @@ public class Main : MonoBehaviour
   string[,] voiceover_files;
   AudioClip[,] voiceovers;
   bool[,] voiceovers_played;
+  float[,] voiceover_vols;
   AudioSource music_audiosource;
   bool music_was_playing;
   string[,] music_files;
   AudioClip[,] musics;
+  float[,] music_vols;
   //AudioSource sfx_audiosource;
+
+  void MapVols()
+  {
+    voiceover_vols[(int)SCENE.ICE,(int)SPEC.VIZ]       = ice_viz_voice_vol;
+    voiceover_vols[(int)SCENE.ICE,(int)SPEC.GAM]       = ice_gam_voice_vol;
+    voiceover_vols[(int)SCENE.ICE,(int)SPEC.NEU]       = ice_neu_voice_vol;
+    voiceover_vols[(int)SCENE.ICE,(int)SPEC.COUNT]     = ice_end_voice_vol;
+    voiceover_vols[(int)SCENE.VOYAGER,(int)SPEC.VIZ]   = voyager_viz_voice_vol;
+    voiceover_vols[(int)SCENE.VOYAGER,(int)SPEC.GAM]   = voyager_gam_voice_vol;
+    voiceover_vols[(int)SCENE.VOYAGER,(int)SPEC.NEU]   = voyager_neu_voice_vol;
+    voiceover_vols[(int)SCENE.VOYAGER,(int)SPEC.COUNT] = voyager_end_voice_vol;
+    voiceover_vols[(int)SCENE.NOTHING,(int)SPEC.VIZ]   = nothing_viz_voice_vol;
+    voiceover_vols[(int)SCENE.NOTHING,(int)SPEC.GAM]   = nothing_gam_voice_vol;
+    voiceover_vols[(int)SCENE.NOTHING,(int)SPEC.NEU]   = nothing_neu_voice_vol;
+    voiceover_vols[(int)SCENE.NOTHING,(int)SPEC.COUNT] = nothing_end_voice_vol;
+    voiceover_vols[(int)SCENE.EXTREME,(int)SPEC.VIZ]   = extreme_viz_voice_vol;
+    voiceover_vols[(int)SCENE.EXTREME,(int)SPEC.GAM]   = extreme_gam_voice_vol;
+    voiceover_vols[(int)SCENE.EXTREME,(int)SPEC.NEU]   = extreme_neu_voice_vol;
+    voiceover_vols[(int)SCENE.EXTREME,(int)SPEC.COUNT] = extreme_end_voice_vol;
+    voiceover_vols[(int)SCENE.EARTH,(int)SPEC.VIZ]     = earth_viz_voice_vol;
+    voiceover_vols[(int)SCENE.EARTH,(int)SPEC.GAM]     = earth_gam_voice_vol;
+    voiceover_vols[(int)SCENE.EARTH,(int)SPEC.NEU]     = earth_neu_voice_vol;
+    voiceover_vols[(int)SCENE.EARTH,(int)SPEC.COUNT]   = earth_end_voice_vol;
+
+    music_vols[(int)SCENE.ICE,(int)SPEC.VIZ]       = ice_viz_music_vol;
+    music_vols[(int)SCENE.ICE,(int)SPEC.GAM]       = ice_gam_music_vol;
+    music_vols[(int)SCENE.ICE,(int)SPEC.NEU]       = ice_neu_music_vol;
+    music_vols[(int)SCENE.VOYAGER,(int)SPEC.VIZ]   = voyager_viz_music_vol;
+    music_vols[(int)SCENE.VOYAGER,(int)SPEC.GAM]   = voyager_gam_music_vol;
+    music_vols[(int)SCENE.VOYAGER,(int)SPEC.NEU]   = voyager_neu_music_vol;
+    music_vols[(int)SCENE.NOTHING,(int)SPEC.VIZ]   = nothing_viz_music_vol;
+    music_vols[(int)SCENE.NOTHING,(int)SPEC.GAM]   = nothing_gam_music_vol;
+    music_vols[(int)SCENE.NOTHING,(int)SPEC.NEU]   = nothing_neu_music_vol;
+    music_vols[(int)SCENE.EXTREME,(int)SPEC.VIZ]   = extreme_viz_music_vol;
+    music_vols[(int)SCENE.EXTREME,(int)SPEC.GAM]   = extreme_gam_music_vol;
+    music_vols[(int)SCENE.EXTREME,(int)SPEC.NEU]   = extreme_neu_music_vol;
+    music_vols[(int)SCENE.EARTH,(int)SPEC.VIZ]     = earth_viz_music_vol;
+    music_vols[(int)SCENE.EARTH,(int)SPEC.GAM]     = earth_gam_music_vol;
+    music_vols[(int)SCENE.EARTH,(int)SPEC.NEU]     = earth_neu_music_vol;
+
+    if(voiceover_was_playing)
+      voiceover_audiosource.volume = voiceover_vols[cur_scene_i,cur_spec_i];
+    if(music_was_playing)
+      music_audiosource.volume = music_vols[cur_scene_i,cur_spec_i];
+  }
 
   string[,] skybox_files;
   Material[,] skyboxes;
@@ -336,6 +450,7 @@ public class Main : MonoBehaviour
     }
     voiceovers = new AudioClip[(int)SCENE.COUNT,(int)SPEC.COUNT+1];
     voiceovers_played = new bool[(int)SCENE.COUNT,(int)SPEC.COUNT+1];
+    voiceover_vols = new float[(int)SCENE.COUNT,(int)SPEC.COUNT+1];
     for(int i = 0; i < (int)SCENE.COUNT; i++)
     {
       for(int j = 0; j < (int)SPEC.COUNT+1; j++)
@@ -343,6 +458,7 @@ public class Main : MonoBehaviour
         voiceovers[i,j] = Resources.Load<AudioClip>(voiceover_files[i,j]);
         voiceovers_played[i,j] = false;
         //voiceovers_played[i,j] = true;
+        voiceover_vols[i,j] = 1.0f;
       }
     }
 
@@ -363,11 +479,13 @@ public class Main : MonoBehaviour
       }
     }
     musics = new AudioClip[(int)SCENE.COUNT,(int)SPEC.COUNT];
+    music_vols = new float[(int)SCENE.COUNT,(int)SPEC.COUNT];
     for(int i = 0; i < (int)SCENE.COUNT; i++)
     {
       for(int j = 0; j < (int)SPEC.COUNT; j++)
       {
         musics[i,j] = Resources.Load<AudioClip>(music_files[i,j]);
+        music_vols[i,j] = 1.0f;
       }
     }
 
@@ -522,8 +640,7 @@ public class Main : MonoBehaviour
     very_lazy_look_ahead = default_look_ahead;
     player_head = new Vector3(0, 2, 0);
 
-    next_scene_i = (int)SCENE.ICE;
-    //next_scene_i = (int)SCENE.EARTH;
+    next_scene_i = starting_scene;
     cur_scene_i = next_scene_i;
     next_scene_i = (next_scene_i + 1) % ((int)SCENE.COUNT);
     cur_spec_i = 0;
@@ -719,6 +836,7 @@ public class Main : MonoBehaviour
     credits_i = 0;
     credits_t = 0f;
 
+    MapVols();
     SetupScene();
   }
 
@@ -1112,12 +1230,14 @@ public class Main : MonoBehaviour
     {
       if(voiceover_audiosource.isPlaying) voiceover_audiosource.Stop();
       voiceover_audiosource.clip = voiceovers[cur_scene_i,(int)SPEC.VIZ];
+      voiceover_audiosource.volume = voiceover_vols[cur_scene_i,(int)SPEC.VIZ];
       voiceover_audiosource.Play();
       voiceover_was_playing = true;
       voiceovers_played[cur_scene_i,(int)SPEC.VIZ] = true;
     }
     if(music_audiosource.isPlaying) music_audiosource.Stop();
     music_audiosource.clip = musics[cur_scene_i,(int)SPEC.VIZ];
+    music_audiosource.volume = music_vols[cur_scene_i,(int)SPEC.VIZ];
     music_audiosource.Play();
     music_was_playing = true;
   }
@@ -1253,6 +1373,14 @@ public class Main : MonoBehaviour
             gaze_reticle.SetActive(true);
         }
 
+        for(int i = 0; i < (int)SPEC.COUNT; i++)
+        {
+          foreach(Transform child_transform in blackhole[i].transform)
+          {
+            child_transform.rotation = Quaternion.Euler(0.0f, 0.0f, nwave_t_10*36*10);
+          }
+        }
+
         break;
 
       case (int)SCENE.EARTH:
@@ -1261,6 +1389,11 @@ public class Main : MonoBehaviour
         {
           if(voiceovers_played[cur_scene_i,(int)SPEC.COUNT])
             gaze_reticle.SetActive(true);
+        }
+
+        foreach(Transform child_transform in ar_blackhole.transform)
+        {
+          child_transform.rotation = Quaternion.Euler(0.0f, 0.0f, nwave_t_10*36*10);
         }
 
         break;
@@ -1517,12 +1650,14 @@ public class Main : MonoBehaviour
           {
             if(voiceover_audiosource.isPlaying) voiceover_audiosource.Stop();
             voiceover_audiosource.clip = voiceovers[cur_scene_i,cur_spec_i];
+            voiceover_audiosource.volume = voiceover_vols[cur_scene_i,cur_spec_i];
             voiceover_audiosource.Play();
             voiceover_was_playing = true;
             voiceovers_played[cur_scene_i,cur_spec_i] = true;
           }
           if(music_audiosource.isPlaying) music_audiosource.Stop();
           music_audiosource.clip = musics[cur_scene_i,cur_spec_i];
+          music_audiosource.volume = music_vols[cur_scene_i,cur_spec_i];
           music_audiosource.Play();
           music_was_playing = true;
         }
@@ -1585,6 +1720,7 @@ public class Main : MonoBehaviour
         if(play_end)
         {
           voiceover_audiosource.clip = voiceovers[cur_scene_i,(int)SPEC.COUNT];
+          voiceover_audiosource.volume = voiceover_vols[cur_scene_i,(int)SPEC.COUNT];
           voiceover_audiosource.Play();
           voiceover_was_playing = true;
           voiceovers_played[cur_scene_i,(int)SPEC.COUNT] = true;
@@ -1596,6 +1732,7 @@ public class Main : MonoBehaviour
       if(!music_audiosource.isPlaying)
       {
         music_audiosource.clip = musics[cur_scene_i,cur_spec_i];
+        music_audiosource.volume = music_vols[cur_scene_i,cur_spec_i];
         music_audiosource.Play();
         music_was_playing = true;
       }
@@ -1635,6 +1772,7 @@ public class Main : MonoBehaviour
       }
     }
 
+    MapVols();
   }
 }
 
