@@ -46,6 +46,7 @@ public class Main : MonoBehaviour
   GameObject ar_group;
   GameObject ar_camera_project;
   GameObject ar_camera_static;
+  GameObject ar_blackhole;
   GameObject ar_alert;
   GameObject ar_timer;
   TextMesh ar_timer_text;
@@ -415,6 +416,7 @@ public class Main : MonoBehaviour
     ar_group = GameObject.Find("AR");
     ar_camera_project = GameObject.Find("AR_Camera_Project");
     ar_camera_static = GameObject.Find("AR_Camera_Static");
+    ar_blackhole = GameObject.Find("AR_BlackHole");
     ar_alert = GameObject.Find("Alert");
     ar_timer = GameObject.Find("Timer");
     ar_timer_text = ar_timer.GetComponent<TextMesh>();
@@ -465,6 +467,7 @@ public class Main : MonoBehaviour
         ar_progress_lines[i].SetPosition(j, new Vector3(0, 0, 0));
     }
 
+    ar_blackhole.SetActive(false);
     ar_alert.SetActive(false);
     ar_timer.SetActive(false);
 
@@ -489,13 +492,6 @@ public class Main : MonoBehaviour
       esun[i]      = GameObject.Find("ESun_"      + spec_names[i]);
       earth[i]     = GameObject.Find("Earth_"     + spec_names[i]);
     }
-
-    scene_centers[(int)SCENE.ICE]     = icecube[  0].transform.position;
-    scene_centers[(int)SCENE.VOYAGER] = voyager[  0].transform.position;
-    scene_centers[(int)SCENE.NOTHING] = milky[    0].transform.position;
-    scene_centers[(int)SCENE.EXTREME] = blackhole[0].transform.position;
-    scene_centers[(int)SCENE.EARTH]   = earth[    0].transform.position;
-    scene_centers[(int)SCENE.CREDITS] = new Vector3(0,0,0);
 
     alpha_id = Shader.PropertyToID("alpha");
     flash_alpha = 0;
@@ -578,6 +574,13 @@ public class Main : MonoBehaviour
       nearth[i].transform.position = anti_gaze_pt;
       earth[i].transform.position = anti_gaze_pt.normalized*600;
     }
+
+    scene_centers[(int)SCENE.ICE]     = icecube[  0].transform.position;
+    scene_centers[(int)SCENE.VOYAGER] = voyager[  0].transform.position;
+    scene_centers[(int)SCENE.NOTHING] = milky[    0].transform.position;
+    scene_centers[(int)SCENE.EXTREME] = blackhole[0].transform.position;
+    scene_centers[(int)SCENE.EARTH]   = earth[    0].transform.position;
+    scene_centers[(int)SCENE.CREDITS] = new Vector3(0,0,0);
 
     spec_euler = cam_euler;
     spec_euler.x = -3.141592f / 3f;
@@ -717,6 +720,43 @@ public class Main : MonoBehaviour
     credits_t = 0f;
 
     SetupScene();
+  }
+
+  //called just before portal to next scene appears
+  void PreSetupNextScene()
+  {
+    scene_rots[next_scene_i] = 0;
+    switch(next_scene_i)
+    {
+
+      case (int)SCENE.ICE:
+        break;
+
+      case (int)SCENE.VOYAGER:
+        break;
+
+      case (int)SCENE.NOTHING:
+        break;
+
+      case (int)SCENE.EXTREME:
+        for(int i = 0; i < (int)SPEC.COUNT; i++)
+        {
+          foreach(Transform child_transform in blackhole[i].transform)
+          {
+            GameObject child = child_transform.gameObject;
+            ParticleSystem ps = child.GetComponent<ParticleSystem>();
+            if(ps) ps.Play();
+          }
+        }
+        break;
+
+      case (int)SCENE.EARTH:
+        break;
+
+      case (int)SCENE.CREDITS:
+        break;
+
+    }
   }
 
   void SetupScene()
@@ -1033,9 +1073,34 @@ public class Main : MonoBehaviour
 
         ar_alert.SetActive(false);
         ar_timer.SetActive(false);
+
+        for(int i = 0; i < (int)SPEC.COUNT; i++)
+        {
+          foreach(Transform child_transform in blackhole[i].transform)
+          {
+            GameObject child = child_transform.gameObject;
+            ParticleSystem ps = child.GetComponent<ParticleSystem>();
+            if(ps) ps.Stop();
+          }
+        }
+        ar_blackhole.SetActive(true);
+        foreach(Transform child_transform in ar_blackhole.transform)
+        {
+          GameObject child = child_transform.gameObject;
+          ParticleSystem ps = child.GetComponent<ParticleSystem>();
+          if(ps) ps.Play();
+        }
+
         break;
 
       case (int)SCENE.CREDITS:
+        foreach(Transform child_transform in ar_blackhole.transform)
+        {
+          GameObject child = child_transform.gameObject;
+          ParticleSystem ps = child.GetComponent<ParticleSystem>();
+          if(ps) ps.Stop();
+        }
+        ar_blackhole.SetActive(false);
 
         break;
 
@@ -1415,7 +1480,7 @@ public class Main : MonoBehaviour
         if(in_portal_motion == 0 && out_portal_motion == 0)
         {
           in_portal_motion = Time.deltaTime;
-          scene_rots[next_scene_i] = 0; //set rot at start of scene transition
+          PreSetupNextScene();
         }
       }
     }
@@ -1539,7 +1604,8 @@ public class Main : MonoBehaviour
     Vector3 nvec_start = new Vector3(1.2f,1.2f,-0.2f);
     Vector3 nvec_dir   = new Vector3(-1f,-1f,1f).normalized;
     Vector3 nvec_end   = nvec_start+nvec_dir*10f;
-    float nvec_t = nwave_t_10/10;
+    float nvec_t = nwave_t_10/5;
+    while(nvec_t > 1) nvec_t -= 1;
     Vector3 nvec_cur = Vector3.Lerp(nvec_start,nvec_end,nvec_t);
     Vector3 nvec_comp = new Vector3(0,0,0);
     for(int i = 0; i < dom_w; i++)
