@@ -719,6 +719,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7399f46fd4111644af16a6c3fd8399a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  starting_scene: 4
   alpha_material: {fileID: 2100000, guid: cc5ad7b8644194bbeb74b46a13481cb7, type: 2}
   star_prefab: {fileID: 1299812747390152, guid: 87ab197597dec455b8decc685297db07,
     type: 2}
@@ -739,12 +740,41 @@ MonoBehaviour:
   scene4_helmet_color: {r: 0.6764706, g: 0.81257606, b: 1, a: 0}
   extreme_camera_shake: 0.2
   extreme_helmet_shake: 0.001
-  label_offset_local_scale: 8
-  label_local_scale: 5
-  label_local_position: {x: 10, y: 10, z: 0}
-  line_0: {x: -8, y: 0, z: 0}
-  line_1: {x: -12, y: 0, z: 0}
-  line_2: {x: -14, y: -4, z: 0}
+  ice_viz_voice_vol: 1
+  ice_gam_voice_vol: 1
+  ice_neu_voice_vol: 1
+  ice_end_voice_vol: 1
+  voyager_viz_voice_vol: 0
+  voyager_gam_voice_vol: 1
+  voyager_neu_voice_vol: 1
+  voyager_end_voice_vol: 1
+  nothing_viz_voice_vol: 1
+  nothing_gam_voice_vol: 1
+  nothing_neu_voice_vol: 1
+  nothing_end_voice_vol: 1
+  extreme_viz_voice_vol: 1
+  extreme_gam_voice_vol: 1
+  extreme_neu_voice_vol: 1
+  extreme_end_voice_vol: 1
+  earth_viz_voice_vol: 1
+  earth_gam_voice_vol: 1
+  earth_neu_voice_vol: 1
+  earth_end_voice_vol: 1
+  ice_viz_music_vol: 1
+  ice_gam_music_vol: 1
+  ice_neu_music_vol: 1
+  voyager_viz_music_vol: 1
+  voyager_gam_music_vol: 1
+  voyager_neu_music_vol: 1
+  nothing_viz_music_vol: 1
+  nothing_gam_music_vol: 1
+  nothing_neu_music_vol: 1
+  extreme_viz_music_vol: 1
+  extreme_gam_music_vol: 1
+  extreme_neu_music_vol: 1
+  earth_viz_music_vol: 1
+  earth_gam_music_vol: 1
+  earth_neu_music_vol: 1
 --- !u!4 &253639470
 Transform:
   m_ObjectHideFlags: 0
@@ -15238,7 +15268,7 @@ ParticleSystem:
   moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
-  randomSeed: -27049250
+  randomSeed: 1624186266
   InitialModule:
     serializedVersion: 3
     enabled: 1
@@ -29695,7 +29725,7 @@ ParticleSystem:
   moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
-  randomSeed: -428494745
+  randomSeed: 1603418940
   InitialModule:
     serializedVersion: 3
     enabled: 1
@@ -30243,7 +30273,7 @@ ParticleSystem:
     m_MeshScale: 1
     m_UseMeshMaterialIndex: 0
     m_UseMeshColors: 1
-    alignToDirection: 1
+    alignToDirection: 0
     randomDirectionAmount: 0.4
     sphericalDirectionAmount: 0
   EmissionModule:

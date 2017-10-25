@@ -97,6 +97,8 @@ public class Main : MonoBehaviour
   Vector3 satellite_position;
   Vector3 satellite_velocity;
 
+  public int starting_scene = 0;
+
   public Material alpha_material;
   public GameObject star_prefab;
   public GameObject ar_label_prefab;
@@ -638,8 +640,7 @@ public class Main : MonoBehaviour
     very_lazy_look_ahead = default_look_ahead;
     player_head = new Vector3(0, 2, 0);
 
-    next_scene_i = (int)SCENE.ICE;
-    //next_scene_i = (int)SCENE.EARTH;
+    next_scene_i = starting_scene;
     cur_scene_i = next_scene_i;
     next_scene_i = (next_scene_i + 1) % ((int)SCENE.COUNT);
     cur_spec_i = 0;
@@ -1372,6 +1373,14 @@ public class Main : MonoBehaviour
             gaze_reticle.SetActive(true);
         }
 
+        for(int i = 0; i < (int)SPEC.COUNT; i++)
+        {
+          foreach(Transform child_transform in blackhole[i].transform)
+          {
+            child_transform.rotation = Quaternion.Euler(0.0f, 0.0f, nwave_t_10*36*10);
+          }
+        }
+
         break;
 
       case (int)SCENE.EARTH:
@@ -1380,6 +1389,11 @@ public class Main : MonoBehaviour
         {
           if(voiceovers_played[cur_scene_i,(int)SPEC.COUNT])
             gaze_reticle.SetActive(true);
+        }
+
+        foreach(Transform child_transform in ar_blackhole.transform)
+        {
+          child_transform.rotation = Quaternion.Euler(0.0f, 0.0f, nwave_t_10*36*10);
         }
 
         break;
