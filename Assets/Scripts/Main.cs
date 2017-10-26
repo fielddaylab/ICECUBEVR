@@ -49,6 +49,7 @@ public class Main : MonoBehaviour
   GameObject ar_blackhole;
   GameObject ar_blackhole_disk;
   GameObject[] ar_blackhole_jets;
+  GameObject[] ar_maps;
   GameObject ar_alert;
   GameObject ar_timer;
   TextMesh ar_timer_text;
@@ -541,6 +542,10 @@ public class Main : MonoBehaviour
     ar_blackhole_jets = new GameObject[2];
     ar_blackhole_jets[0] = GameObject.Find("AR_BH_Jet_X");
     ar_blackhole_jets[1] = GameObject.Find("AR_BH_Jet_nX");
+    ar_maps = new GameObject[3];
+    ar_maps[0] = GameObject.Find("map0");
+    ar_maps[1] = GameObject.Find("map1");
+    ar_maps[2] = GameObject.Find("map2");
     ar_alert = GameObject.Find("Alert");
     ar_timer = GameObject.Find("Timer");
     ar_timer_text = ar_timer.GetComponent<TextMesh>();
@@ -912,6 +917,9 @@ public class Main : MonoBehaviour
         ar_progress_lines[i].SetPosition(j, new Vector3(0, 0, 0));
     }
 
+    for(int i = 0; i < 3; i++)
+      ar_maps[i].SetActive(false);
+
     int label_i = 0;
     switch(cur_scene_i)
     {
@@ -996,6 +1004,7 @@ public class Main : MonoBehaviour
         ar_label_lines[label_i].SetPosition(2, new Vector3(-8, -2, 0));
         label_i++;
 
+        ar_maps[0].SetActive(true);
         dom.SetActive(false);
         break;
 
@@ -1034,6 +1043,8 @@ public class Main : MonoBehaviour
         ar_label_lines[label_i].SetPosition(1, new Vector3(15, 0, 0));
         ar_label_lines[label_i].SetPosition(2, new Vector3(20, 10, 0));
         label_i++;
+
+        ar_maps[1].SetActive(true);
 
         break;
 
@@ -1162,12 +1173,15 @@ public class Main : MonoBehaviour
           }
         }
 
+        ar_maps[2].SetActive(true);
+
         gaze_projection.transform.rotation = rotationFromEuler(anti_gaze_cam_euler);
         portal_projection.transform.rotation = rotationFromEuler(anti_gaze_cam_euler);
         ar_alert.SetActive(true);
         ar_timer.SetActive(true);
         timer_t = 0;
         alert_t = 0;
+
         break;
 
       case (int)SCENE.EARTH:
