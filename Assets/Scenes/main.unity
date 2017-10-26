@@ -325,7 +325,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 110945328}
   m_LocalRotation: {x: 0.21592084, y: -0.48920858, z: 0.12642685, w: 0.83550555}
-  m_LocalPosition: {x: 274, y: 194, z: -254}
+  m_LocalPosition: {x: 598.8, y: 194, z: -940.2}
   m_LocalScale: {x: 100, y: 100, z: 100}
   m_Children:
   - {fileID: 1709196186}
@@ -398,7 +398,7 @@ Transform:
   m_GameObject: {fileID: 119907327}
   m_LocalRotation: {x: 0.67594975, y: -0.12882845, z: 0.36679992, w: 0.62606156}
   m_LocalPosition: {x: -140.7, y: -45, z: -2.2}
-  m_LocalScale: {x: 50, y: 50, z: 50}
+  m_LocalScale: {x: 500, y: 500, z: 500}
   m_Children: []
   m_Father: {fileID: 187568915}
   m_RootOrder: 1
@@ -719,7 +719,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7399f46fd4111644af16a6c3fd8399a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  starting_scene: 0
+  starting_scene: 3
   alpha_material: {fileID: 2100000, guid: cc5ad7b8644194bbeb74b46a13481cb7, type: 2}
   star_prefab: {fileID: 1299812747390152, guid: 87ab197597dec455b8decc685297db07,
     type: 2}
@@ -1103,7 +1103,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 320553397}
   m_LocalRotation: {x: 0.21592084, y: -0.48920858, z: 0.12642685, w: 0.83550555}
-  m_LocalPosition: {x: 274, y: 194, z: -254}
+  m_LocalPosition: {x: 598.8, y: 194, z: -940.2}
   m_LocalScale: {x: 100, y: 100, z: 100}
   m_Children:
   - {fileID: 1917294250}
@@ -4387,7 +4387,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 385788977}
   m_LocalRotation: {x: 0.21592084, y: -0.48920858, z: 0.12642685, w: 0.83550555}
-  m_LocalPosition: {x: 274, y: 194, z: -254}
+  m_LocalPosition: {x: 598.8, y: 194, z: -940.2}
   m_LocalScale: {x: 100, y: 100, z: 100}
   m_Children: []
   m_Father: {fileID: 221797058}
@@ -9270,7 +9270,7 @@ TextMesh:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 698471214}
-  m_Text: Visible
+  m_Text: VISIBLE
   m_OffsetZ: 0
   m_CharacterSize: 0.3
   m_LineSpacing: 1
@@ -10261,7 +10261,7 @@ Transform:
   m_GameObject: {fileID: 964016840}
   m_LocalRotation: {x: 0.67594975, y: -0.12882845, z: 0.36679992, w: 0.62606156}
   m_LocalPosition: {x: -140.7, y: -45, z: -2.2}
-  m_LocalScale: {x: 50, y: 50, z: 50}
+  m_LocalScale: {x: 500, y: 500, z: 500}
   m_Children: []
   m_Father: {fileID: 839934079}
   m_RootOrder: 1
@@ -10342,7 +10342,7 @@ TextMesh:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 974518800}
-  m_Text: Gamma
+  m_Text: X-RAY
   m_OffsetZ: 0
   m_CharacterSize: 0.3
   m_LineSpacing: 1
@@ -29099,7 +29099,7 @@ TextMesh:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1789904895}
-  m_Text: 'Neutrino
+  m_Text: 'NEUTRINO
 
 '
   m_OffsetZ: 0
@@ -36323,7 +36323,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
+  far clip plane: 1500
   field of view: 96.01604
   orthographic: 0
   orthographic size: 5
