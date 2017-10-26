@@ -47,6 +47,8 @@ public class Main : MonoBehaviour
   GameObject ar_camera_project;
   GameObject ar_camera_static;
   GameObject ar_blackhole;
+  GameObject ar_blackhole_disk;
+  GameObject[] ar_blackhole_jets;
   GameObject ar_alert;
   GameObject ar_timer;
   TextMesh ar_timer_text;
@@ -535,6 +537,10 @@ public class Main : MonoBehaviour
     ar_camera_project = GameObject.Find("AR_Camera_Project");
     ar_camera_static = GameObject.Find("AR_Camera_Static");
     ar_blackhole = GameObject.Find("AR_BlackHole");
+    ar_blackhole_disk = GameObject.Find("AR_BH_Disk");
+    ar_blackhole_jets = new GameObject[2];
+    ar_blackhole_jets[0] = GameObject.Find("AR_BH_Jet_X");
+    ar_blackhole_jets[1] = GameObject.Find("AR_BH_Jet_nX");
     ar_alert = GameObject.Find("Alert");
     ar_timer = GameObject.Find("Timer");
     ar_timer_text = ar_timer.GetComponent<TextMesh>();
@@ -711,7 +717,7 @@ public class Main : MonoBehaviour
     portal_camera_next_skybox.material = skyboxes[next_scene_i, (int)SPEC.VIZ];
 
     //dom
-    GameObject dom_string;
+    //GameObject dom_string;
     GameObject dom_bulb;
     //kill placement cube
     GameObject c = dom.transform.GetChild(0).gameObject;
@@ -1428,6 +1434,24 @@ public class Main : MonoBehaviour
       case (int)SPEC.GAM: spec_sel_reticle.transform.position = spec_gam_reticle.transform.position; break;
       case (int)SPEC.VIZ: spec_sel_reticle.transform.position = spec_viz_reticle.transform.position; break;
       case (int)SPEC.NEU: spec_sel_reticle.transform.position = spec_neu_reticle.transform.position; break;
+    }
+
+    if(cur_scene_i == (int)SCENE.EARTH)
+    {
+      switch(spec)
+      {
+        case (int)SPEC.GAM:
+        case (int)SPEC.VIZ:
+          ar_blackhole_disk.SetActive(true);
+          for(int i = 0; i < 2; i++)
+            ar_blackhole_jets[i].SetActive(true);
+          break;
+        case (int)SPEC.NEU:
+          ar_blackhole_disk.SetActive(false);
+          for(int i = 0; i < 2; i++)
+            ar_blackhole_jets[i].SetActive(false);
+          break;
+      }
     }
 
     main_camera.GetComponent<Camera>().cullingMask = (1 << layers[cur_scene_i, cur_spec_i]) | (1 << default_layer);
