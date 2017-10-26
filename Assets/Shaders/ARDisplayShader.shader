@@ -70,12 +70,12 @@
         glow_a += tex2D(_MainTex,uv+fixed2( off,-off)).a;
         glow_a += tex2D(_MainTex,uv+fixed2(-off,-off)).a;
         glow_a /= 8.;
-        glow_a /= 2.;
+        glow_a /= 1.;
         fixed4 glow = fixed4(220./255.,255./255.,255./255.,glow_a);
         fixed4 col = fixed4(198./255.,254./255.,254./255.,a*tex2D(_MainTex, uv).a+(jitter*rt));
-        col.r = (col.r*col.a+(1.-col.a)*(glow.r*glow.a));
-        col.g = (col.g*col.a+(1.-col.a)*(glow.g*glow.a));
-        col.b = (col.b*col.a+(1.-col.a)*(glow.b*glow.a));
+        //col.r = (col.r*col.a+(1.-col.a)*(glow.r*glow.a));
+        //col.g = (col.g*col.a+(1.-col.a)*(glow.g*glow.a));
+        //col.b = (col.b*col.a+(1.-col.a)*(glow.b*glow.a));
         col.a = (      col.a+(1.-col.a)*(       glow.a));
         return col;
       }
