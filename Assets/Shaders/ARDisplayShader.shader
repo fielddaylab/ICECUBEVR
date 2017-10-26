@@ -58,8 +58,25 @@
         float a = 1.;//0.6+sin(y*4000)*0.2;
         float rx = rand(float3(0.2+i.uv.y,0.1+i.uv.y,0.4));
         float rt = rand(float3(0.2+i.uv.x,0.3+i.uv.y,0.5));
-        fixed4 col = fixed4(198./255.,254./255.,254./255.,a*tex2D(_MainTex, float2(i.uv.x + rx*jitter*0.4 + jitter*i.uv.y*0.25, i.uv.y)/i.vw).a+(jitter*rt));
-        //fixed4 col = fixed4(tex2D(_MainTex, i.uv/i.vw));
+        float2 uv = float2(i.uv.x + rx*jitter*0.4 + jitter*i.uv.y*0.25, i.uv.y)/i.vw;
+        float glow_a = 0.;
+        float off = 0.002;
+        glow_a += tex2D(_MainTex,uv+fixed2(   0, off)).a;
+        glow_a += tex2D(_MainTex,uv+fixed2(   0,-off)).a;
+        glow_a += tex2D(_MainTex,uv+fixed2( off,   0)).a;
+        glow_a += tex2D(_MainTex,uv+fixed2(-off,   0)).a;
+        glow_a += tex2D(_MainTex,uv+fixed2( off, off)).a;
+        glow_a += tex2D(_MainTex,uv+fixed2(-off, off)).a;
+        glow_a += tex2D(_MainTex,uv+fixed2( off,-off)).a;
+        glow_a += tex2D(_MainTex,uv+fixed2(-off,-off)).a;
+        glow_a /= 8.;
+        glow_a /= 2.;
+        fixed4 glow = fixed4(220./255.,255./255.,255./255.,glow_a);
+        fixed4 col = fixed4(198./255.,254./255.,254./255.,a*tex2D(_MainTex, uv).a+(jitter*rt));
+        col.r = (col.r*col.a+(1.-col.a)*(glow.r*glow.a));
+        col.g = (col.g*col.a+(1.-col.a)*(glow.g*glow.a));
+        col.b = (col.b*col.a+(1.-col.a)*(glow.b*glow.a));
+        col.a = (      col.a+(1.-col.a)*(       glow.a));
         return col;
       }
       ENDCG
