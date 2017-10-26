@@ -921,7 +921,7 @@ public class Main : MonoBehaviour
         ar_label_offsets[label_i].transform.localScale = new Vector3(3f, 3f, 3f);
         ar_label_offsets[label_i].transform.position = icecube[0].transform.position;
         ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
-        ar_label_texts[label_i].text = "Ice Cube";
+        ar_label_texts[label_i].text = "ICE CUBE";
         ar_labels[label_i].transform.localScale = new Vector3(3f, 3f, 3f);
         ar_labels[label_i].transform.localPosition = new Vector3(20f, 20f, 0f);
         ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
@@ -948,7 +948,7 @@ public class Main : MonoBehaviour
         ar_label_offsets[label_i].transform.localScale = new Vector3(1f, 1f, 1f);
         ar_label_offsets[label_i].transform.position = voyager[0].transform.position;
         ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
-        ar_label_texts[label_i].text = "Voyager";
+        ar_label_texts[label_i].text = "VOYAGER";
         ar_labels[label_i].transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
         ar_labels[label_i].transform.localPosition = new Vector3(3f, 3f, 0f);
         ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
@@ -965,7 +965,7 @@ public class Main : MonoBehaviour
         ar_label_offsets[label_i].transform.localScale = new Vector3(10f, 10f, 10f);
         ar_label_offsets[label_i].transform.position = pluto[0].transform.position;
         ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
-        ar_label_texts[label_i].text = "Pluto";
+        ar_label_texts[label_i].text = "PLUTO";
         ar_labels[label_i].transform.localScale = new Vector3(2f, 2f, 2f);
         ar_labels[label_i].transform.localPosition = new Vector3(7f, -7f, 0f);
         ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
@@ -982,7 +982,7 @@ public class Main : MonoBehaviour
         ar_label_offsets[label_i].transform.localScale = new Vector3(20f, 20f, 20f);
         ar_label_offsets[label_i].transform.position = vearth[0].transform.position;
         ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
-        ar_label_texts[label_i].text = "Earth";
+        ar_label_texts[label_i].text = "EARTH";
         ar_labels[label_i].transform.localScale = new Vector3(5f, 5f, 5f);
         ar_labels[label_i].transform.localPosition = new Vector3(2f, 2f, 0f);
         ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
@@ -1004,7 +1004,7 @@ public class Main : MonoBehaviour
         ar_label_offsets[label_i].transform.localScale = new Vector3(10f, 10f, 10f);
         ar_label_offsets[label_i].transform.position = milky[0].transform.position;
         ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
-        ar_label_texts[label_i].text = "Milky Way";
+        ar_label_texts[label_i].text = "MILKY WAY";
         ar_labels[label_i].transform.localScale = new Vector3(1f, 1f, 1f);
         ar_labels[label_i].transform.localPosition = new Vector3(5f, 5f, 0f);
         ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
@@ -1021,7 +1021,7 @@ public class Main : MonoBehaviour
         ar_label_offsets[label_i].transform.localScale = new Vector3(100f, 100f, 100f);
         ar_label_offsets[label_i].transform.position = nearth[0].transform.position;
         ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
-        ar_label_texts[label_i].text = "Earth";
+        ar_label_texts[label_i].text = "EARTH";
         ar_labels[label_i].transform.localScale = new Vector3(6f, 6f, 6f);
         ar_labels[label_i].transform.localPosition = new Vector3(-1.2f, -0.8f, 0f);
         ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
@@ -1048,7 +1048,7 @@ public class Main : MonoBehaviour
         ar_progress_offsets[label_i].transform.localScale = ar_label_offsets[label_i].transform.localScale;
         ar_progress_offsets[label_i].transform.position   = ar_label_offsets[label_i].transform.position;
         ar_progress_offsets[label_i].transform.rotation   = ar_label_offsets[label_i].transform.rotation;
-        ar_label_texts[label_i].text = "Visible Scan";
+        ar_label_texts[label_i].text = "VISIBLE";
         ar_labels[label_i].transform.localScale = new Vector3(10f, 10f, 10f);
         ar_labels[label_i].transform.localPosition = new Vector3(-1.2f, 1f, 0f);
         ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
@@ -1077,7 +1077,7 @@ public class Main : MonoBehaviour
         ar_progress_offsets[label_i].transform.localScale = ar_label_offsets[label_i].transform.localScale;
         ar_progress_offsets[label_i].transform.position   = ar_label_offsets[label_i].transform.position;
         ar_progress_offsets[label_i].transform.rotation   = ar_label_offsets[label_i].transform.rotation;
-        ar_label_texts[label_i].text = "Gamma Scan";
+        ar_label_texts[label_i].text = "X-RAY";
         ar_labels[label_i].transform.localScale = new Vector3(10f, 10f, 10f);
         ar_labels[label_i].transform.localPosition = new Vector3(-1.5f, 0f, 0f);
         ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
@@ -1106,7 +1106,7 @@ public class Main : MonoBehaviour
         ar_progress_offsets[label_i].transform.localScale = ar_label_offsets[label_i].transform.localScale;
         ar_progress_offsets[label_i].transform.position   = ar_label_offsets[label_i].transform.position;
         ar_progress_offsets[label_i].transform.rotation   = ar_label_offsets[label_i].transform.rotation;
-        ar_label_texts[label_i].text = "Neutrino Scan";
+        ar_label_texts[label_i].text = "NEUTRINO";
         ar_labels[label_i].transform.localScale = new Vector3(10f, 10f, 10f);
         ar_labels[label_i].transform.localPosition = new Vector3(-1.2f, -1f, 0f);
         ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
@@ -1132,7 +1132,7 @@ public class Main : MonoBehaviour
         ar_label_offsets[label_i].transform.localScale = new Vector3(200f, 200f, 200f);
         ar_label_offsets[label_i].transform.position = blackhole[0].transform.position;
         ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
-        ar_label_texts[label_i].text = "Black Hole";
+        ar_label_texts[label_i].text = "BLACK HOLE";
         ar_labels[label_i].transform.localScale = new Vector3(10f, 10f, 10f);
         ar_labels[label_i].transform.localPosition = new Vector3(1f, 1f, 0f);
         ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
@@ -1151,6 +1151,17 @@ public class Main : MonoBehaviour
         for(int j = 0; j < (int)SPEC.COUNT+1; j++)
           voiceovers_played[(int)SCENE.EXTREME,j] = false;
 
+        //should have also been done in pre-setup, but can't hurt (in case of debug "start here")
+        for(int i = 0; i < (int)SPEC.COUNT; i++)
+        {
+          foreach(Transform child_transform in blackhole[i].transform)
+          {
+            GameObject child = child_transform.gameObject;
+            ParticleSystem ps = child.GetComponent<ParticleSystem>();
+            if(ps) ps.Play();
+          }
+        }
+
         gaze_projection.transform.rotation = rotationFromEuler(anti_gaze_cam_euler);
         portal_projection.transform.rotation = rotationFromEuler(anti_gaze_cam_euler);
         ar_alert.SetActive(true);
@@ -1164,7 +1175,7 @@ public class Main : MonoBehaviour
         ar_label_offsets[label_i].transform.localScale = new Vector3(8f, 8f, 8f);
         ar_label_offsets[label_i].transform.position = earth[0].transform.position;
         ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
-        ar_label_texts[label_i].text = "Ice Cube";
+        ar_label_texts[label_i].text = "ICE CUBE";
         ar_labels[label_i].transform.localScale = new Vector3(5f, 5f, 5f);
         ar_labels[label_i].transform.localPosition = new Vector3(2.25f, 3f, 0f);
         ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
@@ -1181,7 +1192,7 @@ public class Main : MonoBehaviour
         ar_label_offsets[label_i].transform.localScale = new Vector3(8f, 8f, 8f);
         ar_label_offsets[label_i].transform.position = esun[0].transform.position;
         ar_label_offsets[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[label_i].transform.position));
-        ar_label_texts[label_i].text = "Sun";
+        ar_label_texts[label_i].text = "SUN";
         ar_labels[label_i].transform.localScale = new Vector3(9f, 9f, 9f);
         ar_labels[label_i].transform.localPosition = new Vector3(17f, 10f, 0f);
         ar_labels[label_i].transform.localScale /= ar_label_offsets[label_i].transform.localScale.x;
@@ -1255,7 +1266,7 @@ public class Main : MonoBehaviour
       ar_label_offsets[1].transform.localScale = new Vector3(label_offset_local_scale, label_offset_local_scale, label_offset_local_scale); //scales the offset- NOT THE SIZE OF ANYTHING (this is dumb)
       ar_label_offsets[1].transform.position = esun[0].transform.position;
       ar_label_offsets[1].transform.rotation = rotationFromEuler(getCamEuler(ar_label_offsets[1].transform.position));
-      ar_label_texts[1].text = "Sun";
+      ar_label_texts[1].text = "SUN";
       ar_labels[1].transform.localScale = new Vector3(label_local_scale, label_local_scale, label_local_scale); //scales the thing
       ar_labels[1].transform.localPosition = label_local_position; //move the whole thing
       ar_labels[1].transform.localScale /= ar_label_offsets[1].transform.localScale.x;
