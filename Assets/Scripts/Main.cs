@@ -292,7 +292,7 @@ public class Main : MonoBehaviour
     0.0f, //voyager
     0.01f, //nothing
     0.01f, //extreme
-    0.005f, //earth
+    0.00f,//5f, //earth
     0.0f, //credits
   };
 
@@ -1411,6 +1411,12 @@ public class Main : MonoBehaviour
         foreach(Transform child_transform in ar_blackhole.transform)
         {
           child_transform.rotation = Quaternion.Euler(0.0f, 0.0f, nwave_t_10*36*10);
+        }
+
+        for(int i = 0; i < (int)SPEC.COUNT; i++)
+        {
+          earth[i].transform.position = anti_gaze_pt.normalized*600;
+          //earth[i].transform.rotation = anti_gaze_pt.normalized*600;
         }
 
         break;
