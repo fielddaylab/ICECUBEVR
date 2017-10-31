@@ -219,7 +219,40 @@ public class Main : MonoBehaviour
   string[,] music_files;
   AudioClip[,] musics;
   float[,] music_vols;
-  //AudioSource sfx_audiosource;
+  AudioSource[] sfx_audiosource;
+  int n_sfx_audiosources;
+  int sfx_audiosource_i;
+  string[] sfx_files = new string[]
+  {
+    "alert_fast",
+    "alert_slow",
+    "complete",
+    "select",
+    "warp",
+    "warp_click"
+  };
+  //very clunky, but whatever
+  enum SFX
+  {
+    ALERT_FAST,
+    ALERT_SLOW,
+    COMPLETE,
+    SELECT,
+    WARP,
+    WARP_CLICK,
+    COUNT
+  };
+  AudioClip[] sfxs;
+  float[] sfx_vols;
+
+  void PlaySFX(SFX s)
+  {
+    if(sfx_audiosource[sfx_audiosource_i].isPlaying) sfx_audiosource[sfx_audiosource_i].Stop();
+    sfx_audiosource[sfx_audiosource_i].clip = sfxs[(int)s];
+    sfx_audiosource[sfx_audiosource_i].volume = sfx_vols[(int)s];
+    sfx_audiosource[sfx_audiosource_i].Play();
+    sfx_audiosource_i = (sfx_audiosource_i+1)%n_sfx_audiosources;
+  }
 
   void MapVols()
   {
@@ -489,6 +522,19 @@ public class Main : MonoBehaviour
         musics[i,j] = Resources.Load<AudioClip>(music_files[i,j]);
         music_vols[i,j] = 1.0f;
       }
+    }
+
+    n_sfx_audiosources = 5;
+    sfx_audiosource_i = 0;
+    sfx_audiosource = new AudioSource[n_sfx_audiosources];
+    for(int i = 0; i < n_sfx_audiosources; i++)
+      sfx_audiosource[i] = GameObject.Find("Script").AddComponent<AudioSource>();
+    sfxs = new AudioClip[(int)SFX.COUNT];
+    sfx_vols = new float[(int)SFX.COUNT];
+    for(int i = 0; i < (int)SFX.COUNT; i++)
+    {
+      sfxs[i] = Resources.Load<AudioClip>(sfx_files[i]);
+      sfx_vols[i] = 1.0f;
     }
 
     string[,] skybox_files = new string[(int)SCENE.COUNT, (int)SPEC.COUNT];
@@ -1667,6 +1713,7 @@ public class Main : MonoBehaviour
         if(in_portal_motion == 0 && out_portal_motion == 0)
         {
           in_portal_motion = Time.deltaTime;
+          PlaySFX(SFX.WARP);
           PreSetupNextScene();
         }
       }
