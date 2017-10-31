@@ -460,7 +460,6 @@ public class Main : MonoBehaviour
       {
         voiceovers[i,j] = Resources.Load<AudioClip>(voiceover_files[i,j]);
         voiceovers_played[i,j] = false;
-        //voiceovers_played[i,j] = true;
         voiceover_vols[i,j] = 1.0f;
       }
     }
