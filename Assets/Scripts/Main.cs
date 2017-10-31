@@ -991,7 +991,7 @@ public class Main : MonoBehaviour
       case (int)SCENE.VOYAGER:
 
         ar_labels[label_i].transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-        ar_labels[label_i].transform.position = voyager[0].transform.position+new Vector3(4,0,0);
+        ar_labels[label_i].transform.position = voyager[0].transform.position+new Vector3(0,0,-10);
         ar_labels[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_labels[label_i].transform.position));
         ar_label_texts[label_i].text = "VOYAGER";
         label_i++;
@@ -1014,13 +1014,13 @@ public class Main : MonoBehaviour
 
       case (int)SCENE.NOTHING:
 
-        ar_labels[label_i].transform.localScale = new Vector3(1f, 1f, 1f);
+        ar_labels[label_i].transform.localScale = new Vector3(2f, 2f, 2f);
         ar_labels[label_i].transform.position = milky[0].transform.position+new Vector3(50,0,0);
         ar_labels[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_labels[label_i].transform.position));
         ar_label_texts[label_i].text = "MILKY WAY";
         label_i++;
 
-        ar_labels[label_i].transform.localScale = new Vector3(1f, 1f, 1f);
+        ar_labels[label_i].transform.localScale = new Vector3(10f, 10f, 10f);
         ar_labels[label_i].transform.position = nearth[0].transform.position+new Vector3(0,0,0);
         ar_labels[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_labels[label_i].transform.position));
         ar_label_texts[label_i].text = "EARTH";
@@ -1032,19 +1032,17 @@ public class Main : MonoBehaviour
 
       case (int)SCENE.EXTREME:
 
-        float bar_y = -3;
+        float bar_y = -2;
         float bar_x = -11;
 
         ar_labels[label_i].transform.localScale = new Vector3(20f, 20f, 20f);
-        ar_labels[label_i].transform.position = blackhole[0].transform.position+new Vector3(0,40,0);
+        ar_labels[label_i].transform.position = blackhole[0].transform.position+new Vector3(-300,100,0);
         ar_labels[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_labels[label_i].transform.position));
         ar_label_texts[label_i].text = "VISIBLE";
 
         ar_progress_offsets[label_i].transform.localScale = ar_labels[label_i].transform.localScale;
         ar_progress_offsets[label_i].transform.position   = ar_labels[label_i].transform.position;
         ar_progress_offsets[label_i].transform.rotation   = ar_labels[label_i].transform.rotation;
-        ar_progresses[label_i].transform.localScale    = ar_labels[label_i].transform.localScale;
-        ar_progresses[label_i].transform.localPosition = ar_labels[label_i].transform.localPosition;
         lw = 10f;
         curve = new AnimationCurve();
         curve.AddKey(0, lw);
@@ -1056,15 +1054,13 @@ public class Main : MonoBehaviour
 
 
         ar_labels[label_i].transform.localScale = new Vector3(20f, 20f, 20f);
-        ar_labels[label_i].transform.position = blackhole[0].transform.position+new Vector3(0,0,0);
+		ar_labels[label_i].transform.position = blackhole[0].transform.position+new Vector3(-340,0,0);
         ar_labels[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_labels[label_i].transform.position));
         ar_label_texts[label_i].text = "XRAY";
 
         ar_progress_offsets[label_i].transform.localScale = ar_labels[label_i].transform.localScale;
         ar_progress_offsets[label_i].transform.position   = ar_labels[label_i].transform.position;
         ar_progress_offsets[label_i].transform.rotation   = ar_labels[label_i].transform.rotation;
-        ar_progresses[label_i].transform.localScale    = ar_labels[label_i].transform.localScale;
-        ar_progresses[label_i].transform.localPosition = ar_labels[label_i].transform.localPosition;
         lw = 10f;
         curve = new AnimationCurve();
         curve.AddKey(0, lw);
@@ -1075,15 +1071,13 @@ public class Main : MonoBehaviour
         label_i++;
 
         ar_labels[label_i].transform.localScale = new Vector3(20f, 20f, 20f);
-        ar_labels[label_i].transform.position = blackhole[0].transform.position+new Vector3(0,-40,0);
+			ar_labels[label_i].transform.position = blackhole[0].transform.position+new Vector3(-300,-100,0);
         ar_labels[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_labels[label_i].transform.position));
         ar_label_texts[label_i].text = "NEUTRINO";
 
         ar_progress_offsets[label_i].transform.localScale = ar_labels[label_i].transform.localScale;
         ar_progress_offsets[label_i].transform.position   = ar_labels[label_i].transform.position;
         ar_progress_offsets[label_i].transform.rotation   = ar_labels[label_i].transform.rotation;
-        ar_progresses[label_i].transform.localScale    = ar_labels[label_i].transform.localScale;
-        ar_progresses[label_i].transform.localPosition = ar_labels[label_i].transform.localPosition;
         lw = 10f;
         curve = new AnimationCurve();
         curve.AddKey(0, lw);
@@ -1094,7 +1088,7 @@ public class Main : MonoBehaviour
         label_i++;
 
         ar_labels[label_i].transform.localScale = new Vector3(20f, 20f, 20f);
-        ar_labels[label_i].transform.position = blackhole[0].transform.position+new Vector3(0,0,0);
+        ar_labels[label_i].transform.position = blackhole[0].transform.position+new Vector3(300,0,0);
         ar_labels[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_labels[label_i].transform.position));
         ar_label_texts[label_i].text = "BLACK HOLE";
         label_i++;
@@ -1261,7 +1255,7 @@ public class Main : MonoBehaviour
         {
           voyager[i].transform.position = voyager[0].transform.position;
         }
-        ar_labels[label_i].transform.position = voyager[0].transform.position+new Vector3(4,0,0);
+        ar_labels[label_i].transform.position = voyager[0].transform.position+new Vector3(4,0,-10);
         ar_labels[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_labels[label_i].transform.position));
         label_i++;
 
@@ -1289,7 +1283,7 @@ public class Main : MonoBehaviour
         if(seconds_left > 0)
         {
           ar_timer_text.text = "00:" + Mathf.Floor(seconds_left) + ":" + Mathf.Floor((seconds_left - Mathf.Floor(seconds_left)) * 100);
-          float bar_y = -3;
+          float bar_y = -2;
           float bar_x = -11;
           float bar_w = 23;
           for(int i = 0; i < (int)SPEC.COUNT; i++)
