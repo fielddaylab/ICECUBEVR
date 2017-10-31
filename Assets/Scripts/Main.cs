@@ -224,12 +224,12 @@ public class Main : MonoBehaviour
   int sfx_audiosource_i;
   string[] sfx_files = new string[]
   {
-    "alert_fast",
-    "alert_slow",
-    "complete",
-    "select",
-    "warp",
-    "warp_click"
+    "sfx/alert_fast",
+    "sfx/alert_slow",
+    "sfx/complete",
+    "sfx/select",
+    "sfx/warp",
+    "sfx/warp_click"
   };
   //very clunky, but whatever
   enum SFX
@@ -1753,6 +1753,7 @@ public class Main : MonoBehaviour
         //spec switched
         if(old_spec != cur_spec_i)
         {
+          PlaySFX(SFX.SELECT);
           if(!voiceovers_played[cur_scene_i,cur_spec_i])
           {
             if(voiceover_audiosource.isPlaying) voiceover_audiosource.Stop();
