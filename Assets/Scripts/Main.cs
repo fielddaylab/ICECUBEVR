@@ -528,7 +528,10 @@ public class Main : MonoBehaviour
     sfx_audiosource_i = 0;
     sfx_audiosource = new AudioSource[n_sfx_audiosources];
     for(int i = 0; i < n_sfx_audiosources; i++)
+    {
       sfx_audiosource[i] = GameObject.Find("Script").AddComponent<AudioSource>();
+      sfx_audiosource[i].priority = 3;
+    }
     sfxs = new AudioClip[(int)SFX.COUNT];
     sfx_vols = new float[(int)SFX.COUNT];
     for(int i = 0; i < (int)SFX.COUNT; i++)
@@ -677,10 +680,11 @@ public class Main : MonoBehaviour
     jitter_state = 0;
 
     voiceover_audiosource = GameObject.Find("Script").AddComponent<AudioSource>();
+    voiceover_audiosource.priority = 1;
     voiceover_was_playing = false;
     music_audiosource = GameObject.Find("Script").AddComponent<AudioSource>();
+    voiceover_audiosource.priority = 2;
     music_was_playing = false;
-    //sfx_audiosource = GameObject.Find("Script").AddComponent<AudioSource>();
 
     default_portal_scale = portal.transform.localScale;
     default_portal_position = portal.transform.position;
@@ -1302,6 +1306,7 @@ public class Main : MonoBehaviour
 
     helmet_light_light.color = helmet_colors[cur_scene_i];
 
+    //scene switched
     if(!voiceovers_played[cur_scene_i,(int)SPEC.VIZ])
     {
       if(voiceover_audiosource.isPlaying) voiceover_audiosource.Stop();
@@ -1745,6 +1750,7 @@ public class Main : MonoBehaviour
         if(distance_viz <= distance_gam && distance_viz <= distance_neu) SetSpec((int)SPEC.VIZ);
         if(distance_neu <= distance_gam && distance_neu <= distance_viz) SetSpec((int)SPEC.NEU);
 
+        //spec switched
         if(old_spec != cur_spec_i)
         {
           if(!voiceovers_played[cur_scene_i,cur_spec_i])
@@ -1809,6 +1815,7 @@ public class Main : MonoBehaviour
       jitter = 0;
     Shader.SetGlobalFloat(jitter_id, jitter);
 
+    //voiceover finished
     if(voiceover_was_playing)
     {
       if(!voiceover_audiosource.isPlaying)
