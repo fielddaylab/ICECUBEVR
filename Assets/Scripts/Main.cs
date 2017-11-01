@@ -809,6 +809,7 @@ public class Main : MonoBehaviour
         }
       }
     }
+    dom.SetActive(false);
 
 /*
     //stars
@@ -1054,7 +1055,7 @@ public class Main : MonoBehaviour
 
 
         ar_labels[label_i].transform.localScale = new Vector3(20f, 20f, 20f);
-		ar_labels[label_i].transform.position = blackhole[0].transform.position+new Vector3(-340,0,0);
+        ar_labels[label_i].transform.position = blackhole[0].transform.position+new Vector3(-340,0,0);
         ar_labels[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_labels[label_i].transform.position));
         ar_label_texts[label_i].text = "XRAY";
 
@@ -1071,7 +1072,7 @@ public class Main : MonoBehaviour
         label_i++;
 
         ar_labels[label_i].transform.localScale = new Vector3(20f, 20f, 20f);
-			ar_labels[label_i].transform.position = blackhole[0].transform.position+new Vector3(-300,-100,0);
+        ar_labels[label_i].transform.position = blackhole[0].transform.position+new Vector3(-300,-100,0);
         ar_labels[label_i].transform.rotation = rotationFromEuler(getCamEuler(ar_labels[label_i].transform.position));
         ar_label_texts[label_i].text = "NEUTRINO";
 
@@ -1154,6 +1155,12 @@ public class Main : MonoBehaviour
           if(ps) ps.Play();
         }
 
+        //should already be done from bh scene, but in case of debug start here
+        gaze_projection.transform.rotation = rotationFromEuler(anti_gaze_cam_euler);
+        portal_projection.transform.rotation = rotationFromEuler(anti_gaze_cam_euler);
+
+        spec_projection.SetActive(false);
+
         break;
 
       case (int)SCENE.CREDITS:
@@ -1164,6 +1171,7 @@ public class Main : MonoBehaviour
           if(ps) ps.Stop();
         }
         ar_blackhole.SetActive(false);
+        eyeray.SetActive(false);
 
         break;
 
@@ -1200,16 +1208,19 @@ public class Main : MonoBehaviour
 
       case (int)SCENE.ICE:
 
-        float grid_t = 1f;
-        float pulse_t = 5f;
-        float beam_t = 8f;
+        float grid_t = 7f;
+        float pulse_t = 15f;
+        float beam_t = 17f;
 
         if(cur_ta < pulse_t) nwave_t_10 = 0;
 
         if(cur_ta >= grid_t)
         {
           if(old_ta < grid_t) //newly here
+          {
+            dom.SetActive(true);
             dom_yacc = 0.5f;
+          }
           if(dom_yacc != 0)
           {
             dom_yvel += dom_yacc;
@@ -1225,18 +1236,14 @@ public class Main : MonoBehaviour
           if(old_ta < beam_t) //newly here
             eyeray.SetActive(true);
 
-        if(!gaze_reticle.activeSelf)
-        {
-          if(voiceovers_played[cur_scene_i,(int)SPEC.COUNT])
-            gaze_reticle.SetActive(true);
-        }
-
         break;
 
       case (int)SCENE.VOYAGER:
 
         float spec_t = 5f;
 
+        /*
+        //use this for timed enable
         if(cur_ta >= spec_t)
         {
           if(old_ta < spec_t) //newly here
@@ -1244,12 +1251,10 @@ public class Main : MonoBehaviour
             spec_projection.SetActive(true);
           }
         }
-
-        if(!gaze_reticle.activeSelf)
-        {
-          if(voiceovers_played[cur_scene_i,(int)SPEC.COUNT])
-            gaze_reticle.SetActive(true);
-        }
+        */
+        //use this for logic enable
+        if(voiceovers_played[cur_scene_i,(int)SPEC.VIZ] && !spec_projection.activeSelf)
+          spec_projection.SetActive(true);
 
         for(int i = 1; i < voyager.Length; i++)
         {
@@ -1263,11 +1268,6 @@ public class Main : MonoBehaviour
 
       case (int)SCENE.NOTHING:
 
-        if(!gaze_reticle.activeSelf)
-        {
-          if(voiceovers_played[cur_scene_i,(int)SPEC.COUNT])
-            gaze_reticle.SetActive(true);
-        }
 
         break;
 
@@ -1299,12 +1299,6 @@ public class Main : MonoBehaviour
           ar_timer_text.text = "XX:XX:XX";
         }
 
-        if(!gaze_reticle.activeSelf)
-        {
-          if(voiceovers_played[cur_scene_i,(int)SPEC.COUNT])
-            gaze_reticle.SetActive(true);
-        }
-
         for(int i = 0; i < (int)SPEC.COUNT; i++)
         {
           foreach(Transform child_transform in blackhole[i].transform)
@@ -1316,12 +1310,6 @@ public class Main : MonoBehaviour
         break;
 
       case (int)SCENE.EARTH:
-
-        if(!gaze_reticle.activeSelf)
-        {
-          if(voiceovers_played[cur_scene_i,(int)SPEC.COUNT])
-            gaze_reticle.SetActive(true);
-        }
 
         foreach(Transform child_transform in ar_blackhole.transform)
         {
@@ -1347,15 +1335,16 @@ public class Main : MonoBehaviour
             credits_text.text = credit_strings[credits_i];
         }
 
-        if(!gaze_reticle.activeSelf)
-        {
-          if(voiceovers_played[cur_scene_i,(int)SPEC.COUNT])
-            gaze_reticle.SetActive(true);
-        }
-
         break;
 
     }
+
+    if(!gaze_reticle.activeSelf)
+    {
+      if(voiceovers_played[cur_scene_i,(int)SPEC.COUNT])
+        gaze_reticle.SetActive(true);
+    }
+
   }
 
   void SetSpec(int spec)
@@ -1587,7 +1576,7 @@ public class Main : MonoBehaviour
     float distance_viz = Vector3.Distance(spec_viz_reticle.transform.position, cam_reticle.transform.position);
     float distance_gam = Vector3.Distance(spec_gam_reticle.transform.position, cam_reticle.transform.position);
     float distance_neu = Vector3.Distance(spec_neu_reticle.transform.position, cam_reticle.transform.position);
-    if(spec_projection.activeInHierarchy && spec_t_numb <= 0 && (distance_gam < 0.5 || distance_viz < 0.5 || distance_neu < 0.5))
+    if(spec_projection.activeSelf && spec_t_numb <= 0 && (distance_gam < 0.5 || distance_viz < 0.5 || distance_neu < 0.5))
     {
       if(spec_t_since < 0)        spec_t_since = Time.deltaTime;
       else                        spec_t_since += Time.deltaTime;
