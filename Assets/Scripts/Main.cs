@@ -1323,7 +1323,11 @@ public class Main : MonoBehaviour
           {
             float t = Mathf.Min(1,(ta[cur_scene_i,i]/scan_t));
             ar_progress_lines[i].SetPosition(1, new Vector3(bar_x+bar_w*t, bar_y, 0));
-            if(t == 1) ar_checks[i].SetActive(true);
+            if(t == 1 && !ar_checks[i].activeSelf)
+            {
+              ar_checks[i].SetActive(true);
+              PlaySFX(SFX.COMPLETE);
+            }
           }
         }
         else if(in_fail_motion == 0)
