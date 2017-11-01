@@ -595,7 +595,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7399f46fd4111644af16a6c3fd8399a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  starting_scene: 0
+  starting_scene: 3
   alpha_material: {fileID: 2100000, guid: cc5ad7b8644194bbeb74b46a13481cb7, type: 2}
   star_prefab: {fileID: 1299812747390152, guid: 87ab197597dec455b8decc685297db07,
     type: 2}
