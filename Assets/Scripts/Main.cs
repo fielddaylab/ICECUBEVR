@@ -223,6 +223,7 @@ public class Main : MonoBehaviour
   AudioClip[,] musics;
   float[,] music_vols;
   AudioSource[] sfx_audiosource;
+  AudioSource warp_audiosource_ptr; //<- PTR! DON'T ALLOCATE!
   int n_sfx_audiosources;
   int sfx_audiosource_i;
   string[] sfx_files = new string[]
@@ -248,13 +249,15 @@ public class Main : MonoBehaviour
   AudioClip[] sfxs;
   float[] sfx_vols;
 
-  void PlaySFX(SFX s)
+  AudioSource PlaySFX(SFX s)
   {
     if(sfx_audiosource[sfx_audiosource_i].isPlaying) sfx_audiosource[sfx_audiosource_i].Stop();
     sfx_audiosource[sfx_audiosource_i].clip = sfxs[(int)s];
     sfx_audiosource[sfx_audiosource_i].volume = sfx_vols[(int)s];
     sfx_audiosource[sfx_audiosource_i].Play();
+    AudioSource used_source = sfx_audiosource[sfx_audiosource_i];
     sfx_audiosource_i = (sfx_audiosource_i+1)%n_sfx_audiosources;
+    return used_source;
   }
 
   void MapVols()
@@ -743,7 +746,7 @@ public class Main : MonoBehaviour
     out_fail_motion = 0;
     max_fail_motion = 1;
 
-    gaze_t_max = 2f;
+    gaze_t_max = 1f;
     gaze_t_max_numb = 4f;
     gaze_t_since = 0;
     gaze_t_in = 0;
@@ -972,6 +975,7 @@ public class Main : MonoBehaviour
 
     AnimationCurve curve;
     float lw;
+
     lw = 0.0001f;
     curve = new AnimationCurve();
     curve.AddKey(0, lw);
@@ -981,6 +985,10 @@ public class Main : MonoBehaviour
       ar_label_left_texts[i].text = "";
       ar_label_right_texts[i].text = "";
 
+      ar_label_lefts[ i].transform.localScale = new Vector3(0f,0f,0f);
+      ar_label_rights[i].transform.localScale = new Vector3(0f,0f,0f);
+      ar_label_lefts[ i].transform.position = new Vector3(0f,0f,0f);
+      ar_label_rights[i].transform.position = new Vector3(0f,0f,0f);
       ar_checks[i].SetActive(false);
 
       ar_progress_lines[i].widthCurve = curve;
@@ -1026,11 +1034,11 @@ public class Main : MonoBehaviour
         ar_label_right_texts[label_right_i].text = "PLUTO";
         label_right_i++;
 
-        ar_label_rights[label_right_i].transform.localScale = new Vector3(10f, 10f, 10f);
-        ar_label_rights[label_right_i].transform.position = vearth[0].transform.position+new Vector3(0,0,0);
-        ar_label_rights[label_right_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_rights[label_right_i].transform.position));
-        ar_label_right_texts[label_right_i].text = "EARTH";
-        label_right_i++;
+        ar_label_lefts[label_left_i].transform.localScale = new Vector3(10f, 10f, 10f);
+        ar_label_lefts[label_left_i].transform.position = vearth[0].transform.position+new Vector3(0,0,0);
+        ar_label_lefts[label_left_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_lefts[label_left_i].transform.position));
+        ar_label_left_texts[label_left_i].text = "EARTH";
+        label_left_i++;
 
         ar_maps[0].SetActive(true);
         dom.SetActive(false);
@@ -1044,11 +1052,11 @@ public class Main : MonoBehaviour
         ar_label_right_texts[label_right_i].text = "MILKY WAY";
         label_right_i++;
 
-        ar_label_rights[label_right_i].transform.localScale = new Vector3(10f, 10f, 10f);
-        ar_label_rights[label_right_i].transform.position = nearth[0].transform.position+new Vector3(0,0,0);
-        ar_label_rights[label_right_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_rights[label_right_i].transform.position));
-        ar_label_right_texts[label_right_i].text = "EARTH";
-        label_right_i++;
+        ar_label_lefts[label_left_i].transform.localScale = new Vector3(10f, 10f, 10f);
+        ar_label_lefts[label_left_i].transform.position = nearth[0].transform.position+new Vector3(0,0,0);
+        ar_label_lefts[label_left_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_lefts[label_left_i].transform.position));
+        ar_label_left_texts[label_left_i].text = "EARTH";
+        label_left_i++;
 
         ar_maps[1].SetActive(true);
 
@@ -1111,11 +1119,11 @@ public class Main : MonoBehaviour
         ar_progress_lines[label_right_i].SetPosition(1, new Vector3(bar_x, bar_y, 0));
         label_right_i++;
 
-        ar_label_rights[label_right_i].transform.localScale = new Vector3(20f, 20f, 20f);
-        ar_label_rights[label_right_i].transform.position = blackhole[0].transform.position+new Vector3(300,0,0);
-        ar_label_rights[label_right_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_rights[label_right_i].transform.position));
-        ar_label_right_texts[label_right_i].text = "BLACK HOLE";
-        label_right_i++;
+        ar_label_lefts[label_left_i].transform.localScale = new Vector3(20f, 20f, 20f);
+        ar_label_lefts[label_left_i].transform.position = blackhole[0].transform.position+new Vector3(300,0,0);
+        ar_label_lefts[label_left_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_lefts[label_left_i].transform.position));
+        ar_label_left_texts[label_left_i].text = "BLACK HOLE";
+        label_left_i++;
 
         for(int j = 0; j < (int)SPEC.COUNT; j++)
           ta[(int)SCENE.EXTREME,j] = 0;
@@ -1146,11 +1154,11 @@ public class Main : MonoBehaviour
 
       case (int)SCENE.EARTH:
 
-        ar_label_rights[label_right_i].transform.localScale = new Vector3(8f, 8f, 8f);
-        ar_label_rights[label_right_i].transform.position = earth[0].transform.position+new Vector3(70,0,-50);
-        ar_label_rights[label_right_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_rights[label_right_i].transform.position));
-        ar_label_right_texts[label_right_i].text = "ICE CUBE";
-        label_right_i++;
+        ar_label_lefts[label_left_i].transform.localScale = new Vector3(8f, 8f, 8f);
+        ar_label_lefts[label_left_i].transform.position = earth[0].transform.position+new Vector3(70,0,-50);
+        ar_label_lefts[label_left_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_lefts[label_left_i].transform.position));
+        ar_label_left_texts[label_left_i].text = "ICE CUBE";
+        label_left_i++;
 
         ar_label_rights[label_right_i].transform.localScale = new Vector3(8f, 8f, 8f);
         ar_label_rights[label_right_i].transform.position = esun[0].transform.position+new Vector3(0,0,0);
@@ -1569,16 +1577,18 @@ public class Main : MonoBehaviour
     {
       if(gaze_t_since < 0)        gaze_t_since = Time.deltaTime;
       else                        gaze_t_since += Time.deltaTime;
+      if(gaze_t_in == 0) warp_audiosource_ptr = PlaySFX(SFX.WARP);
       if(gaze_t_in < gaze_t_max)  gaze_t_in += Time.deltaTime;
       if(gaze_t_in >= gaze_t_max) gaze_t_numb = gaze_t_max_numb;
 
       //advance
       if(gaze_t_in >= gaze_t_max)
       {
+        if(warp_audiosource_ptr != null)
+          warp_audiosource_ptr = null;
         if(in_portal_motion == 0 && out_portal_motion == 0)
         {
           in_portal_motion = Time.deltaTime;
-          PlaySFX(SFX.WARP);
           PreSetupNextScene();
         }
       }
@@ -1587,7 +1597,16 @@ public class Main : MonoBehaviour
     {
       if(gaze_t_since > 0) gaze_t_since = -Time.deltaTime;
       else                 gaze_t_since -= Time.deltaTime;
-      if(gaze_t_in > 0)    gaze_t_in -= Time.deltaTime;
+      if(gaze_t_in > 0)
+      {
+        if(warp_audiosource_ptr != null && warp_audiosource_ptr.isPlaying)
+        {
+          warp_audiosource_ptr.Stop();
+          warp_audiosource_ptr = null;
+        }
+        gaze_t_in = 0;
+        //gaze_t_in -= Time.deltaTime;
+      }
     }
     if(gaze_t_in > 0)   gaze_t_run += Time.deltaTime;
     else                gaze_t_run = 0;
