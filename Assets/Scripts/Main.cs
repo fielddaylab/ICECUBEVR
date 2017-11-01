@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Main : MonoBehaviour
 {
-  string[] credit_strings = new string[]
+  public string[] credit_strings = new string[]
   {
     "", //needs empty string at beginning so it starts off empty
     "Me",
