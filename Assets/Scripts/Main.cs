@@ -417,6 +417,17 @@ public class Main : MonoBehaviour
     return Quaternion.Euler(-Mathf.Rad2Deg * euler.x, Mathf.Rad2Deg * euler.y, 0);
   }
 
+
+  void HandleHMDMounted()
+  {
+    // Do stuff
+  }
+
+  void HandleHMDUnmounted()
+  {
+    // Do stuff
+  }
+
   void Start()
   {
     scene_names = new string[(int)SCENE.COUNT];
@@ -929,6 +940,9 @@ public class Main : MonoBehaviour
 
     MapVols();
     SetupScene();
+
+    OVRManager.HMDMounted += HandleHMDMounted;
+    OVRManager.HMDUnmounted += HandleHMDUnmounted;
   }
 
   //called just before portal to next scene appears
