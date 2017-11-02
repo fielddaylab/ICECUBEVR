@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using GameAnalyticsSDK;
 
 public class Main : MonoBehaviour
 {
@@ -988,7 +989,16 @@ public class Main : MonoBehaviour
 
   void SetupScene()
   {
-    SetSpec((int)SPEC.VIZ);
+	
+	if (cur_scene_i == (int)SCENE.ICE) {
+		GameAnalytics.NewProgressionEvent (GAProgressionStatus.Start, "Universe", "Scene_" + cur_scene_i, "viz", 0);
+	} else {
+		int last_scene_i = cur_scene_i - 1;
+		GameAnalytics.NewProgressionEvent (GAProgressionStatus.Complete, "Universe", "Scene_" + last_scene_i, "viz", 0);
+		GameAnalytics.NewProgressionEvent (GAProgressionStatus.Start, "Universe", "Scene_" + cur_scene_i, "viz", 0);
+	}
+	
+	SetSpec((int)SPEC.VIZ);
     spec_t_numb = spec_t_max_numb;
 
     for(int i = 0; i < 3; i++)
@@ -1419,12 +1429,18 @@ public class Main : MonoBehaviour
 
   void SetSpec(int spec)
   {
-    cur_spec_i = spec;
+	cur_spec_i = spec;
     switch(spec)
     {
-      case (int)SPEC.GAM: spec_sel_reticle.transform.position = spec_gam_reticle.transform.position; break;
-      case (int)SPEC.VIZ: spec_sel_reticle.transform.position = spec_viz_reticle.transform.position; break;
-      case (int)SPEC.NEU: spec_sel_reticle.transform.position = spec_neu_reticle.transform.position; break;
+      case (int)SPEC.GAM: spec_sel_reticle.transform.position = spec_gam_reticle.transform.position; 
+			GameAnalytics.NewProgressionEvent (GAProgressionStatus.Start, "Universe", "Scene_" + cur_scene_i, "xray", 0);
+			break;
+      case (int)SPEC.VIZ: spec_sel_reticle.transform.position = spec_viz_reticle.transform.position; 
+			GameAnalytics.NewProgressionEvent (GAProgressionStatus.Start, "Universe", "Scene_" + cur_scene_i, "viz", 0);
+			break;
+      case (int)SPEC.NEU: spec_sel_reticle.transform.position = spec_neu_reticle.transform.position;
+			GameAnalytics.NewProgressionEvent (GAProgressionStatus.Start, "Universe", "Scene_" + cur_scene_i, "neu", 0);
+			break;
     }
 
     if(cur_scene_i == (int)SCENE.EARTH)
@@ -1521,11 +1537,13 @@ public class Main : MonoBehaviour
     if(in_fail_motion > 0) in_fail_motion += Time.deltaTime * 0.2f;
     if(in_fail_motion > max_fail_motion)
     {
+	  //FAIL
       out_fail_motion = in_fail_motion-max_fail_motion;
       if(out_fail_motion <= 0) out_fail_motion = 0.00001f;
       in_fail_motion = 0;
       next_scene_i = cur_scene_i+1;
       scene_rots[next_scene_i] = 0;
+	  GameAnalytics.NewProgressionEvent (GAProgressionStatus.Fail, "Universe", "Scene_" + next_scene_i, "viz", 0);
       SetupScene();
     }
     if(out_fail_motion > 0)               out_fail_motion += Time.deltaTime;
