@@ -758,7 +758,7 @@ public class Main : MonoBehaviour
     gaze_t_numb = 0;
 
     spec_t_max = 1f;
-    spec_t_max_numb = 5f;
+    spec_t_max_numb = 1f;
     spec_t_since = 0;
     spec_t_in = 0;
     spec_t_run = 0;
