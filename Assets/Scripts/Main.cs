@@ -53,8 +53,10 @@ public class Main : MonoBehaviour
   GameObject ar_alert;
   GameObject ar_timer;
   TextMesh ar_timer_text;
-  GameObject credits;
-  TextMesh credits_text;
+  GameObject credits_0;
+  GameObject credits_1;
+  TextMesh credits_text_0;
+  TextMesh credits_text_1;
 
   int MAX_LABELS = 5;
   GameObject[] ar_label_lefts;
@@ -618,8 +620,10 @@ public class Main : MonoBehaviour
     ar_alert = GameObject.Find("Alert");
     ar_timer = GameObject.Find("Timer");
     ar_timer_text = ar_timer.GetComponent<TextMesh>();
-    credits = GameObject.Find("Credits");
-    credits_text = credits.GetComponent<TextMesh>();
+    credits_0 = GameObject.Find("Credits_0");
+    credits_text_0 = credits_0.GetComponent<TextMesh>();
+    credits_1 = GameObject.Find("Credits_1");
+    credits_text_1 = credits_1.GetComponent<TextMesh>();
     //stars = GameObject.Find("Stars");
     //starsscale = GameObject.Find("StarsScale");
 
@@ -1374,22 +1378,18 @@ public class Main : MonoBehaviour
           ar_timer_text.text = "XX:XX:XX";
         }
 
+        float bhr_speed = 2.0f;
         for(int i = 0; i < (int)SPEC.COUNT; i++)
         {
           foreach(Transform child_transform in blackhole[i].transform)
           {
-            child_transform.localRotation = Quaternion.Euler(0.0f, nwave_t_10*36*20, 0.0f);
+            child_transform.localRotation = Quaternion.Euler(0.0f, nwave_t_10*36*bhr_speed, 0.0f);
           }
         }
 
         break;
 
       case (int)SCENE.EARTH:
-
-        foreach(Transform child_transform in ar_blackhole.transform)
-        {
-          child_transform.rotation = Quaternion.Euler(0.0f, nwave_t_10*36*20, 0.0f);
-        }
 
         earth[0].transform.position = anti_gaze_pt.normalized*600;
 
@@ -1402,8 +1402,11 @@ public class Main : MonoBehaviour
         {
           credits_t = 0;
           credits_i++;
-          if(credits_i < credit_strings.Length)
-            credits_text.text = credit_strings[credits_i];
+          if(credits_i*2+1 < credit_strings.Length)
+          {
+            credits_text_0.text = credit_strings[credits_i*2+0];
+            credits_text_1.text = credit_strings[credits_i*2+1];
+          }
         }
 
         break;
