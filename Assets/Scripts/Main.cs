@@ -1659,9 +1659,15 @@ public class Main : MonoBehaviour
             voiceover_was_playing = true;
             voiceovers_played[cur_scene_i,cur_spec_i] = true;
           }
-          if(music_audiosource.isPlaying) music_audiosource.Stop();
+          float old_time = music_audiosource.time;
+          if(music_audiosource.isPlaying)
+          {
+            old_time = music_audiosource.time;
+            music_audiosource.Stop();
+          }
           music_audiosource.clip = musics[cur_scene_i,cur_spec_i];
           music_audiosource.volume = music_vols[cur_scene_i,cur_spec_i];
+          music_audiosource.time = old_time;
           music_audiosource.Play();
           music_was_playing = true;
         }
