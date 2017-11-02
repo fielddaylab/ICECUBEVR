@@ -1494,7 +1494,7 @@ public class Main : MonoBehaviour
       out_fail_motion = in_fail_motion-max_fail_motion;
       if(out_fail_motion <= 0) out_fail_motion = 0.00001f;
       in_fail_motion = 0;
-      next_scene_i = cur_scene_i;
+      next_scene_i = cur_scene_i+1;
       scene_rots[next_scene_i] = 0;
       SetupScene();
     }
