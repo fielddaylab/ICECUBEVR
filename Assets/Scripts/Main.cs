@@ -1344,7 +1344,8 @@ public class Main : MonoBehaviour
         }
         else if(in_fail_motion == 0)
         {
-          in_fail_motion = 0.0001f;
+          if(gaze_t_in == 0)
+            in_fail_motion = 0.0001f;
           ar_timer_text.text = "XX:XX:XX";
         }
 
@@ -1366,6 +1367,7 @@ public class Main : MonoBehaviour
         }
 
         earth[0].transform.position = anti_gaze_pt.normalized*600;
+
         break;
 
       case (int)SCENE.CREDITS:
@@ -1585,7 +1587,10 @@ public class Main : MonoBehaviour
     cam_spinner.transform.localRotation = Quaternion.Euler(0, 0, rot);
 
     float distance = Vector3.Distance(gaze_reticle.transform.position, cam_reticle.transform.position);
-    if(gaze_t_numb <= 0 && distance < 0.3 && voiceovers_played[cur_scene_i,(int)SPEC.COUNT])
+    if(
+      (cur_scene_i != (int)SCENE.EARTH && gaze_t_numb <= 0 && distance < 0.3 && voiceovers_played[cur_scene_i,(int)SPEC.COUNT] && in_fail_motion == 0) || //just use this line for normal use...
+      (cur_scene_i == (int)SCENE.EARTH && voiceovers_played[cur_scene_i,(int)SPEC.COUNT] && !voiceover_was_playing) //weird hack for end scene
+    )
     {
       if(gaze_t_since < 0)        gaze_t_since = Time.deltaTime;
       else                        gaze_t_since += Time.deltaTime;

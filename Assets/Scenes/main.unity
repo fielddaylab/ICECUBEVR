@@ -609,7 +609,7 @@ MonoBehaviour:
   - 'Sound and Music: Andrew Fitzpatrik'
   - 'Writing: Lindy Biller'
   - 
-  starting_scene: 2
+  starting_scene: 0
   alpha_material: {fileID: 2100000, guid: cc5ad7b8644194bbeb74b46a13481cb7, type: 2}
   star_prefab: {fileID: 1299812747390152, guid: 87ab197597dec455b8decc685297db07,
     type: 2}
@@ -9340,7 +9340,9 @@ Prefab:
       propertyPath: m_CullingMask.m_Bits
       value: 512
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 64099413897450352, guid: 8520e9289f03c194592d7c0e643c0ed5, type: 2}
+    - {fileID: 64666703725108942, guid: 8520e9289f03c194592d7c0e643c0ed5, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: 8520e9289f03c194592d7c0e643c0ed5, type: 2}
   m_IsPrefabParent: 0
 --- !u!1001 &739425852
