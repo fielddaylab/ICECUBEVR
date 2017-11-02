@@ -1043,6 +1043,9 @@ public class Main : MonoBehaviour
         ar_label_left_texts[label_left_i].text = "EARTH";
         label_left_i++;
 
+        gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
+        portal_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
+
         ar_maps[0].SetActive(true);
         dom.SetActive(false);
         break;
@@ -1060,6 +1063,9 @@ public class Main : MonoBehaviour
         ar_label_lefts[label_left_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_lefts[label_left_i].transform.position));
         ar_label_left_texts[label_left_i].text = "EARTH";
         label_left_i++;
+
+        gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
+        portal_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
 
         ar_maps[1].SetActive(true);
         spec_projection.SetActive(true);
@@ -1148,6 +1154,7 @@ public class Main : MonoBehaviour
 
         gaze_projection.transform.rotation = rotationFromEuler(anti_gaze_cam_euler);
         portal_projection.transform.rotation = rotationFromEuler(anti_gaze_cam_euler);
+
         ar_alert.SetActive(true);
         ar_timer.SetActive(true);
         timer_t = 0;
@@ -1189,7 +1196,6 @@ public class Main : MonoBehaviour
           if(ps) ps.Play();
         }
 
-        //should already be done from bh scene, but in case of debug start here
         gaze_projection.transform.rotation = rotationFromEuler(anti_gaze_cam_euler);
         portal_projection.transform.rotation = rotationFromEuler(anti_gaze_cam_euler);
 
@@ -1202,9 +1208,13 @@ public class Main : MonoBehaviour
           ParticleSystem ps = child.GetComponent<ParticleSystem>();
           if(ps) ps.Stop();
         }
+
         ar_blackhole.SetActive(false);
         gaze_reticle.SetActive(false);
         eyeray.SetActive(false);
+
+        gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
+        portal_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
 
         break;
 
@@ -1312,6 +1322,7 @@ public class Main : MonoBehaviour
           ar_alert.SetActive(false);
         else
           ar_alert.SetActive(true);
+
         float seconds_left = 60 - timer_t;
         if(seconds_left > 0)
         {
@@ -1353,7 +1364,7 @@ public class Main : MonoBehaviour
         {
           foreach(Transform child_transform in blackhole[i].transform)
           {
-            child_transform.rotation = Quaternion.Euler(0.0f, 0.0f, nwave_t_10*36*10);
+            child_transform.localRotation = Quaternion.Euler(0.0f, nwave_t_10*36*20, 0.0f);
           }
         }
 
@@ -1363,7 +1374,7 @@ public class Main : MonoBehaviour
 
         foreach(Transform child_transform in ar_blackhole.transform)
         {
-          child_transform.rotation = Quaternion.Euler(0.0f, 0.0f, nwave_t_10*36*10);
+          child_transform.rotation = Quaternion.Euler(0.0f, nwave_t_10*36*20, 0.0f);
         }
 
         earth[0].transform.position = anti_gaze_pt.normalized*600;
