@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 4959060166985282}
   - component: {fileID: 33805880018322700}
   - component: {fileID: 23408063034059812}
-  m_Layer: 12
+  m_Layer: 15
   m_Name: Sun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -37,9 +37,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4954797856947564}
   - component: {fileID: 33086506035730520}
-  - component: {fileID: 64666703725108942}
   - component: {fileID: 23546007493584216}
-  m_Layer: 12
+  m_Layer: 15
   m_Name: Sun Plane 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -55,7 +54,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4812474225101818}
   - component: {fileID: 108304473541883658}
-  m_Layer: 12
+  m_Layer: 15
   m_Name: Point light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -71,9 +70,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4009159842087748}
   - component: {fileID: 33984535030041464}
-  - component: {fileID: 64099413897450352}
   - component: {fileID: 23682537409812374}
-  m_Layer: 12
+  m_Layer: 15
   m_Name: Sun Plane 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -125,16 +123,16 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1164195167296064}
-  m_LocalRotation: {x: -0.9799987, y: 0.086821236, z: -0.07405273, w: 0.16303642}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 20, y: 20, z: 20}
+  m_LocalRotation: {x: 0.053381864, y: 0.61911654, z: -0.6975649, w: 0.35671887}
+  m_LocalPosition: {x: -798.7, y: -224.8, z: 677.1}
+  m_LocalScale: {x: 70, y: 70, z: 70}
   m_Children:
   - {fileID: 4812474225101818}
   - {fileID: 4009159842087748}
   - {fileID: 4954797856947564}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: -162.14, y: -10.5, z: 11.78}
+  m_LocalEulerAnglesHint: {x: -86.8, y: 43.2, z: -86.803}
 --- !u!23 &23408063034059812
 MeshRenderer:
   m_ObjectHideFlags: 1
@@ -252,34 +250,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1636771432017898}
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
---- !u!64 &64099413897450352
-MeshCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1636771432017898}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Convex: 0
-  m_InflateMesh: 0
-  m_SkinWidth: 0.01
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
---- !u!64 &64666703725108942
-MeshCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1244731623354426}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Convex: 0
-  m_InflateMesh: 0
-  m_SkinWidth: 0.01
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!108 &108304473541883658
 Light:
   m_ObjectHideFlags: 1
@@ -308,24 +278,10 @@ Light:
   m_RenderMode: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 32768
   m_Lightmapping: 4
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
-  m_FalloffTable:
-    m_Table[0]: 0
-    m_Table[1]: 0
-    m_Table[2]: 0
-    m_Table[3]: 0
-    m_Table[4]: 0
-    m_Table[5]: 0
-    m_Table[6]: 0
-    m_Table[7]: 0
-    m_Table[8]: 0
-    m_Table[9]: 0
-    m_Table[10]: 0
-    m_Table[11]: 0
-    m_Table[12]: 0
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
   m_ShadowRadius: 0
