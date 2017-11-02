@@ -53,8 +53,10 @@ public class Main : MonoBehaviour
   GameObject ar_alert;
   GameObject ar_timer;
   TextMesh ar_timer_text;
-  GameObject credits;
-  TextMesh credits_text;
+  GameObject credits_0;
+  GameObject credits_1;
+  TextMesh credits_text_0;
+  TextMesh credits_text_1;
 
   int MAX_LABELS = 5;
   GameObject[] ar_label_lefts;
@@ -417,6 +419,17 @@ public class Main : MonoBehaviour
     return Quaternion.Euler(-Mathf.Rad2Deg * euler.x, Mathf.Rad2Deg * euler.y, 0);
   }
 
+
+  void HandleHMDMounted()
+  {
+    // Do stuff
+  }
+
+  void HandleHMDUnmounted()
+  {
+    // Do stuff
+  }
+
   void Start()
   {
     scene_names = new string[(int)SCENE.COUNT];
@@ -508,8 +521,12 @@ public class Main : MonoBehaviour
     voiceovers_played[(int)SCENE.ICE,(int)SPEC.GAM]     = true;
     voiceovers_played[(int)SCENE.NOTHING,(int)SPEC.NEU] = true;
     voiceovers_played[(int)SCENE.NOTHING,(int)SPEC.GAM] = true;
+    voiceovers_played[(int)SCENE.EXTREME,(int)SPEC.NEU] = true;
+    voiceovers_played[(int)SCENE.EXTREME,(int)SPEC.GAM] = true;
     voiceovers_played[(int)SCENE.EARTH,(int)SPEC.NEU]   = true;
     voiceovers_played[(int)SCENE.EARTH,(int)SPEC.GAM]   = true;
+    voiceovers_played[(int)SCENE.CREDITS,(int)SPEC.NEU] = true;
+    voiceovers_played[(int)SCENE.CREDITS,(int)SPEC.GAM] = true;
 
     music_files = new string[(int)SCENE.COUNT,(int)SPEC.COUNT];
     for(int i = 0; i < (int)SCENE.COUNT; i++)
@@ -603,8 +620,10 @@ public class Main : MonoBehaviour
     ar_alert = GameObject.Find("Alert");
     ar_timer = GameObject.Find("Timer");
     ar_timer_text = ar_timer.GetComponent<TextMesh>();
-    credits = GameObject.Find("Credits");
-    credits_text = credits.GetComponent<TextMesh>();
+    credits_0 = GameObject.Find("Credits_0");
+    credits_text_0 = credits_0.GetComponent<TextMesh>();
+    credits_1 = GameObject.Find("Credits_1");
+    credits_text_1 = credits_1.GetComponent<TextMesh>();
     //stars = GameObject.Find("Stars");
     //starsscale = GameObject.Find("StarsScale");
 
@@ -754,7 +773,7 @@ public class Main : MonoBehaviour
     gaze_t_numb = 0;
 
     spec_t_max = 1f;
-    spec_t_max_numb = 5f;
+    spec_t_max_numb = 1f;
     spec_t_since = 0;
     spec_t_in = 0;
     spec_t_run = 0;
@@ -925,6 +944,9 @@ public class Main : MonoBehaviour
 
     MapVols();
     SetupScene();
+
+    OVRManager.HMDMounted += HandleHMDMounted;
+    OVRManager.HMDUnmounted += HandleHMDUnmounted;
   }
 
   //called just before portal to next scene appears
@@ -969,9 +991,12 @@ public class Main : MonoBehaviour
     SetSpec((int)SPEC.VIZ);
     spec_t_numb = spec_t_max_numb;
 
-    main_camera_skybox.material = skyboxes[cur_scene_i, cur_spec_i];
-
+    for(int i = 0; i < 3; i++)
+      ar_maps[i].SetActive(false);
+    spec_projection.SetActive(false);
     gaze_reticle.SetActive(false);
+
+    main_camera_skybox.material = skyboxes[cur_scene_i, cur_spec_i];
 
     AnimationCurve curve;
     float lw;
@@ -996,9 +1021,6 @@ public class Main : MonoBehaviour
         ar_progress_lines[i].SetPosition(j, new Vector3(0, 0, 0));
     }
 
-    for(int i = 0; i < 3; i++)
-      ar_maps[i].SetActive(false);
-
     int label_left_i = 0;
     int label_right_i = 0;
     switch(cur_scene_i)
@@ -1015,7 +1037,6 @@ public class Main : MonoBehaviour
         gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
         portal_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
 
-        spec_projection.SetActive(false);
         eyeray.SetActive(false);
 
         break;
@@ -1040,6 +1061,9 @@ public class Main : MonoBehaviour
         ar_label_left_texts[label_left_i].text = "EARTH";
         label_left_i++;
 
+        gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
+        portal_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
+
         ar_maps[0].SetActive(true);
         dom.SetActive(false);
         break;
@@ -1058,7 +1082,11 @@ public class Main : MonoBehaviour
         ar_label_left_texts[label_left_i].text = "EARTH";
         label_left_i++;
 
+        gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
+        portal_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
+
         ar_maps[1].SetActive(true);
+        spec_projection.SetActive(true);
 
         break;
 
@@ -1127,8 +1155,6 @@ public class Main : MonoBehaviour
 
         for(int j = 0; j < (int)SPEC.COUNT; j++)
           ta[(int)SCENE.EXTREME,j] = 0;
-        for(int j = 0; j < (int)SPEC.COUNT+1; j++)
-          voiceovers_played[(int)SCENE.EXTREME,j] = false;
 
         //should have also been done in pre-setup, but can't hurt (in case of debug "start here")
         for(int i = 0; i < (int)SPEC.COUNT; i++)
@@ -1142,9 +1168,11 @@ public class Main : MonoBehaviour
         }
 
         ar_maps[2].SetActive(true);
+        spec_projection.SetActive(true);
 
         gaze_projection.transform.rotation = rotationFromEuler(anti_gaze_cam_euler);
         portal_projection.transform.rotation = rotationFromEuler(anti_gaze_cam_euler);
+
         ar_alert.SetActive(true);
         ar_timer.SetActive(true);
         timer_t = 0;
@@ -1186,11 +1214,8 @@ public class Main : MonoBehaviour
           if(ps) ps.Play();
         }
 
-        //should already be done from bh scene, but in case of debug start here
         gaze_projection.transform.rotation = rotationFromEuler(anti_gaze_cam_euler);
         portal_projection.transform.rotation = rotationFromEuler(anti_gaze_cam_euler);
-
-        spec_projection.SetActive(false);
 
         break;
 
@@ -1201,9 +1226,13 @@ public class Main : MonoBehaviour
           ParticleSystem ps = child.GetComponent<ParticleSystem>();
           if(ps) ps.Stop();
         }
+
         ar_blackhole.SetActive(false);
         gaze_reticle.SetActive(false);
         eyeray.SetActive(false);
+
+        gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
+        portal_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
 
         break;
 
@@ -1285,8 +1314,7 @@ public class Main : MonoBehaviour
           }
         }
         */
-        //use this for logic enable
-        if(voiceovers_played[cur_scene_i,(int)SPEC.VIZ] && !spec_projection.activeSelf)
+        if(!spec_projection.activeSelf && voiceovers_played[cur_scene_i,(int)SPEC.VIZ] && !voiceover_was_playing)
           spec_projection.SetActive(true);
 
         for(int i = 1; i < voyager.Length; i++)
@@ -1312,6 +1340,7 @@ public class Main : MonoBehaviour
           ar_alert.SetActive(false);
         else
           ar_alert.SetActive(true);
+
         float seconds_left = 60 - timer_t;
         if(seconds_left > 0)
         {
@@ -1319,6 +1348,7 @@ public class Main : MonoBehaviour
           float bar_y = -2;
           float bar_x = -11;
           float bar_w = 23;
+          bool play_end = true;
           for(int i = 0; i < (int)SPEC.COUNT; i++)
           {
             float t = Mathf.Min(1,(ta[cur_scene_i,i]/scan_t));
@@ -1328,19 +1358,32 @@ public class Main : MonoBehaviour
               ar_checks[i].SetActive(true);
               PlaySFX(SFX.COMPLETE);
             }
+            if(t < 1) play_end = false;
+          }
+          if(voiceovers_played[cur_scene_i,(int)SPEC.COUNT]) play_end = false;
+          if(play_end)
+          {
+            if(voiceover_audiosource.isPlaying) voiceover_audiosource.Stop();
+            voiceover_audiosource.clip = voiceovers[cur_scene_i,(int)SPEC.COUNT];
+            voiceover_audiosource.volume = voiceover_vols[cur_scene_i,(int)SPEC.COUNT];
+            voiceover_audiosource.Play();
+            voiceover_was_playing = true;
+            voiceovers_played[cur_scene_i,(int)SPEC.COUNT] = true;
           }
         }
         else if(in_fail_motion == 0)
         {
-          in_fail_motion = 0.0001f;
+          if(gaze_t_in == 0)
+            in_fail_motion = 0.0001f;
           ar_timer_text.text = "XX:XX:XX";
         }
 
+        float bhr_speed = 2.0f;
         for(int i = 0; i < (int)SPEC.COUNT; i++)
         {
           foreach(Transform child_transform in blackhole[i].transform)
           {
-            child_transform.rotation = Quaternion.Euler(0.0f, 0.0f, nwave_t_10*36*10);
+            child_transform.localRotation = Quaternion.Euler(0.0f, nwave_t_10*36*bhr_speed, 0.0f);
           }
         }
 
@@ -1348,12 +1391,8 @@ public class Main : MonoBehaviour
 
       case (int)SCENE.EARTH:
 
-        foreach(Transform child_transform in ar_blackhole.transform)
-        {
-          child_transform.rotation = Quaternion.Euler(0.0f, 0.0f, nwave_t_10*36*10);
-        }
-
         earth[0].transform.position = anti_gaze_pt.normalized*600;
+
         break;
 
       case (int)SCENE.CREDITS:
@@ -1363,20 +1402,19 @@ public class Main : MonoBehaviour
         {
           credits_t = 0;
           credits_i++;
-          if(credits_i < credit_strings.Length)
-            credits_text.text = credit_strings[credits_i];
+          if(credits_i*2+1 < credit_strings.Length)
+          {
+            credits_text_0.text = credit_strings[credits_i*2+0];
+            credits_text_1.text = credit_strings[credits_i*2+1];
+          }
         }
 
         break;
 
     }
 
-    if(!gaze_reticle.activeSelf)
-    {
-      if(voiceovers_played[cur_scene_i,(int)SPEC.COUNT])
-        gaze_reticle.SetActive(true);
-    }
-
+    if(!gaze_reticle.activeSelf && voiceovers_played[cur_scene_i,(int)SPEC.COUNT])
+      gaze_reticle.SetActive(true);
   }
 
   void SetSpec(int spec)
@@ -1486,7 +1524,7 @@ public class Main : MonoBehaviour
       out_fail_motion = in_fail_motion-max_fail_motion;
       if(out_fail_motion <= 0) out_fail_motion = 0.00001f;
       in_fail_motion = 0;
-      next_scene_i = cur_scene_i;
+      next_scene_i = cur_scene_i+1;
       scene_rots[next_scene_i] = 0;
       SetupScene();
     }
@@ -1577,7 +1615,10 @@ public class Main : MonoBehaviour
     cam_spinner.transform.localRotation = Quaternion.Euler(0, 0, rot);
 
     float distance = Vector3.Distance(gaze_reticle.transform.position, cam_reticle.transform.position);
-    if(gaze_t_numb <= 0 && distance < 0.3 && voiceovers_played[cur_scene_i,(int)SPEC.COUNT])
+    if(
+      (cur_scene_i != (int)SCENE.EARTH && gaze_t_numb <= 0 && distance < 0.3 && voiceovers_played[cur_scene_i,(int)SPEC.COUNT] && in_fail_motion == 0) || //just use this line for normal use...
+      (cur_scene_i == (int)SCENE.EARTH && voiceovers_played[cur_scene_i,(int)SPEC.COUNT] && !voiceover_was_playing) //weird hack for end scene
+    )
     {
       if(gaze_t_since < 0)        gaze_t_since = Time.deltaTime;
       else                        gaze_t_since += Time.deltaTime;
@@ -1646,9 +1687,15 @@ public class Main : MonoBehaviour
             voiceover_was_playing = true;
             voiceovers_played[cur_scene_i,cur_spec_i] = true;
           }
-          if(music_audiosource.isPlaying) music_audiosource.Stop();
+          float old_time = music_audiosource.time;
+          if(music_audiosource.isPlaying)
+          {
+            old_time = music_audiosource.time;
+            music_audiosource.Stop();
+          }
           music_audiosource.clip = musics[cur_scene_i,cur_spec_i];
           music_audiosource.volume = music_vols[cur_scene_i,cur_spec_i];
+          music_audiosource.time = old_time;
           music_audiosource.Play();
           music_was_playing = true;
         }
@@ -1704,7 +1751,9 @@ public class Main : MonoBehaviour
     {
       if(!voiceover_audiosource.isPlaying)
       {
+        voiceover_was_playing = false;
         bool play_end = !voiceovers_played[cur_scene_i,(int)SPEC.COUNT];
+        if(cur_scene_i == (int)SCENE.EXTREME) play_end = false;
         for(int i = 0; play_end && i < (int)SPEC.COUNT; i++)
         {
           if(!voiceovers_played[cur_scene_i,i]) play_end = false;
