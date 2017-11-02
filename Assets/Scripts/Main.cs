@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using GameAnalyticsSDK;
@@ -334,8 +334,8 @@ public class Main : MonoBehaviour
     0.0f, //ice
     0.0f, //voyager
     0.01f, //nothing
-    0.01f, //extreme
-    0.00f,//5f, //earth
+    0.002f, //extreme
+    0.00f, //earth
     0.0f, //credits
   };
 
@@ -999,6 +999,7 @@ public class Main : MonoBehaviour
 	}
 	
 	SetSpec((int)SPEC.VIZ);
+    SetSpec((int)SPEC.VIZ);
     spec_t_numb = spec_t_max_numb;
 
     for(int i = 0; i < 3; i++)
@@ -1383,8 +1384,7 @@ public class Main : MonoBehaviour
         }
         else if(in_fail_motion == 0)
         {
-          if(gaze_t_in == 0)
-            in_fail_motion = 0.0001f;
+          in_fail_motion = 0.0001f;
           ar_timer_text.text = "XX:XX:XX";
         }
 
@@ -1541,9 +1541,11 @@ public class Main : MonoBehaviour
       out_fail_motion = in_fail_motion-max_fail_motion;
       if(out_fail_motion <= 0) out_fail_motion = 0.00001f;
       in_fail_motion = 0;
+      gaze_t_in = 0;
       next_scene_i = cur_scene_i+1;
       scene_rots[next_scene_i] = 0;
-	  GameAnalytics.NewProgressionEvent (GAProgressionStatus.Fail, "Universe", "Scene_" + next_scene_i, "viz", 0);
+      voiceovers_played[(int)SCENE.EXTREME,(int)SPEC.VIZ] = false;
+      voiceovers_played[(int)SCENE.EXTREME,(int)SPEC.COUNT] = false;
       SetupScene();
     }
     if(out_fail_motion > 0)               out_fail_motion += Time.deltaTime;
@@ -1654,6 +1656,8 @@ public class Main : MonoBehaviour
           in_portal_motion = Time.deltaTime;
           PreSetupNextScene();
         }
+        gaze_t_in = 0;
+        in_fail_motion = 0;
       }
     }
     else

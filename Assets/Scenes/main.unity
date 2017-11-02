@@ -800,7 +800,7 @@ MonoBehaviour:
   - 
   - 
   - 
-  starting_scene: 3
+  starting_scene: 0
   alpha_material: {fileID: 2100000, guid: cc5ad7b8644194bbeb74b46a13481cb7, type: 2}
   star_prefab: {fileID: 1299812747390152, guid: 87ab197597dec455b8decc685297db07,
     type: 2}
@@ -1572,7 +1572,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: be9b2d44d1bec4ff9b3a5e505e7649e6, type: 3}
       propertyPath: m_RootOrder
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: be9b2d44d1bec4ff9b3a5e505e7649e6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -4887,7 +4887,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1957412893874986, guid: 3969414c1f263446fa5e87ca6eb9cba3, type: 2}
       propertyPath: m_Name
-      value: BlackHole_Gam
+      value: BlackHole_Gama
       objectReference: {fileID: 0}
     - target: {fileID: 108013397661961926, guid: 3969414c1f263446fa5e87ca6eb9cba3,
         type: 2}
