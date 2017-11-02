@@ -1383,7 +1383,7 @@ public class Main : MonoBehaviour
         {
           foreach(Transform child_transform in blackhole[i].transform)
           {
-            child_transform.localRotation = Quaternion.Euler(0.0f, nwave_t_10*36*bhr_speed, 0.0f);
+            child_transform.localRotation = Quaternion.Euler(10.0f, nwave_t_10*36*bhr_speed, 10.0f);
           }
         }
 
