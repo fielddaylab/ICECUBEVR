@@ -508,8 +508,12 @@ public class Main : MonoBehaviour
     voiceovers_played[(int)SCENE.ICE,(int)SPEC.GAM]     = true;
     voiceovers_played[(int)SCENE.NOTHING,(int)SPEC.NEU] = true;
     voiceovers_played[(int)SCENE.NOTHING,(int)SPEC.GAM] = true;
+    voiceovers_played[(int)SCENE.EXTREME,(int)SPEC.NEU] = true;
+    voiceovers_played[(int)SCENE.EXTREME,(int)SPEC.GAM] = true;
     voiceovers_played[(int)SCENE.EARTH,(int)SPEC.NEU]   = true;
     voiceovers_played[(int)SCENE.EARTH,(int)SPEC.GAM]   = true;
+    voiceovers_played[(int)SCENE.CREDITS,(int)SPEC.NEU] = true;
+    voiceovers_played[(int)SCENE.CREDITS,(int)SPEC.GAM] = true;
 
     music_files = new string[(int)SCENE.COUNT,(int)SPEC.COUNT];
     for(int i = 0; i < (int)SCENE.COUNT; i++)
@@ -969,9 +973,12 @@ public class Main : MonoBehaviour
     SetSpec((int)SPEC.VIZ);
     spec_t_numb = spec_t_max_numb;
 
-    main_camera_skybox.material = skyboxes[cur_scene_i, cur_spec_i];
-
+    for(int i = 0; i < 3; i++)
+      ar_maps[i].SetActive(false);
+    spec_projection.SetActive(false);
     gaze_reticle.SetActive(false);
+
+    main_camera_skybox.material = skyboxes[cur_scene_i, cur_spec_i];
 
     AnimationCurve curve;
     float lw;
@@ -996,9 +1003,6 @@ public class Main : MonoBehaviour
         ar_progress_lines[i].SetPosition(j, new Vector3(0, 0, 0));
     }
 
-    for(int i = 0; i < 3; i++)
-      ar_maps[i].SetActive(false);
-
     int label_left_i = 0;
     int label_right_i = 0;
     switch(cur_scene_i)
@@ -1015,7 +1019,6 @@ public class Main : MonoBehaviour
         gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
         portal_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
 
-        spec_projection.SetActive(false);
         eyeray.SetActive(false);
 
         break;
@@ -1059,6 +1062,7 @@ public class Main : MonoBehaviour
         label_left_i++;
 
         ar_maps[1].SetActive(true);
+        spec_projection.SetActive(true);
 
         break;
 
@@ -1127,8 +1131,6 @@ public class Main : MonoBehaviour
 
         for(int j = 0; j < (int)SPEC.COUNT; j++)
           ta[(int)SCENE.EXTREME,j] = 0;
-        for(int j = 0; j < (int)SPEC.COUNT+1; j++)
-          voiceovers_played[(int)SCENE.EXTREME,j] = false;
 
         //should have also been done in pre-setup, but can't hurt (in case of debug "start here")
         for(int i = 0; i < (int)SPEC.COUNT; i++)
@@ -1142,6 +1144,7 @@ public class Main : MonoBehaviour
         }
 
         ar_maps[2].SetActive(true);
+        spec_projection.SetActive(true);
 
         gaze_projection.transform.rotation = rotationFromEuler(anti_gaze_cam_euler);
         portal_projection.transform.rotation = rotationFromEuler(anti_gaze_cam_euler);
@@ -1189,8 +1192,6 @@ public class Main : MonoBehaviour
         //should already be done from bh scene, but in case of debug start here
         gaze_projection.transform.rotation = rotationFromEuler(anti_gaze_cam_euler);
         portal_projection.transform.rotation = rotationFromEuler(anti_gaze_cam_euler);
-
-        spec_projection.SetActive(false);
 
         break;
 
@@ -1285,8 +1286,7 @@ public class Main : MonoBehaviour
           }
         }
         */
-        //use this for logic enable
-        if(voiceovers_played[cur_scene_i,(int)SPEC.VIZ] && !spec_projection.activeSelf)
+        if(!spec_projection.activeSelf && voiceovers_played[cur_scene_i,(int)SPEC.VIZ] && !voiceover_was_playing)
           spec_projection.SetActive(true);
 
         for(int i = 1; i < voyager.Length; i++)
@@ -1319,6 +1319,7 @@ public class Main : MonoBehaviour
           float bar_y = -2;
           float bar_x = -11;
           float bar_w = 23;
+          bool play_end = true;
           for(int i = 0; i < (int)SPEC.COUNT; i++)
           {
             float t = Mathf.Min(1,(ta[cur_scene_i,i]/scan_t));
@@ -1328,6 +1329,17 @@ public class Main : MonoBehaviour
               ar_checks[i].SetActive(true);
               PlaySFX(SFX.COMPLETE);
             }
+            if(t < 1) play_end = false;
+          }
+          if(voiceovers_played[cur_scene_i,(int)SPEC.COUNT]) play_end = false;
+          if(play_end)
+          {
+            if(voiceover_audiosource.isPlaying) voiceover_audiosource.Stop();
+            voiceover_audiosource.clip = voiceovers[cur_scene_i,(int)SPEC.COUNT];
+            voiceover_audiosource.volume = voiceover_vols[cur_scene_i,(int)SPEC.COUNT];
+            voiceover_audiosource.Play();
+            voiceover_was_playing = true;
+            voiceovers_played[cur_scene_i,(int)SPEC.COUNT] = true;
           }
         }
         else if(in_fail_motion == 0)
@@ -1371,12 +1383,8 @@ public class Main : MonoBehaviour
 
     }
 
-    if(!gaze_reticle.activeSelf)
-    {
-      if(voiceovers_played[cur_scene_i,(int)SPEC.COUNT])
-        gaze_reticle.SetActive(true);
-    }
-
+    if(!gaze_reticle.activeSelf && voiceovers_played[cur_scene_i,(int)SPEC.COUNT])
+      gaze_reticle.SetActive(true);
   }
 
   void SetSpec(int spec)
@@ -1704,7 +1712,9 @@ public class Main : MonoBehaviour
     {
       if(!voiceover_audiosource.isPlaying)
       {
+        voiceover_was_playing = false;
         bool play_end = !voiceovers_played[cur_scene_i,(int)SPEC.COUNT];
+        if(cur_scene_i == (int)SCENE.EXTREME) play_end = false;
         for(int i = 0; play_end && i < (int)SPEC.COUNT; i++)
         {
           if(!voiceovers_played[cur_scene_i,i]) play_end = false;
