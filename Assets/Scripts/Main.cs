@@ -61,9 +61,11 @@ public class Main : MonoBehaviour
 
   int MAX_LABELS = 5;
   GameObject[] ar_label_lefts;
+  GameObject[] ar_label_left_kids;
   GameObject[] ar_label_left_quads;
   TextMesh[] ar_label_left_texts;
   GameObject[] ar_label_rights;
+  GameObject[] ar_label_right_kids;
   GameObject[] ar_label_right_quads;
   TextMesh[] ar_label_right_texts;
   GameObject[] ar_progresses;
@@ -629,9 +631,11 @@ public class Main : MonoBehaviour
     //starsscale = GameObject.Find("StarsScale");
 
     ar_label_lefts      = new GameObject[MAX_LABELS];
+    ar_label_left_kids  = new GameObject[MAX_LABELS];
     ar_label_left_quads = new GameObject[MAX_LABELS];
     ar_label_left_texts = new TextMesh[MAX_LABELS];
     ar_label_rights      = new GameObject[MAX_LABELS];
+    ar_label_right_kids  = new GameObject[MAX_LABELS];
     ar_label_right_quads = new GameObject[MAX_LABELS];
     ar_label_right_texts = new TextMesh[MAX_LABELS];
 
@@ -651,8 +655,19 @@ public class Main : MonoBehaviour
     {
       ar_label_lefts[i] = (GameObject)Instantiate(ar_label_left_prefab);
       ar_label_lefts[i].transform.parent = ar_group.transform;
-      int k = 0;
+      int k;
+      k = 0;
       foreach(Transform child_transform in ar_label_lefts[i].transform)
+      {
+        GameObject child = child_transform.gameObject;
+        switch(k)
+        {
+          case 0: ar_label_left_kids[i] = child; break;
+        }
+        k++;
+      }
+      k = 0;
+      foreach(Transform child_transform in ar_label_left_kids[i].transform)
       {
         GameObject child = child_transform.gameObject;
         switch(k)
@@ -671,6 +686,16 @@ public class Main : MonoBehaviour
         GameObject child = child_transform.gameObject;
         switch(k)
         {
+          case 0: ar_label_right_kids[i] = child; break;
+        }
+        k++;
+      }
+      k = 0;
+      foreach(Transform child_transform in ar_label_right_kids[i].transform)
+      {
+        GameObject child = child_transform.gameObject;
+        switch(k)
+        {
           case 0: ar_label_right_quads[i] = child; break;
           case 1: ar_label_right_texts[i] = child.GetComponent<TextMesh>(); break;
         }
@@ -678,7 +703,7 @@ public class Main : MonoBehaviour
       }
 
       ar_checks[i] = (GameObject)Instantiate(ar_check_prefab);
-      ar_checks[i].transform.parent = ar_label_rights[i].transform;
+      ar_checks[i].transform.parent = ar_label_right_kids[i].transform;
 
       ar_progress_offsets[i] = (GameObject)Instantiate(ar_progress_prefab);
       ar_progress_offsets[i].transform.parent = ar_group.transform;
@@ -738,7 +763,8 @@ public class Main : MonoBehaviour
     default_satellite_position = new Vector3(4f, 1.5f, 10);
     satellite_position = default_satellite_position;
     satellite_velocity = new Vector3(0, 0, -0.5f);
-    voyager[0].transform.position = satellite_position;
+    for(int i = 0; i < voyager.Length; i++)
+      voyager[i].transform.position = satellite_position;
 
     default_look_ahead = new Vector3(0, 0, 1);
     look_ahead = default_look_ahead;
@@ -1025,6 +1051,8 @@ public class Main : MonoBehaviour
       ar_label_rights[i].transform.localScale = new Vector3(0f,0f,0f);
       ar_label_lefts[ i].transform.position = new Vector3(0f,0f,0f);
       ar_label_rights[i].transform.position = new Vector3(0f,0f,0f);
+      ar_label_left_kids[ i].transform.localPosition = new Vector3(0f,0f,0f);
+      ar_label_right_kids[i].transform.localPosition = new Vector3(0f,0f,0f);
       ar_checks[i].SetActive(false);
 
       ar_progress_lines[i].widthCurve = curve;
@@ -1040,7 +1068,8 @@ public class Main : MonoBehaviour
       case (int)SCENE.ICE:
 
         ar_label_rights[label_right_i].transform.localScale = new Vector3(3f, 3f, 3f);
-        ar_label_rights[label_right_i].transform.position = icecube[0].transform.position+new Vector3(70,0,-50);
+        ar_label_rights[    label_right_i].transform.position = icecube[0].transform.position;
+        ar_label_right_kids[label_right_i].transform.localPosition = new Vector3(20,0,-20);
         ar_label_rights[label_right_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_rights[label_right_i].transform.position));
         ar_label_right_texts[label_right_i].text = "ICE CUBE";
         label_right_i++;
@@ -1055,19 +1084,22 @@ public class Main : MonoBehaviour
       case (int)SCENE.VOYAGER:
 
         ar_label_rights[label_right_i].transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-        ar_label_rights[label_right_i].transform.position = voyager[0].transform.position+new Vector3(0,0,-10);
+        ar_label_rights[    label_right_i].transform.position = voyager[0].transform.position;
+        ar_label_right_kids[label_right_i].transform.localPosition = new Vector3(10,1,10);
         ar_label_rights[label_right_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_rights[label_right_i].transform.position));
         ar_label_right_texts[label_right_i].text = "VOYAGER";
         label_right_i++;
 
         ar_label_rights[label_right_i].transform.localScale = new Vector3(10f, 10f, 10f);
-        ar_label_rights[label_right_i].transform.position = pluto[0].transform.position+new Vector3(70,20,-150);
+        ar_label_rights[    label_right_i].transform.position = pluto[0].transform.position;
+        ar_label_right_kids[label_right_i].transform.localPosition = new Vector3(11,0,0);
         ar_label_rights[label_right_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_rights[label_right_i].transform.position));
         ar_label_right_texts[label_right_i].text = "PLUTO";
         label_right_i++;
 
         ar_label_lefts[label_left_i].transform.localScale = new Vector3(10f, 10f, 10f);
-        ar_label_lefts[label_left_i].transform.position = vearth[0].transform.position+new Vector3(0,0,0);
+        ar_label_lefts[    label_left_i].transform.position = vearth[0].transform.position;
+        ar_label_left_kids[label_left_i].transform.localPosition = new Vector3(-5,0,0);
         ar_label_lefts[label_left_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_lefts[label_left_i].transform.position));
         ar_label_left_texts[label_left_i].text = "EARTH";
         label_left_i++;
@@ -1082,13 +1114,15 @@ public class Main : MonoBehaviour
       case (int)SCENE.NOTHING:
 
         ar_label_rights[label_right_i].transform.localScale = new Vector3(2f, 2f, 2f);
-        ar_label_rights[label_right_i].transform.position = milky[0].transform.position+new Vector3(50,0,0);
+        ar_label_rights[    label_right_i].transform.position = milky[0].transform.position;
+        ar_label_right_kids[label_right_i].transform.localPosition = new Vector3(10,-5,0);
         ar_label_rights[label_right_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_rights[label_right_i].transform.position));
         ar_label_right_texts[label_right_i].text = "MILKY WAY";
         label_right_i++;
 
         ar_label_lefts[label_left_i].transform.localScale = new Vector3(10f, 10f, 10f);
-        ar_label_lefts[label_left_i].transform.position = nearth[0].transform.position+new Vector3(0,0,0);
+        ar_label_lefts[    label_left_i].transform.position = nearth[0].transform.position;
+        ar_label_left_kids[label_left_i].transform.localPosition = new Vector3(-5,0,0);
         ar_label_lefts[label_left_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_lefts[label_left_i].transform.position));
         ar_label_left_texts[label_left_i].text = "EARTH";
         label_left_i++;
@@ -1107,12 +1141,13 @@ public class Main : MonoBehaviour
         float bar_x = -11;
 
         ar_label_rights[label_right_i].transform.localScale = new Vector3(20f, 20f, 20f);
-        ar_label_rights[label_right_i].transform.position = blackhole[0].transform.position+new Vector3(-300,100,0);
+        ar_label_rights[    label_right_i].transform.position = blackhole[0].transform.position;
+        ar_label_right_kids[label_right_i].transform.localPosition = new Vector3(25,5,0);
         ar_label_rights[label_right_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_rights[label_right_i].transform.position));
         ar_label_right_texts[label_right_i].text = "VISIBLE";
 
         ar_progress_offsets[label_right_i].transform.localScale = ar_label_rights[label_right_i].transform.localScale;
-        ar_progress_offsets[label_right_i].transform.position   = ar_label_rights[label_right_i].transform.position;
+        ar_progress_offsets[label_right_i].transform.position   = ar_label_right_kids[label_right_i].transform.position;
         ar_progress_offsets[label_right_i].transform.rotation   = ar_label_rights[label_right_i].transform.rotation;
         lw = 10f;
         curve = new AnimationCurve();
@@ -1125,12 +1160,13 @@ public class Main : MonoBehaviour
 
 
         ar_label_rights[label_right_i].transform.localScale = new Vector3(20f, 20f, 20f);
-        ar_label_rights[label_right_i].transform.position = blackhole[0].transform.position+new Vector3(-340,0,0);
+        ar_label_rights[    label_right_i].transform.position = blackhole[0].transform.position;
+        ar_label_right_kids[label_right_i].transform.localPosition = new Vector3(27,0,0);
         ar_label_rights[label_right_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_rights[label_right_i].transform.position));
         ar_label_right_texts[label_right_i].text = "XRAY";
 
         ar_progress_offsets[label_right_i].transform.localScale = ar_label_rights[label_right_i].transform.localScale;
-        ar_progress_offsets[label_right_i].transform.position   = ar_label_rights[label_right_i].transform.position;
+        ar_progress_offsets[label_right_i].transform.position   = ar_label_right_kids[label_right_i].transform.position;
         ar_progress_offsets[label_right_i].transform.rotation   = ar_label_rights[label_right_i].transform.rotation;
         lw = 10f;
         curve = new AnimationCurve();
@@ -1141,13 +1177,15 @@ public class Main : MonoBehaviour
         ar_progress_lines[label_right_i].SetPosition(1, new Vector3(bar_x, bar_y, 0));
         label_right_i++;
 
+
         ar_label_rights[label_right_i].transform.localScale = new Vector3(20f, 20f, 20f);
-        ar_label_rights[label_right_i].transform.position = blackhole[0].transform.position+new Vector3(-300,-100,0);
+        ar_label_rights[    label_right_i].transform.position = blackhole[0].transform.position;
+        ar_label_right_kids[label_right_i].transform.localPosition = new Vector3(25,-5,0);
         ar_label_rights[label_right_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_rights[label_right_i].transform.position));
         ar_label_right_texts[label_right_i].text = "NEUTRINO";
 
         ar_progress_offsets[label_right_i].transform.localScale = ar_label_rights[label_right_i].transform.localScale;
-        ar_progress_offsets[label_right_i].transform.position   = ar_label_rights[label_right_i].transform.position;
+        ar_progress_offsets[label_right_i].transform.position   = ar_label_right_kids[label_right_i].transform.position;
         ar_progress_offsets[label_right_i].transform.rotation   = ar_label_rights[label_right_i].transform.rotation;
         lw = 10f;
         curve = new AnimationCurve();
@@ -1158,8 +1196,10 @@ public class Main : MonoBehaviour
         ar_progress_lines[label_right_i].SetPosition(1, new Vector3(bar_x, bar_y, 0));
         label_right_i++;
 
+
         ar_label_lefts[label_left_i].transform.localScale = new Vector3(20f, 20f, 20f);
-        ar_label_lefts[label_left_i].transform.position = blackhole[0].transform.position+new Vector3(300,0,0);
+        ar_label_lefts[    label_left_i].transform.position = blackhole[0].transform.position;
+        ar_label_left_kids[label_left_i].transform.localPosition = new Vector3(-25,0,0);
         ar_label_lefts[label_left_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_lefts[label_left_i].transform.position));
         ar_label_left_texts[label_left_i].text = "BLACK HOLE";
         label_left_i++;
@@ -1194,13 +1234,15 @@ public class Main : MonoBehaviour
       case (int)SCENE.EARTH:
 
         ar_label_lefts[label_left_i].transform.localScale = new Vector3(8f, 8f, 8f);
-        ar_label_lefts[label_left_i].transform.position = earth[0].transform.position+new Vector3(70,0,-50);
+        ar_label_lefts[    label_left_i].transform.position = earth[0].transform.position;
+        ar_label_left_kids[label_left_i].transform.localPosition = new Vector3(-5,0,0);
         ar_label_lefts[label_left_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_lefts[label_left_i].transform.position));
         ar_label_left_texts[label_left_i].text = "ICE CUBE";
         label_left_i++;
 
         ar_label_rights[label_right_i].transform.localScale = new Vector3(8f, 8f, 8f);
-        ar_label_rights[label_right_i].transform.position = esun[0].transform.position+new Vector3(0,0,0);
+        ar_label_rights[    label_right_i].transform.position = esun[0].transform.position;
+        ar_label_right_kids[label_right_i].transform.localPosition = new Vector3(15,0,0);
         ar_label_rights[label_right_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_rights[label_right_i].transform.position));
         ar_label_right_texts[label_right_i].text = "SUN";
         label_right_i++;
@@ -1328,11 +1370,9 @@ public class Main : MonoBehaviour
         if(!spec_projection.activeSelf && voiceovers_played[cur_scene_i,(int)SPEC.VIZ] && !voiceover_was_playing)
           spec_projection.SetActive(true);
 
-        for(int i = 1; i < voyager.Length; i++)
-        {
-          voyager[i].transform.position = voyager[0].transform.position;
-        }
-        ar_label_rights[label_right_i].transform.position = voyager[0].transform.position+new Vector3(4,0,-10);
+        for(int i = 0; i < voyager.Length; i++)
+          voyager[i].transform.position = satellite_position;
+        ar_label_rights[    label_right_i].transform.position = voyager[0].transform.position;
         ar_label_rights[label_right_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_rights[label_right_i].transform.position));
         label_right_i++;
 
@@ -1596,7 +1636,6 @@ public class Main : MonoBehaviour
     satellite_position += satellite_velocity * Time.deltaTime;
     if(cur_scene_i != 1)
       satellite_position = default_satellite_position;
-    voyager[0].transform.position = satellite_position;
 
     if(in_portal_motion > 0)
     {
