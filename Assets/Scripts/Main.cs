@@ -165,6 +165,14 @@ public class Main : MonoBehaviour
   public float earth_neu_voice_vol = 1.0f;
   [Range(0.0f, 1.0f)]
   public float earth_end_voice_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float credits_viz_voice_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float credits_gam_voice_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float credits_neu_voice_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float credits_end_voice_vol = 1.0f;
 
   [Range(0.0f, 1.0f)]
   public float ice_viz_music_vol = 1.0f;
@@ -196,6 +204,12 @@ public class Main : MonoBehaviour
   public float earth_gam_music_vol = 1.0f;
   [Range(0.0f, 1.0f)]
   public float earth_neu_music_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float credits_viz_music_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float credits_gam_music_vol = 1.0f;
+  [Range(0.0f, 1.0f)]
+  public float credits_neu_music_vol = 1.0f;
 
   int alpha_id;
   float flash_alpha;
@@ -284,6 +298,10 @@ public class Main : MonoBehaviour
     voiceover_vols[(int)SCENE.EARTH,(int)SPEC.GAM]     = earth_gam_voice_vol;
     voiceover_vols[(int)SCENE.EARTH,(int)SPEC.NEU]     = earth_neu_voice_vol;
     voiceover_vols[(int)SCENE.EARTH,(int)SPEC.COUNT]   = earth_end_voice_vol;
+    voiceover_vols[(int)SCENE.CREDITS,(int)SPEC.VIZ]   = credits_viz_voice_vol;
+    voiceover_vols[(int)SCENE.CREDITS,(int)SPEC.GAM]   = credits_gam_voice_vol;
+    voiceover_vols[(int)SCENE.CREDITS,(int)SPEC.NEU]   = credits_neu_voice_vol;
+    voiceover_vols[(int)SCENE.CREDITS,(int)SPEC.COUNT] = credits_end_voice_vol;
 
     music_vols[(int)SCENE.ICE,(int)SPEC.VIZ]       = ice_viz_music_vol;
     music_vols[(int)SCENE.ICE,(int)SPEC.GAM]       = ice_gam_music_vol;
@@ -300,6 +318,9 @@ public class Main : MonoBehaviour
     music_vols[(int)SCENE.EARTH,(int)SPEC.VIZ]     = earth_viz_music_vol;
     music_vols[(int)SCENE.EARTH,(int)SPEC.GAM]     = earth_gam_music_vol;
     music_vols[(int)SCENE.EARTH,(int)SPEC.NEU]     = earth_neu_music_vol;
+    music_vols[(int)SCENE.CREDITS,(int)SPEC.VIZ]   = credits_viz_music_vol;
+    music_vols[(int)SCENE.CREDITS,(int)SPEC.GAM]   = credits_gam_music_vol;
+    music_vols[(int)SCENE.CREDITS,(int)SPEC.NEU]   = credits_neu_music_vol;
 
     if(voiceover_was_playing)
       voiceover_audiosource.volume = voiceover_vols[cur_scene_i,cur_spec_i];
