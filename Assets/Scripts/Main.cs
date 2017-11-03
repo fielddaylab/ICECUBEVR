@@ -417,6 +417,9 @@ public class Main : MonoBehaviour
   float spec_t_run; //grows while not fully out. 0 when fully out
   float spec_t_numb; //countdown when distance should be ignored
 
+  float dumb_delay_t_max; //prevent anything interesting til this point
+  float dumb_delay_t;
+
   Vector3 gaze_pt;
   Vector3 anti_gaze_pt;
   Vector2 cam_euler;
@@ -817,6 +820,9 @@ public class Main : MonoBehaviour
     spec_t_in = 0;
     spec_t_run = 0;
     spec_t_numb = 0;
+
+    dumb_delay_t_max = 3f;
+    dumb_delay_t = 0f;
 
     gaze_pt = new Vector3(1f, .8f, -1f).normalized;
 
@@ -1292,7 +1298,7 @@ public class Main : MonoBehaviour
     helmet_light_light.color = helmet_colors[cur_scene_i];
 
     //scene switched
-    if(!voiceovers_played[cur_scene_i,(int)SPEC.VIZ])
+    if(!voiceovers_played[cur_scene_i,(int)SPEC.VIZ] && dumb_delay_t > dumb_delay_t_max)
     {
       if(voiceover_audiosource.isPlaying) voiceover_audiosource.Stop();
       voiceover_audiosource.clip = voiceovers[cur_scene_i,(int)SPEC.VIZ];
@@ -1321,9 +1327,9 @@ public class Main : MonoBehaviour
 
       case (int)SCENE.ICE:
 
-        float grid_t = 7f;
-        float pulse_t = 15f;
-        float beam_t = 17f;
+        float grid_t = 7f+dumb_delay_t_max;
+        float pulse_t = 15f+dumb_delay_t_max;
+        float beam_t = 17f+dumb_delay_t_max;
 
         if(cur_ta < pulse_t) nwave_t_10 = 0;
 
@@ -1719,7 +1725,7 @@ public class Main : MonoBehaviour
         if(old_spec != cur_spec_i)
         {
           PlaySFX(SFX.SELECT);
-          if(!voiceovers_played[cur_scene_i,cur_spec_i])
+          if(!voiceovers_played[cur_scene_i,cur_spec_i] && dumb_delay_t > dumb_delay_t_max)
           {
             if(voiceover_audiosource.isPlaying) voiceover_audiosource.Stop();
             voiceover_audiosource.clip = voiceovers[cur_scene_i,cur_spec_i];
@@ -1806,6 +1812,21 @@ public class Main : MonoBehaviour
           voiceover_audiosource.Play();
           voiceover_was_playing = true;
           voiceovers_played[cur_scene_i,(int)SPEC.COUNT] = true;
+        }
+      }
+    }
+    else
+    {
+      if(dumb_delay_t < dumb_delay_t_max)
+      {
+        dumb_delay_t += Time.deltaTime;
+        if(dumb_delay_t >= dumb_delay_t_max)//newly done with delay
+        {
+          voiceover_audiosource.clip = voiceovers[cur_scene_i,cur_spec_i];
+          voiceover_audiosource.volume = voiceover_vols[cur_scene_i,cur_spec_i];
+          voiceover_audiosource.Play();
+          voiceover_was_playing = true;
+          voiceovers_played[cur_scene_i,cur_spec_i] = true;
         }
       }
     }
