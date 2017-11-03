@@ -29,7 +29,7 @@ MonoBehaviour:
   secretKey:
   - 5259fd8ab932e2b02af4d96c5fda3f30ec2fe169
   Build:
-  - 1.0.0-alpha.3
+  - 1.0.0-alpha.4
   SelectedPlatformStudio:
   - Field Day
   SelectedPlatformGame:
