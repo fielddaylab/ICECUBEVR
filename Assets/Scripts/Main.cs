@@ -47,9 +47,6 @@ public class Main : MonoBehaviour
   GameObject ar_group;
   GameObject ar_camera_project;
   GameObject ar_camera_static;
-  GameObject ar_blackhole;
-  GameObject ar_blackhole_disk;
-  GameObject[] ar_blackhole_jets;
   GameObject[] ar_maps;
   GameObject ar_alert;
   GameObject ar_timer;
@@ -611,11 +608,6 @@ public class Main : MonoBehaviour
     ar_group = GameObject.Find("AR");
     ar_camera_project = GameObject.Find("AR_Camera_Project");
     ar_camera_static = GameObject.Find("AR_Camera_Static");
-    ar_blackhole = GameObject.Find("AR_BlackHole");
-    ar_blackhole_disk = GameObject.Find("AR_BH_Disk");
-    ar_blackhole_jets = new GameObject[2];
-    ar_blackhole_jets[0] = GameObject.Find("AR_BH_Jet_X");
-    ar_blackhole_jets[1] = GameObject.Find("AR_BH_Jet_nX");
     ar_maps = new GameObject[3];
     ar_maps[0] = GameObject.Find("map0");
     ar_maps[1] = GameObject.Find("map1");
@@ -715,7 +707,6 @@ public class Main : MonoBehaviour
         ar_progress_lines[i].SetPosition(j, new Vector3(0, 0, 0));
     }
 
-    ar_blackhole.SetActive(false);
     ar_alert.SetActive(false);
     ar_timer.SetActive(false);
 
@@ -1259,13 +1250,6 @@ public class Main : MonoBehaviour
             if(ps) ps.Stop();
           }
         }
-        ar_blackhole.SetActive(true);
-        foreach(Transform child_transform in ar_blackhole.transform)
-        {
-          GameObject child = child_transform.gameObject;
-          ParticleSystem ps = child.GetComponent<ParticleSystem>();
-          if(ps) ps.Play();
-        }
 
         gaze_projection.transform.rotation = rotationFromEuler(anti_gaze_cam_euler);
         portal_projection.transform.rotation = rotationFromEuler(anti_gaze_cam_euler);
@@ -1273,14 +1257,7 @@ public class Main : MonoBehaviour
         break;
 
       case (int)SCENE.CREDITS:
-        foreach(Transform child_transform in ar_blackhole.transform)
-        {
-          GameObject child = child_transform.gameObject;
-          ParticleSystem ps = child.GetComponent<ParticleSystem>();
-          if(ps) ps.Stop();
-        }
 
-        ar_blackhole.SetActive(false);
         gaze_reticle.SetActive(false);
         eyeray.SetActive(false);
 
@@ -1481,24 +1458,6 @@ public class Main : MonoBehaviour
       case (int)SPEC.NEU: spec_sel_reticle.transform.position = spec_neu_reticle.transform.position;
 			//GameAnalytics.NewProgressionEvent (GAProgressionStatus.Start, "Universe", "Scene_" + cur_scene_i, "neu", 0);
 			break;
-    }
-
-    if(cur_scene_i == (int)SCENE.EARTH)
-    {
-      switch(spec)
-      {
-        case (int)SPEC.GAM:
-        case (int)SPEC.VIZ:
-          ar_blackhole_disk.SetActive(true);
-          for(int i = 0; i < 2; i++)
-            ar_blackhole_jets[i].SetActive(true);
-          break;
-        case (int)SPEC.NEU:
-          ar_blackhole_disk.SetActive(false);
-          for(int i = 0; i < 2; i++)
-            ar_blackhole_jets[i].SetActive(false);
-          break;
-      }
     }
 
     main_camera.GetComponent<Camera>().cullingMask = (1 << layers[cur_scene_i, cur_spec_i]) | (1 << default_layer);
