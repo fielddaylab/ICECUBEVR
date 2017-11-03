@@ -3933,12 +3933,12 @@ MonoBehaviour:
   ice_viz_music_vol: 0.5
   ice_gam_music_vol: 0.5
   ice_neu_music_vol: 0.5
-  voyager_viz_music_vol: 0.15
-  voyager_gam_music_vol: 0.15
-  voyager_neu_music_vol: 0.15
-  nothing_viz_music_vol: 0.5
-  nothing_gam_music_vol: 0.5
-  nothing_neu_music_vol: 0.5
+  voyager_viz_music_vol: 0.05
+  voyager_gam_music_vol: 0.05
+  voyager_neu_music_vol: 0.05
+  nothing_viz_music_vol: 0.6
+  nothing_gam_music_vol: 0.6
+  nothing_neu_music_vol: 0.6
   extreme_viz_music_vol: 0.5
   extreme_gam_music_vol: 0.5
   extreme_neu_music_vol: 0.5
