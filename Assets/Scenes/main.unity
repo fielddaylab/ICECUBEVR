@@ -10375,13 +10375,13 @@ MonoBehaviour:
   - 
   - 
   - 
-  starting_scene: 3
+  starting_scene: 0
   alpha_material: {fileID: 2100000, guid: cc5ad7b8644194bbeb74b46a13481cb7, type: 2}
   star_prefab: {fileID: 1299812747390152, guid: 87ab197597dec455b8decc685297db07,
     type: 2}
-  ar_label_left_prefab: {fileID: 1544796748458992, guid: 6539e3deaee3c4f73b76749a43f61d3b,
+  ar_label_left_prefab: {fileID: 1860962432028934, guid: 6539e3deaee3c4f73b76749a43f61d3b,
     type: 2}
-  ar_label_right_prefab: {fileID: 1933916374355676, guid: cfd0cce96e31b4eb9a031ca8d85da9d6,
+  ar_label_right_prefab: {fileID: 1077840109798102, guid: cfd0cce96e31b4eb9a031ca8d85da9d6,
     type: 2}
   ar_progress_prefab: {fileID: 1187901120155258, guid: 89a27608346844f149790f9b3ec5c919,
     type: 2}
