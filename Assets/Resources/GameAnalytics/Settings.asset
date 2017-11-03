@@ -29,14 +29,14 @@ MonoBehaviour:
   secretKey:
   - 5259fd8ab932e2b02af4d96c5fda3f30ec2fe169
   Build:
-  - 0.1
+  - 1.0.0-alpha.3
   SelectedPlatformStudio:
-  - 
+  - Field Day
   SelectedPlatformGame:
-  - 
-  SelectedPlatformGameID: ffffffff
-  SelectedStudio: 00000000
-  SelectedGame: 00000000
+  - Virtual Antartica
+  SelectedPlatformGameID: 94a60000
+  SelectedStudio: 01000000
+  SelectedGame: 01000000
   NewVersion: 
   Changes: 
   SignUpOpen: 1
@@ -59,9 +59,9 @@ MonoBehaviour:
   CustomDimensions03: []
   ResourceItemTypes: []
   ResourceCurrencies: []
-  LastCreatedGamePlatform: 0
+  LastCreatedGamePlatform: -1
   Platforms: 02000000
-  CurrentInspectorState: 3
+  CurrentInspectorState: 1
   ClosedHints: 
   DisplayHints: 0
   DisplayHintsScrollState: {x: 0, y: 0}

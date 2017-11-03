@@ -1433,13 +1433,13 @@ public class Main : MonoBehaviour
     switch(spec)
     {
       case (int)SPEC.GAM: spec_sel_reticle.transform.position = spec_gam_reticle.transform.position; 
-			GameAnalytics.NewProgressionEvent (GAProgressionStatus.Start, "Universe", "Scene_" + cur_scene_i, "xray", 0);
+			//GameAnalytics.NewProgressionEvent (GAProgressionStatus.Start, "Universe", "Scene_" + cur_scene_i, "xray", 0);
 			break;
       case (int)SPEC.VIZ: spec_sel_reticle.transform.position = spec_viz_reticle.transform.position; 
-			GameAnalytics.NewProgressionEvent (GAProgressionStatus.Start, "Universe", "Scene_" + cur_scene_i, "viz", 0);
+			//GameAnalytics.NewProgressionEvent (GAProgressionStatus.Start, "Universe", "Scene_" + cur_scene_i, "viz", 0);
 			break;
       case (int)SPEC.NEU: spec_sel_reticle.transform.position = spec_neu_reticle.transform.position;
-			GameAnalytics.NewProgressionEvent (GAProgressionStatus.Start, "Universe", "Scene_" + cur_scene_i, "neu", 0);
+			//GameAnalytics.NewProgressionEvent (GAProgressionStatus.Start, "Universe", "Scene_" + cur_scene_i, "neu", 0);
 			break;
     }
 
