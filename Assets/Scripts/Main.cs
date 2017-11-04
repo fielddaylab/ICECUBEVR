@@ -454,6 +454,83 @@ public class Main : MonoBehaviour
     // Do stuff
   }
 
+  void reStart()
+  {
+    for(int i = 0; i < (int)SCENE.COUNT; i++)
+    {
+      for(int j = 0; j < (int)SPEC.COUNT+1; j++)
+      {
+        voiceovers_played[i,j] = false;
+      }
+    }
+
+    //auto skip these
+    voiceovers_played[(int)SCENE.ICE,(int)SPEC.NEU]     = true;
+    voiceovers_played[(int)SCENE.ICE,(int)SPEC.GAM]     = true;
+    voiceovers_played[(int)SCENE.NOTHING,(int)SPEC.NEU] = true;
+    voiceovers_played[(int)SCENE.NOTHING,(int)SPEC.GAM] = true;
+    voiceovers_played[(int)SCENE.EXTREME,(int)SPEC.NEU] = true;
+    voiceovers_played[(int)SCENE.EXTREME,(int)SPEC.GAM] = true;
+    voiceovers_played[(int)SCENE.EARTH,(int)SPEC.NEU]   = true;
+    voiceovers_played[(int)SCENE.EARTH,(int)SPEC.GAM]   = true;
+    voiceovers_played[(int)SCENE.CREDITS,(int)SPEC.NEU] = true;
+    voiceovers_played[(int)SCENE.CREDITS,(int)SPEC.GAM] = true;
+
+    for(int i = 0; i < (int)SCENE.COUNT; i++)
+      for(int j = 0; j < (int)SPEC.COUNT; j++)
+        ta[i,j] = 0;
+
+    for(int i = 0; i < (int)SCENE.COUNT; i++)
+      scene_rots[i] = 0f;
+
+    flash_alpha = 0;
+    time_mod_twelve_pi = 0;
+    jitter = 0;
+    jitter_countdown = 0;
+    jitter_state = 0;
+
+    satellite_position = default_satellite_position;
+
+    next_scene_i = starting_scene;
+    cur_scene_i = next_scene_i;
+    next_scene_i = (next_scene_i + 1) % ((int)SCENE.COUNT);
+    cur_spec_i = 0;
+
+    mouse_captured = false;
+    mouse_just_captured = true;
+    mouse_x = Screen.width / 2;
+    mouse_y = Screen.height / 2;
+
+    in_portal_motion = 0;
+    out_portal_motion = 0;
+    max_portal_motion = 1;
+
+    in_fail_motion = 0;
+    out_fail_motion = 0;
+    max_fail_motion = 1;
+
+    gaze_t_max = 1f;
+    gaze_t_max_numb = 4f;
+    gaze_t_since = 0;
+    gaze_t_in = 0;
+    gaze_t_run = 0;
+    gaze_t_numb = 0;
+
+    spec_t_max = 1f;
+    spec_t_max_numb = 1f;
+    spec_t_since = 0;
+    spec_t_in = 0;
+    spec_t_run = 0;
+    spec_t_numb = 0;
+
+    dumb_delay_t_max = 3f;
+    dumb_delay_t = 0f;
+
+    credits_i = 0;
+    credits_t = 0f;
+
+  }
+
   void Start()
   {
     scene_names = new string[(int)SCENE.COUNT];
@@ -535,22 +612,9 @@ public class Main : MonoBehaviour
       for(int j = 0; j < (int)SPEC.COUNT+1; j++)
       {
         voiceovers[i,j] = Resources.Load<AudioClip>(voiceover_files[i,j]);
-        voiceovers_played[i,j] = false;
         voiceover_vols[i,j] = 1.0f;
       }
     }
-
-    //auto skip these
-    voiceovers_played[(int)SCENE.ICE,(int)SPEC.NEU]     = true;
-    voiceovers_played[(int)SCENE.ICE,(int)SPEC.GAM]     = true;
-    voiceovers_played[(int)SCENE.NOTHING,(int)SPEC.NEU] = true;
-    voiceovers_played[(int)SCENE.NOTHING,(int)SPEC.GAM] = true;
-    voiceovers_played[(int)SCENE.EXTREME,(int)SPEC.NEU] = true;
-    voiceovers_played[(int)SCENE.EXTREME,(int)SPEC.GAM] = true;
-    voiceovers_played[(int)SCENE.EARTH,(int)SPEC.NEU]   = true;
-    voiceovers_played[(int)SCENE.EARTH,(int)SPEC.GAM]   = true;
-    voiceovers_played[(int)SCENE.CREDITS,(int)SPEC.NEU] = true;
-    voiceovers_played[(int)SCENE.CREDITS,(int)SPEC.GAM] = true;
 
     music_files = new string[(int)SCENE.COUNT,(int)SPEC.COUNT];
     for(int i = 0; i < (int)SCENE.COUNT; i++)
@@ -600,9 +664,8 @@ public class Main : MonoBehaviour
     helmet_colors[4] = scene4_helmet_color;
 
     ta = new float[(int)SCENE.COUNT, (int)SPEC.COUNT];
-    for(int i = 0; i < (int)SCENE.COUNT; i++)
-      for(int j = 0; j < (int)SPEC.COUNT; j++)
-        ta[i,j] = 0;
+
+    reStart();
 
     default_layer = LayerMask.NameToLayer("Default");
 
@@ -757,13 +820,8 @@ public class Main : MonoBehaviour
     }
 
     alpha_id = Shader.PropertyToID("alpha");
-    flash_alpha = 0;
     time_mod_twelve_pi_id = Shader.PropertyToID("time_mod_twelve_pi");
-    time_mod_twelve_pi = 0;
     jitter_id = Shader.PropertyToID("jitter");
-    jitter = 0;
-    jitter_countdown = 0;
-    jitter_state = 0;
 
     voiceover_audiosource = GameObject.Find("Script").AddComponent<AudioSource>();
     voiceover_audiosource.priority = 1;
@@ -776,7 +834,6 @@ public class Main : MonoBehaviour
     default_portal_position = portal.transform.position;
 
     default_satellite_position = new Vector3(4f, 1.5f, 10);
-    satellite_position = default_satellite_position;
     satellite_velocity = new Vector3(0, 0, -0.5f);
     for(int i = 0; i < voyager.Length; i++)
       voyager[i].transform.position = satellite_position;
@@ -787,42 +844,7 @@ public class Main : MonoBehaviour
     very_lazy_look_ahead = default_look_ahead;
     player_head = new Vector3(0, 2, 0);
 
-    next_scene_i = starting_scene;
-    cur_scene_i = next_scene_i;
-    next_scene_i = (next_scene_i + 1) % ((int)SCENE.COUNT);
-    cur_spec_i = 0;
-
-    mouse_captured = false;
-    mouse_just_captured = true;
-    mouse_x = Screen.width / 2;
-    mouse_y = Screen.height / 2;
-
     camera_house.transform.rotation = Quaternion.Euler((mouse_y - Screen.height / 2) * -2, (mouse_x - Screen.width / 2) * 2, 0);
-
-    in_portal_motion = 0;
-    out_portal_motion = 0;
-    max_portal_motion = 1;
-
-    in_fail_motion = 0;
-    out_fail_motion = 0;
-    max_fail_motion = 1;
-
-    gaze_t_max = 1f;
-    gaze_t_max_numb = 4f;
-    gaze_t_since = 0;
-    gaze_t_in = 0;
-    gaze_t_run = 0;
-    gaze_t_numb = 0;
-
-    spec_t_max = 1f;
-    spec_t_max_numb = 1f;
-    spec_t_since = 0;
-    spec_t_in = 0;
-    spec_t_run = 0;
-    spec_t_numb = 0;
-
-    dumb_delay_t_max = 3f;
-    dumb_delay_t = 0f;
 
     gaze_pt = new Vector3(1f, .8f, -1f).normalized;
 
@@ -984,9 +1006,6 @@ public class Main : MonoBehaviour
     Destroy(star, 0f);
 */
 
-    credits_i = 0;
-    credits_t = 0f;
-
     MapVols();
     SetupScene();
 
@@ -1033,16 +1052,15 @@ public class Main : MonoBehaviour
 
   void SetupScene()
   {
-	
-	if (cur_scene_i == (int)SCENE.ICE) {
-		GameAnalytics.NewProgressionEvent (GAProgressionStatus.Start, "Universe", "Scene_" + cur_scene_i, "viz", 0);
-	} else {
-		int last_scene_i = cur_scene_i - 1;
-		GameAnalytics.NewProgressionEvent (GAProgressionStatus.Complete, "Universe", "Scene_" + last_scene_i, "viz", 0);
-		GameAnalytics.NewProgressionEvent (GAProgressionStatus.Start, "Universe", "Scene_" + cur_scene_i, "viz", 0);
-	}
-	
-	SetSpec((int)SPEC.VIZ);
+    if(cur_scene_i == (int)SCENE.ICE)
+      GameAnalytics.NewProgressionEvent(GAProgressionStatus.Start, "Universe", "Scene_" + cur_scene_i, "viz", 0);
+    else
+    {
+      int last_scene_i = cur_scene_i - 1;
+      GameAnalytics.NewProgressionEvent(GAProgressionStatus.Complete, "Universe", "Scene_" + last_scene_i, "viz", 0);
+      GameAnalytics.NewProgressionEvent(GAProgressionStatus.Start,    "Universe", "Scene_" + cur_scene_i,  "viz", 0);
+    }
+
     SetSpec((int)SPEC.VIZ);
     spec_t_numb = spec_t_max_numb;
 
@@ -1103,7 +1121,7 @@ public class Main : MonoBehaviour
 
         ar_label_rights[label_right_i].transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
         ar_label_rights[    label_right_i].transform.position = voyager[0].transform.position;
-        ar_label_right_kids[label_right_i].transform.localPosition = new Vector3(10,1,10);
+        ar_label_right_kids[label_right_i].transform.localPosition = new Vector3(25,1,10);
         ar_label_rights[label_right_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_rights[label_right_i].transform.position));
         ar_label_right_texts[label_right_i].text = "VOYAGER";
         label_right_i++;
@@ -1473,18 +1491,18 @@ public class Main : MonoBehaviour
 
   void SetSpec(int spec)
   {
-	cur_spec_i = spec;
+    cur_spec_i = spec;
     switch(spec)
     {
-      case (int)SPEC.GAM: spec_sel_reticle.transform.position = spec_gam_reticle.transform.position; 
-			//GameAnalytics.NewProgressionEvent (GAProgressionStatus.Start, "Universe", "Scene_" + cur_scene_i, "xray", 0);
-			break;
-      case (int)SPEC.VIZ: spec_sel_reticle.transform.position = spec_viz_reticle.transform.position; 
-			//GameAnalytics.NewProgressionEvent (GAProgressionStatus.Start, "Universe", "Scene_" + cur_scene_i, "viz", 0);
-			break;
+      case (int)SPEC.GAM: spec_sel_reticle.transform.position = spec_gam_reticle.transform.position;
+        //GameAnalytics.NewProgressionEvent (GAProgressionStatus.Start, "Universe", "Scene_" + cur_scene_i, "xray", 0);
+        break;
+      case (int)SPEC.VIZ: spec_sel_reticle.transform.position = spec_viz_reticle.transform.position;
+        //GameAnalytics.NewProgressionEvent (GAProgressionStatus.Start, "Universe", "Scene_" + cur_scene_i, "viz", 0);
+        break;
       case (int)SPEC.NEU: spec_sel_reticle.transform.position = spec_neu_reticle.transform.position;
-			//GameAnalytics.NewProgressionEvent (GAProgressionStatus.Start, "Universe", "Scene_" + cur_scene_i, "neu", 0);
-			break;
+        //GameAnalytics.NewProgressionEvent (GAProgressionStatus.Start, "Universe", "Scene_" + cur_scene_i, "neu", 0);
+        break;
     }
 
     main_camera.GetComponent<Camera>().cullingMask = (1 << layers[cur_scene_i, cur_spec_i]) | (1 << default_layer);
@@ -1537,6 +1555,11 @@ public class Main : MonoBehaviour
       out_portal_motion = in_portal_motion-max_portal_motion;
       if(out_portal_motion <= 0) out_portal_motion = 0.00001f;
       in_portal_motion = 0;
+      if(cur_scene_i == (int)SCENE.CREDITS)
+      {
+        reStart();
+        next_scene_i = (int)SCENE.ICE;
+      }
       cur_scene_i = next_scene_i;
       next_scene_i = (next_scene_i + 1) % ((int)SCENE.COUNT);
       SetupScene();
@@ -1563,7 +1586,7 @@ public class Main : MonoBehaviour
     if(in_fail_motion > 0) in_fail_motion += Time.deltaTime * 0.2f;
     if(in_fail_motion > max_fail_motion)
     {
-	  //FAIL
+      //FAIL
       out_fail_motion = in_fail_motion-max_fail_motion;
       if(out_fail_motion <= 0) out_fail_motion = 0.00001f;
       in_fail_motion = 0;
