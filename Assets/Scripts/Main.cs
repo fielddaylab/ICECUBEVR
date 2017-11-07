@@ -1009,8 +1009,6 @@ public class Main : MonoBehaviour
     MapVols();
     SetupScene();
 
-    OVRManager.HMDMounted += HandleHMDMounted;
-    OVRManager.HMDUnmounted += HandleHMDUnmounted;
   }
 
   //called just before portal to next scene appears
