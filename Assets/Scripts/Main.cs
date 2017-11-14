@@ -55,6 +55,8 @@ public class Main : MonoBehaviour
   GameObject credits_1;
   TextMesh credits_text_0;
   TextMesh credits_text_1;
+  GameObject subtitles;
+  TextMesh subtitles_text;
 
   int MAX_LABELS = 5;
   GameObject[] ar_label_lefts;
@@ -231,8 +233,14 @@ public class Main : MonoBehaviour
   bool voiceover_was_playing;
   string[,] voiceover_files;
   AudioClip[,] voiceovers;
-  bool[,] voiceovers_played;
   float[,] voiceover_vols;
+  int MAX_SUBTITLES_PER_CLIP = 10;
+  string[,,] subtitle_strings;
+  float[,,] subtitle_queues;
+  int subtitle_i;
+  float subtitle_f;
+  int subtitle_spec;
+  bool[,] voiceovers_played;
   AudioSource music_audiosource;
   bool music_was_playing;
   string[,] music_files;
@@ -605,6 +613,11 @@ public class Main : MonoBehaviour
       }
     }
     voiceovers = new AudioClip[(int)SCENE.COUNT,(int)SPEC.COUNT+1];
+    subtitle_strings = new string[(int)SCENE.COUNT,(int)SPEC.COUNT+1,MAX_SUBTITLES_PER_CLIP];
+    subtitle_queues  = new float[ (int)SCENE.COUNT,(int)SPEC.COUNT+1,MAX_SUBTITLES_PER_CLIP];
+    subtitle_i = 0;
+    subtitle_f = 0;
+    subtitle_spec = 0;
     voiceovers_played = new bool[(int)SCENE.COUNT,(int)SPEC.COUNT+1];
     voiceover_vols = new float[(int)SCENE.COUNT,(int)SPEC.COUNT+1];
     for(int i = 0; i < (int)SCENE.COUNT; i++)
@@ -614,6 +627,146 @@ public class Main : MonoBehaviour
         voiceovers[i,j] = Resources.Load<AudioClip>(voiceover_files[i,j]);
         voiceover_vols[i,j] = 1.0f;
       }
+    }
+
+    //manually fill out subtitles
+    {
+    int i;
+
+    //ICE
+    i = 0;
+    subtitle_strings[(int)SCENE.ICE,(int)SPEC.VIZ,i] = "This is a tst";
+    subtitle_queues[ (int)SCENE.ICE,(int)SPEC.VIZ,i] = 0.1f;
+    i++;
+    subtitle_strings[(int)SCENE.ICE,(int)SPEC.VIZ,i] = "A very important test";
+    subtitle_queues[ (int)SCENE.ICE,(int)SPEC.VIZ,i] = 5f;
+    i++;
+    subtitle_strings[(int)SCENE.ICE,(int)SPEC.VIZ,i] = "";
+    subtitle_queues[ (int)SCENE.ICE,(int)SPEC.VIZ,i] = 10f;
+    i++;
+    subtitle_strings[(int)SCENE.ICE,(int)SPEC.VIZ,i] = "";
+    subtitle_queues[ (int)SCENE.ICE,(int)SPEC.VIZ,i] = 0f;
+    i++;
+
+    i = 0;
+    subtitle_strings[(int)SCENE.ICE,(int)SPEC.GAM,i] = "";
+    subtitle_queues[ (int)SCENE.ICE,(int)SPEC.GAM,i] = 0f;
+    i++;
+
+    i = 0;
+    subtitle_strings[(int)SCENE.ICE,(int)SPEC.NEU,i] = "";
+    subtitle_queues[ (int)SCENE.ICE,(int)SPEC.NEU,i] = 0f;
+    i++;
+
+    i = 0;
+    subtitle_strings[(int)SCENE.ICE,(int)SPEC.COUNT,i] = "";
+    subtitle_queues[ (int)SCENE.ICE,(int)SPEC.COUNT,i] = 0f;
+    i++;
+
+    //VOYAGER
+    i = 0;
+    subtitle_strings[(int)SCENE.VOYAGER,(int)SPEC.VIZ,i] = "";
+    subtitle_queues[ (int)SCENE.VOYAGER,(int)SPEC.VIZ,i] = 0f;
+    i++;
+
+    i = 0;
+    subtitle_strings[(int)SCENE.VOYAGER,(int)SPEC.GAM,i] = "";
+    subtitle_queues[ (int)SCENE.VOYAGER,(int)SPEC.GAM,i] = 0f;
+    i++;
+
+    i = 0;
+    subtitle_strings[(int)SCENE.VOYAGER,(int)SPEC.NEU,i] = "";
+    subtitle_queues[ (int)SCENE.VOYAGER,(int)SPEC.NEU,i] = 0f;
+    i++;
+
+    i = 0;
+    subtitle_strings[(int)SCENE.VOYAGER,(int)SPEC.COUNT,i] = "";
+    subtitle_queues[ (int)SCENE.VOYAGER,(int)SPEC.COUNT,i] = 0f;
+    i++;
+
+    //NOTHING
+    i = 0;
+    subtitle_strings[(int)SCENE.NOTHING,(int)SPEC.VIZ,i] = "";
+    subtitle_queues[ (int)SCENE.NOTHING,(int)SPEC.VIZ,i] = 0f;
+    i++;
+
+    i = 0;
+    subtitle_strings[(int)SCENE.NOTHING,(int)SPEC.GAM,i] = "";
+    subtitle_queues[ (int)SCENE.NOTHING,(int)SPEC.GAM,i] = 0f;
+    i++;
+
+    i = 0;
+    subtitle_strings[(int)SCENE.NOTHING,(int)SPEC.NEU,i] = "";
+    subtitle_queues[ (int)SCENE.NOTHING,(int)SPEC.NEU,i] = 0f;
+    i++;
+
+    i = 0;
+    subtitle_strings[(int)SCENE.NOTHING,(int)SPEC.COUNT,i] = "";
+    subtitle_queues[ (int)SCENE.NOTHING,(int)SPEC.COUNT,i] = 0f;
+    i++;
+
+    //EXTREME
+    i = 0;
+    subtitle_strings[(int)SCENE.EXTREME,(int)SPEC.VIZ,i] = "";
+    subtitle_queues[ (int)SCENE.EXTREME,(int)SPEC.VIZ,i] = 0f;
+    i++;
+
+    i = 0;
+    subtitle_strings[(int)SCENE.EXTREME,(int)SPEC.GAM,i] = "";
+    subtitle_queues[ (int)SCENE.EXTREME,(int)SPEC.GAM,i] = 0f;
+    i++;
+
+    i = 0;
+    subtitle_strings[(int)SCENE.EXTREME,(int)SPEC.NEU,i] = "";
+    subtitle_queues[ (int)SCENE.EXTREME,(int)SPEC.NEU,i] = 0f;
+    i++;
+
+    i = 0;
+    subtitle_strings[(int)SCENE.EXTREME,(int)SPEC.COUNT,i] = "";
+    subtitle_queues[ (int)SCENE.EXTREME,(int)SPEC.COUNT,i] = 0f;
+    i++;
+
+    //EARTH
+    i = 0;
+    subtitle_strings[(int)SCENE.EARTH,(int)SPEC.VIZ,i] = "";
+    subtitle_queues[ (int)SCENE.EARTH,(int)SPEC.VIZ,i] = 0f;
+    i++;
+
+    i = 0;
+    subtitle_strings[(int)SCENE.EARTH,(int)SPEC.GAM,i] = "";
+    subtitle_queues[ (int)SCENE.EARTH,(int)SPEC.GAM,i] = 0f;
+    i++;
+
+    i = 0;
+    subtitle_strings[(int)SCENE.EARTH,(int)SPEC.NEU,i] = "";
+    subtitle_queues[ (int)SCENE.EARTH,(int)SPEC.NEU,i] = 0f;
+    i++;
+
+    i = 0;
+    subtitle_strings[(int)SCENE.EARTH,(int)SPEC.COUNT,i] = "";
+    subtitle_queues[ (int)SCENE.EARTH,(int)SPEC.COUNT,i] = 0f;
+    i++;
+
+    //CREDITS
+    i = 0;
+    subtitle_strings[(int)SCENE.CREDITS,(int)SPEC.VIZ,i] = "";
+    subtitle_queues[ (int)SCENE.CREDITS,(int)SPEC.VIZ,i] = 0f;
+    i++;
+
+    i = 0;
+    subtitle_strings[(int)SCENE.CREDITS,(int)SPEC.GAM,i] = "";
+    subtitle_queues[ (int)SCENE.CREDITS,(int)SPEC.GAM,i] = 0f;
+    i++;
+
+    i = 0;
+    subtitle_strings[(int)SCENE.CREDITS,(int)SPEC.NEU,i] = "";
+    subtitle_queues[ (int)SCENE.CREDITS,(int)SPEC.NEU,i] = 0f;
+    i++;
+
+    i = 0;
+    subtitle_strings[(int)SCENE.CREDITS,(int)SPEC.COUNT,i] = "";
+    subtitle_queues[ (int)SCENE.CREDITS,(int)SPEC.COUNT,i] = 0f;
+    i++;
     }
 
     music_files = new string[(int)SCENE.COUNT,(int)SPEC.COUNT];
@@ -706,6 +859,8 @@ public class Main : MonoBehaviour
     credits_text_0 = credits_0.GetComponent<TextMesh>();
     credits_1 = GameObject.Find("Credits_1");
     credits_text_1 = credits_1.GetComponent<TextMesh>();
+    subtitles = GameObject.Find("Subtitles");
+    subtitles_text = subtitles.GetComponent<TextMesh>();
     //stars = GameObject.Find("Stars");
     //starsscale = GameObject.Find("StarsScale");
 
@@ -1324,6 +1479,9 @@ public class Main : MonoBehaviour
       voiceover_audiosource.Play();
       voiceover_was_playing = true;
       voiceovers_played[cur_scene_i,(int)SPEC.VIZ] = true;
+      subtitle_i = 0;
+      subtitle_f = 0;
+      subtitle_spec = (int)SPEC.VIZ;
     }
     if(music_audiosource.isPlaying) music_audiosource.Stop();
     music_audiosource.clip = musics[cur_scene_i,(int)SPEC.VIZ];
@@ -1442,6 +1600,9 @@ public class Main : MonoBehaviour
             voiceover_audiosource.Play();
             voiceover_was_playing = true;
             voiceovers_played[cur_scene_i,(int)SPEC.COUNT] = true;
+            subtitle_i = 0;
+            subtitle_f = 0;
+            subtitle_spec = (int)SPEC.COUNT;
           }
         }
         else if(in_fail_motion == 0)
@@ -1602,6 +1763,18 @@ public class Main : MonoBehaviour
 
     UpdateScene();
 
+    //subtitles
+    float old_sub_f = subtitle_f;
+    subtitle_f += Time.deltaTime;
+    if(
+      old_sub_f  <  subtitle_queues[cur_scene_i,subtitle_spec,subtitle_i] &&
+      subtitle_f >= subtitle_queues[cur_scene_i,subtitle_spec,subtitle_i]
+    )
+    {
+      subtitles_text.text = subtitle_strings[cur_scene_i,subtitle_spec,subtitle_i];
+      subtitle_i++;
+    }
+
     if(mouse_captured)
     {
       float in_x = Input.GetAxis("Mouse X") * 10;
@@ -1756,6 +1929,9 @@ public class Main : MonoBehaviour
             voiceover_audiosource.Play();
             voiceover_was_playing = true;
             voiceovers_played[cur_scene_i,cur_spec_i] = true;
+            subtitle_i = 0;
+            subtitle_f = 0;
+            subtitle_spec = cur_spec_i;
           }
           float old_time = music_audiosource.time;
           if(music_audiosource.isPlaying)
@@ -1835,6 +2011,9 @@ public class Main : MonoBehaviour
           voiceover_audiosource.Play();
           voiceover_was_playing = true;
           voiceovers_played[cur_scene_i,(int)SPEC.COUNT] = true;
+          subtitle_i = 0;
+          subtitle_f = 0;
+          subtitle_spec = (int)SPEC.COUNT;
         }
       }
     }
@@ -1850,6 +2029,9 @@ public class Main : MonoBehaviour
           voiceover_audiosource.Play();
           voiceover_was_playing = true;
           voiceovers_played[cur_scene_i,cur_spec_i] = true;
+          subtitle_i = 0;
+          subtitle_f = 0;
+          subtitle_spec = cur_spec_i;
         }
       }
     }
