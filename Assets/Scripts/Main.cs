@@ -632,141 +632,224 @@ public class Main : MonoBehaviour
     //manually fill out subtitles
     {
     int i;
+    int j;
+    int k;
+    //prepopulate with defaults
+    for(i = 0; i < (int)SCENE.COUNT; i++)
+    for(j = 0; j < (int)SPEC.COUNT+1; j++)
+    for(k = 0; k < MAX_SUBTITLES_PER_CLIP; k++)
+    {
+      subtitle_strings[i,j,k] = "";
+      subtitle_queues[ i,j,k] = 0f;
+    }
 
     //ICE
-    i = 0;
-    subtitle_strings[(int)SCENE.ICE,(int)SPEC.VIZ,i] = "This is a tst";
-    subtitle_queues[ (int)SCENE.ICE,(int)SPEC.VIZ,i] = 0.1f;
-    i++;
-    subtitle_strings[(int)SCENE.ICE,(int)SPEC.VIZ,i] = "A very important test";
-    subtitle_queues[ (int)SCENE.ICE,(int)SPEC.VIZ,i] = 5f;
-    i++;
-    subtitle_strings[(int)SCENE.ICE,(int)SPEC.VIZ,i] = "";
-    subtitle_queues[ (int)SCENE.ICE,(int)SPEC.VIZ,i] = 10f;
-    i++;
-    subtitle_strings[(int)SCENE.ICE,(int)SPEC.VIZ,i] = "";
-    subtitle_queues[ (int)SCENE.ICE,(int)SPEC.VIZ,i] = 0f;
-    i++;
+    i = (int)SCENE.ICE;
+    j = (int)SPEC.VIZ;
+    k = 0;
+    subtitle_strings[i,j,k] = "This is a test";
+    subtitle_queues[i,j,k] = 0.1f;
+    k++;
+    subtitle_strings[i,j,k] = "A very important test";
+    subtitle_queues[i,j,k] = 5f;
+    k++;
+    subtitle_queues[i,j,k] = 10f;
+    k++;
 
-    i = 0;
-    subtitle_strings[(int)SCENE.ICE,(int)SPEC.GAM,i] = "";
-    subtitle_queues[ (int)SCENE.ICE,(int)SPEC.GAM,i] = 0f;
-    i++;
+    j = (int)SPEC.GAM;
+    k = 0;
+    subtitle_strings[i,j,k] = "SUBTITLE_TEXT XXX";
+    subtitle_queues[i,j,k] = 0.1f;
+    k++;
+    subtitle_queues[i,j,k] = 1f;
+    k++;
 
-    i = 0;
-    subtitle_strings[(int)SCENE.ICE,(int)SPEC.NEU,i] = "";
-    subtitle_queues[ (int)SCENE.ICE,(int)SPEC.NEU,i] = 0f;
-    i++;
+    j = (int)SPEC.NEU;
+    k = 0;
+    subtitle_strings[i,j,k] = "SUBTITLE_TEXT XXX";
+    subtitle_queues[i,j,k] = 0.1f;
+    k++;
+    subtitle_queues[i,j,k] = 1f;
+    k++;
 
-    i = 0;
-    subtitle_strings[(int)SCENE.ICE,(int)SPEC.COUNT,i] = "";
-    subtitle_queues[ (int)SCENE.ICE,(int)SPEC.COUNT,i] = 0f;
-    i++;
+    j = (int)SPEC.COUNT;
+    k = 0;
+    subtitle_strings[i,j,k] = "SUBTITLE_TEXT XXX";
+    subtitle_queues[i,j,k] = 0.1f;
+    k++;
+    subtitle_queues[i,j,k] = 1f;
+    k++;
 
     //VOYAGER
-    i = 0;
-    subtitle_strings[(int)SCENE.VOYAGER,(int)SPEC.VIZ,i] = "";
-    subtitle_queues[ (int)SCENE.VOYAGER,(int)SPEC.VIZ,i] = 0f;
-    i++;
+    i = (int)SCENE.VOYAGER;
+    j = (int)SPEC.VIZ;
+    k = 0;
+    subtitle_strings[i,j,k] = "SUBTITLE_TEXT XXX";
+    subtitle_queues[i,j,k] = 0.1f;
+    k++;
+    subtitle_queues[i,j,k] = 1f;
+    k++;
 
-    i = 0;
-    subtitle_strings[(int)SCENE.VOYAGER,(int)SPEC.GAM,i] = "";
-    subtitle_queues[ (int)SCENE.VOYAGER,(int)SPEC.GAM,i] = 0f;
-    i++;
+    j = (int)SPEC.GAM;
+    k = 0;
+    subtitle_strings[i,j,k] = "SUBTITLE_TEXT XXX";
+    subtitle_queues[i,j,k] = 0.1f;
+    k++;
+    subtitle_queues[i,j,k] = 1f;
+    k++;
 
-    i = 0;
-    subtitle_strings[(int)SCENE.VOYAGER,(int)SPEC.NEU,i] = "";
-    subtitle_queues[ (int)SCENE.VOYAGER,(int)SPEC.NEU,i] = 0f;
-    i++;
+    j = (int)SPEC.NEU;
+    k = 0;
+    subtitle_strings[i,j,k] = "SUBTITLE_TEXT XXX";
+    subtitle_queues[i,j,k] = 0.1f;
+    k++;
+    subtitle_queues[i,j,k] = 1f;
+    k++;
 
-    i = 0;
-    subtitle_strings[(int)SCENE.VOYAGER,(int)SPEC.COUNT,i] = "";
-    subtitle_queues[ (int)SCENE.VOYAGER,(int)SPEC.COUNT,i] = 0f;
-    i++;
+    j = (int)SPEC.COUNT;
+    k = 0;
+    subtitle_strings[i,j,k] = "SUBTITLE_TEXT XXX";
+    subtitle_queues[i,j,k] = 0.1f;
+    k++;
+    subtitle_queues[i,j,k] = 1f;
+    k++;
 
     //NOTHING
-    i = 0;
-    subtitle_strings[(int)SCENE.NOTHING,(int)SPEC.VIZ,i] = "";
-    subtitle_queues[ (int)SCENE.NOTHING,(int)SPEC.VIZ,i] = 0f;
-    i++;
+    i = (int)SCENE.NOTHING;
+    j = (int)SPEC.VIZ;
+    k = 0;
+    subtitle_strings[i,j,k] = "SUBTITLE_TEXT XXX";
+    subtitle_queues[i,j,k] = 0.1f;
+    k++;
+    subtitle_queues[i,j,k] = 1f;
+    k++;
 
-    i = 0;
-    subtitle_strings[(int)SCENE.NOTHING,(int)SPEC.GAM,i] = "";
-    subtitle_queues[ (int)SCENE.NOTHING,(int)SPEC.GAM,i] = 0f;
-    i++;
+    j = (int)SPEC.GAM;
+    k = 0;
+    subtitle_strings[i,j,k] = "SUBTITLE_TEXT XXX";
+    subtitle_queues[i,j,k] = 0.1f;
+    k++;
+    subtitle_queues[i,j,k] = 1f;
+    k++;
 
-    i = 0;
-    subtitle_strings[(int)SCENE.NOTHING,(int)SPEC.NEU,i] = "";
-    subtitle_queues[ (int)SCENE.NOTHING,(int)SPEC.NEU,i] = 0f;
-    i++;
+    j = (int)SPEC.NEU;
+    k = 0;
+    subtitle_strings[i,j,k] = "SUBTITLE_TEXT XXX";
+    subtitle_queues[i,j,k] = 0.1f;
+    k++;
+    subtitle_queues[i,j,k] = 1f;
+    k++;
 
-    i = 0;
-    subtitle_strings[(int)SCENE.NOTHING,(int)SPEC.COUNT,i] = "";
-    subtitle_queues[ (int)SCENE.NOTHING,(int)SPEC.COUNT,i] = 0f;
-    i++;
+    j = (int)SPEC.COUNT;
+    k = 0;
+    subtitle_strings[i,j,k] = "SUBTITLE_TEXT XXX";
+    subtitle_queues[i,j,k] = 0.1f;
+    k++;
+    subtitle_queues[i,j,k] = 1f;
+    k++;
 
     //EXTREME
-    i = 0;
-    subtitle_strings[(int)SCENE.EXTREME,(int)SPEC.VIZ,i] = "";
-    subtitle_queues[ (int)SCENE.EXTREME,(int)SPEC.VIZ,i] = 0f;
-    i++;
+    i = (int)SCENE.EXTREME;
+    j = (int)SPEC.VIZ;
+    k = 0;
+    subtitle_strings[i,j,k] = "SUBTITLE_TEXT XXX";
+    subtitle_queues[i,j,k] = 0.1f;
+    k++;
+    subtitle_queues[i,j,k] = 1f;
+    k++;
 
-    i = 0;
-    subtitle_strings[(int)SCENE.EXTREME,(int)SPEC.GAM,i] = "";
-    subtitle_queues[ (int)SCENE.EXTREME,(int)SPEC.GAM,i] = 0f;
-    i++;
+    j = (int)SPEC.GAM;
+    k = 0;
+    subtitle_strings[i,j,k] = "SUBTITLE_TEXT XXX";
+    subtitle_queues[i,j,k] = 0.1f;
+    k++;
+    subtitle_queues[i,j,k] = 1f;
+    k++;
 
-    i = 0;
-    subtitle_strings[(int)SCENE.EXTREME,(int)SPEC.NEU,i] = "";
-    subtitle_queues[ (int)SCENE.EXTREME,(int)SPEC.NEU,i] = 0f;
-    i++;
+    j = (int)SPEC.NEU;
+    k = 0;
+    subtitle_strings[i,j,k] = "SUBTITLE_TEXT XXX";
+    subtitle_queues[i,j,k] = 0.1f;
+    k++;
+    subtitle_queues[i,j,k] = 1f;
+    k++;
 
-    i = 0;
-    subtitle_strings[(int)SCENE.EXTREME,(int)SPEC.COUNT,i] = "";
-    subtitle_queues[ (int)SCENE.EXTREME,(int)SPEC.COUNT,i] = 0f;
-    i++;
+    j = (int)SPEC.COUNT;
+    k = 0;
+    subtitle_strings[i,j,k] = "SUBTITLE_TEXT XXX";
+    subtitle_queues[i,j,k] = 0.1f;
+    k++;
+    subtitle_queues[i,j,k] = 1f;
+    k++;
 
     //EARTH
-    i = 0;
-    subtitle_strings[(int)SCENE.EARTH,(int)SPEC.VIZ,i] = "";
-    subtitle_queues[ (int)SCENE.EARTH,(int)SPEC.VIZ,i] = 0f;
-    i++;
+    i = (int)SCENE.EARTH;
+    j = (int)SPEC.VIZ;
+    k = 0;
+    subtitle_strings[i,j,k] = "SUBTITLE_TEXT XXX";
+    subtitle_queues[i,j,k] = 0.1f;
+    k++;
+    subtitle_queues[i,j,k] = 1f;
+    k++;
 
-    i = 0;
-    subtitle_strings[(int)SCENE.EARTH,(int)SPEC.GAM,i] = "";
-    subtitle_queues[ (int)SCENE.EARTH,(int)SPEC.GAM,i] = 0f;
-    i++;
+    j = (int)SPEC.GAM;
+    k = 0;
+    subtitle_strings[i,j,k] = "SUBTITLE_TEXT XXX";
+    subtitle_queues[i,j,k] = 0.1f;
+    k++;
+    subtitle_queues[i,j,k] = 1f;
+    k++;
 
-    i = 0;
-    subtitle_strings[(int)SCENE.EARTH,(int)SPEC.NEU,i] = "";
-    subtitle_queues[ (int)SCENE.EARTH,(int)SPEC.NEU,i] = 0f;
-    i++;
+    j = (int)SPEC.NEU;
+    k = 0;
+    subtitle_strings[i,j,k] = "SUBTITLE_TEXT XXX";
+    subtitle_queues[i,j,k] = 0.1f;
+    k++;
+    subtitle_queues[i,j,k] = 1f;
+    k++;
 
-    i = 0;
-    subtitle_strings[(int)SCENE.EARTH,(int)SPEC.COUNT,i] = "";
-    subtitle_queues[ (int)SCENE.EARTH,(int)SPEC.COUNT,i] = 0f;
-    i++;
+    j = (int)SPEC.COUNT;
+    k = 0;
+    subtitle_strings[i,j,k] = "SUBTITLE_TEXT XXX";
+    subtitle_queues[i,j,k] = 0.1f;
+    k++;
+    subtitle_queues[i,j,k] = 1f;
+    k++;
 
     //CREDITS
-    i = 0;
-    subtitle_strings[(int)SCENE.CREDITS,(int)SPEC.VIZ,i] = "";
-    subtitle_queues[ (int)SCENE.CREDITS,(int)SPEC.VIZ,i] = 0f;
-    i++;
+    i = (int)SCENE.CREDITS;
+    j = (int)SPEC.VIZ;
+    k = 0;
+    subtitle_strings[i,j,k] = "SUBTITLE_TEXT XXX";
+    subtitle_queues[i,j,k] = 0.1f;
+    k++;
+    subtitle_queues[i,j,k] = 1f;
+    k++;
 
-    i = 0;
-    subtitle_strings[(int)SCENE.CREDITS,(int)SPEC.GAM,i] = "";
-    subtitle_queues[ (int)SCENE.CREDITS,(int)SPEC.GAM,i] = 0f;
-    i++;
+    j = (int)SPEC.GAM;
+    k = 0;
+    subtitle_strings[i,j,k] = "SUBTITLE_TEXT XXX";
+    subtitle_queues[i,j,k] = 0.1f;
+    k++;
+    subtitle_queues[i,j,k] = 1f;
+    k++;
 
-    i = 0;
-    subtitle_strings[(int)SCENE.CREDITS,(int)SPEC.NEU,i] = "";
-    subtitle_queues[ (int)SCENE.CREDITS,(int)SPEC.NEU,i] = 0f;
-    i++;
+    j = (int)SPEC.NEU;
+    k = 0;
+    subtitle_strings[i,j,k] = "SUBTITLE_TEXT XXX";
+    subtitle_queues[i,j,k] = 0.1f;
+    k++;
+    subtitle_queues[i,j,k] = 1f;
+    k++;
 
-    i = 0;
-    subtitle_strings[(int)SCENE.CREDITS,(int)SPEC.COUNT,i] = "";
-    subtitle_queues[ (int)SCENE.CREDITS,(int)SPEC.COUNT,i] = 0f;
-    i++;
+    j = (int)SPEC.COUNT;
+    k = 0;
+    subtitle_strings[i,j,k] = "SUBTITLE_TEXT XXX";
+    subtitle_queues[i,j,k] = 0.1f;
+    k++;
+    subtitle_queues[i,j,k] = 1f;
+    k++;
+
     }
 
     music_files = new string[(int)SCENE.COUNT,(int)SPEC.COUNT];
@@ -1764,15 +1847,18 @@ public class Main : MonoBehaviour
     UpdateScene();
 
     //subtitles
-    float old_sub_t = subtitle_t;
-    subtitle_t += Time.deltaTime;
-    if(
-      old_sub_t  <  subtitle_queues[cur_scene_i,subtitle_spec,subtitle_i] &&
-      subtitle_t >= subtitle_queues[cur_scene_i,subtitle_spec,subtitle_i]
-    )
+    if(dumb_delay_t > dumb_delay_t_max)
     {
-      subtitles_text.text = subtitle_strings[cur_scene_i,subtitle_spec,subtitle_i];
-      subtitle_i++;
+      float old_sub_t = subtitle_t;
+      subtitle_t += Time.deltaTime;
+      if(
+        old_sub_t  <  subtitle_queues[cur_scene_i,subtitle_spec,subtitle_i] &&
+        subtitle_t >= subtitle_queues[cur_scene_i,subtitle_spec,subtitle_i]
+      )
+      {
+        subtitles_text.text = subtitle_strings[cur_scene_i,subtitle_spec,subtitle_i];
+        subtitle_i++;
+      }
     }
 
     if(mouse_captured)
