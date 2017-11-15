@@ -238,7 +238,7 @@ public class Main : MonoBehaviour
   string[,,] subtitle_strings;
   float[,,] subtitle_queues;
   int subtitle_i;
-  float subtitle_f;
+  float subtitle_t;
   int subtitle_spec;
   bool[,] voiceovers_played;
   AudioSource music_audiosource;
@@ -616,7 +616,7 @@ public class Main : MonoBehaviour
     subtitle_strings = new string[(int)SCENE.COUNT,(int)SPEC.COUNT+1,MAX_SUBTITLES_PER_CLIP];
     subtitle_queues  = new float[ (int)SCENE.COUNT,(int)SPEC.COUNT+1,MAX_SUBTITLES_PER_CLIP];
     subtitle_i = 0;
-    subtitle_f = 0;
+    subtitle_t = 0;
     subtitle_spec = 0;
     voiceovers_played = new bool[(int)SCENE.COUNT,(int)SPEC.COUNT+1];
     voiceover_vols = new float[(int)SCENE.COUNT,(int)SPEC.COUNT+1];
@@ -1478,7 +1478,8 @@ public class Main : MonoBehaviour
       voiceover_was_playing = true;
       voiceovers_played[cur_scene_i,(int)SPEC.VIZ] = true;
       subtitle_i = 0;
-      subtitle_f = 0;
+      subtitle_t = 0;
+      subtitles_text.text = "";
       subtitle_spec = (int)SPEC.VIZ;
     }
     if(music_audiosource.isPlaying) music_audiosource.Stop();
@@ -1599,7 +1600,8 @@ public class Main : MonoBehaviour
             voiceover_was_playing = true;
             voiceovers_played[cur_scene_i,(int)SPEC.COUNT] = true;
             subtitle_i = 0;
-            subtitle_f = 0;
+            subtitle_t = 0;
+            subtitles_text.text = "";
             subtitle_spec = (int)SPEC.COUNT;
           }
         }
@@ -1762,11 +1764,11 @@ public class Main : MonoBehaviour
     UpdateScene();
 
     //subtitles
-    float old_sub_f = subtitle_f;
-    subtitle_f += Time.deltaTime;
+    float old_sub_t = subtitle_t;
+    subtitle_t += Time.deltaTime;
     if(
-      old_sub_f  <  subtitle_queues[cur_scene_i,subtitle_spec,subtitle_i] &&
-      subtitle_f >= subtitle_queues[cur_scene_i,subtitle_spec,subtitle_i]
+      old_sub_t  <  subtitle_queues[cur_scene_i,subtitle_spec,subtitle_i] &&
+      subtitle_t >= subtitle_queues[cur_scene_i,subtitle_spec,subtitle_i]
     )
     {
       subtitles_text.text = subtitle_strings[cur_scene_i,subtitle_spec,subtitle_i];
@@ -1928,7 +1930,8 @@ public class Main : MonoBehaviour
             voiceover_was_playing = true;
             voiceovers_played[cur_scene_i,cur_spec_i] = true;
             subtitle_i = 0;
-            subtitle_f = 0;
+            subtitle_t = 0;
+            subtitles_text.text = "";
             subtitle_spec = cur_spec_i;
           }
           float old_time = music_audiosource.time;
@@ -2010,7 +2013,8 @@ public class Main : MonoBehaviour
           voiceover_was_playing = true;
           voiceovers_played[cur_scene_i,(int)SPEC.COUNT] = true;
           subtitle_i = 0;
-          subtitle_f = 0;
+          subtitle_t = 0;
+          subtitles_text.text = "";
           subtitle_spec = (int)SPEC.COUNT;
         }
       }
@@ -2028,7 +2032,8 @@ public class Main : MonoBehaviour
           voiceover_was_playing = true;
           voiceovers_played[cur_scene_i,cur_spec_i] = true;
           subtitle_i = 0;
-          subtitle_f = 0;
+          subtitle_t = 0;
+          subtitles_text.text = "";
           subtitle_spec = cur_spec_i;
         }
       }
