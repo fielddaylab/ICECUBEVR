@@ -5,6 +5,63 @@ using GameAnalyticsSDK;
 
 public class Main : MonoBehaviour
 {
+  public class gaze_trigger
+  {
+    public Vector3 position = new Vector3(0f,0f,0f);
+    public float t_max         = 1f; //The time required to confirm a gaze
+    public float t_max_numb    = 1f; //The time required to wait before confirming another gaze
+
+    public float t_in          = 0f; //grows to max when in, 0 when out
+    public float t_numb        = 0f; //countdown when distance should be ignored
+    public bool just_in        = false; //1 when newly in
+    public bool just_triggered = false; //1 when in for > threshhold
+    public float range         = 0.3f; //required distance for activation
+
+    //derived
+    public float shrink = 0f;
+    public float rot    = 0f;
+
+    public gaze_trigger()
+    {}
+
+    public bool in_range(Vector3 ptr)
+    {
+      return Vector3.Distance(this.position,ptr) < this.range;
+    }
+
+    public bool tick(Vector3 ptr, float dt)
+    {
+      this.just_in = false;
+      this.just_triggered = false;
+
+      bool ret = false;
+      if(this.t_numb <= 0 && this.in_range(ptr))
+      {
+        if(this.t_in == 0) this.just_in = true; //breaking news!!
+        this.t_in += dt;
+        if(this.t_in >= this.t_max)
+        {
+          this.just_triggered = true;
+          this.t_numb = this.t_max_numb;
+          this.t_in = this.t_max;
+        }
+        ret = true;
+      }
+      else
+      {
+        this.t_in = 0;
+        this.t_numb -= dt;
+        ret = false;
+      }
+
+      this.shrink = (this.t_in/this.t_max);
+      this.rot    = (this.t_in/this.t_max)*5f*360.0f;
+
+      return ret;
+    }
+
+  }
+
   public string[] credit_strings = new string[]
   {
     "", //needs empty string at beginning so it starts off empty
@@ -43,7 +100,7 @@ public class Main : MonoBehaviour
   GameObject spec_neu_reticle;
   GameObject spec_sel_reticle;
   GameObject eyeray;
-  GameObject dom;
+  GameObject grid;
   GameObject ar_group;
   GameObject ar_camera_project;
   GameObject ar_camera_static;
@@ -84,16 +141,16 @@ public class Main : MonoBehaviour
   //GameObject stars;
   //GameObject starsscale;
 
-  int dom_w = 10;
-  int dom_h = 10;
-  int dom_d = 10;
-  float dom_oyoff = 0f;
-  float dom_yoff = -1000f;
-  float dom_yvel = 0f;
-  float dom_yacc = 0f;
-  float default_dom_s;
-  float[,,] dom_s;
-  GameObject[,,] dom_bulbs;
+  int grid_w = 10;
+  int grid_h = 10;
+  int grid_d = 10;
+  float grid_oyoff = 0f;
+  float grid_yoff = -1000f;
+  float grid_yvel = 0f;
+  float grid_yacc = 0f;
+  float default_grid_s;
+  float[,,] grid_s;
+  GameObject[,,] grid_bulbs;
 
   Vector3 default_portal_scale;
   Vector3 default_portal_position;
@@ -113,8 +170,8 @@ public class Main : MonoBehaviour
   public GameObject ar_label_left_prefab;
   public GameObject ar_label_right_prefab;
   public GameObject ar_progress_prefab;
-  public GameObject dom_string_prefab;
-  public GameObject dom_bulb_prefab;
+  public GameObject grid_string_prefab;
+  public GameObject grid_bulb_prefab;
   public GameObject ar_check_prefab;
 
   public Color scene0_helmet_color;
@@ -241,6 +298,10 @@ public class Main : MonoBehaviour
   int subtitle_i;
   float subtitle_t;
   int subtitle_spec;
+  int subtitle_pause_i_ice_0 = 0;
+  int subtitle_pause_i_ice_1 = 0;
+  int subtitle_pause_i_voyager_0 = 0;
+  int subtitle_pause_i_voyager_1 = 0;
   bool[,] voiceovers_played;
   AudioSource music_audiosource;
   bool music_was_playing;
@@ -412,19 +473,9 @@ public class Main : MonoBehaviour
   float out_fail_motion;
   float max_fail_motion;
 
-  float gaze_t_max; //The time required to confirm a gaze
-  float gaze_t_max_numb; //The time required to wait before confirming another gaze
-  float gaze_t_since; //if positive, time since entered. if negative, time since exited.
-  float gaze_t_in; //grows to max when in, shrinks to 0 when out
-  float gaze_t_run; //grows while not fully out. 0 when fully out
-  float gaze_t_numb; //countdown when distance should be ignored
-
-  float spec_t_max; //The time required to select a button
-  float spec_t_max_numb; //The time required to wait before selecting another button
-  float spec_t_since; //if positive, time since entered. if negative, time since exited.
-  float spec_t_in; //grows to max when in, shrinks to 0 when out
-  float spec_t_run; //grows while not fully out. 0 when fully out
-  float spec_t_numb; //countdown when distance should be ignored
+  gaze_trigger advance_trigger;
+  gaze_trigger spec_trigger;
+  gaze_trigger warp_trigger;
 
   float dumb_delay_t_max; //prevent anything interesting til this point
   float dumb_delay_t;
@@ -518,19 +569,10 @@ public class Main : MonoBehaviour
     out_fail_motion = 0;
     max_fail_motion = 1;
 
-    gaze_t_max = 1f;
-    gaze_t_max_numb = 4f;
-    gaze_t_since = 0;
-    gaze_t_in = 0;
-    gaze_t_run = 0;
-    gaze_t_numb = 0;
-
-    spec_t_max = 1f;
-    spec_t_max_numb = 1f;
-    spec_t_since = 0;
-    spec_t_in = 0;
-    spec_t_run = 0;
-    spec_t_numb = 0;
+    advance_trigger = new gaze_trigger();
+    spec_trigger    = new gaze_trigger();
+    warp_trigger    = new gaze_trigger();
+    warp_trigger.t_max_numb = 4f;
 
     dumb_delay_t_max = 3f;
     dumb_delay_t = 0f;
@@ -670,9 +712,11 @@ public class Main : MonoBehaviour
     k++;
     subtitle_strings[i,j,k] = "Ok. Can you look up at the gaze point for me?";
     subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_pause_i_ice_0 = k;
     k++;
     subtitle_strings[i,j,k] = "Great! Now look at the one at your feet.";
     subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_pause_i_ice_1 = k;
     k++;
     subtitle_strings[i,j,k] = "Alright! Everything seems to be in order.";
     subtitle_cues_delta[i,j,k] = 1f;
@@ -831,6 +875,7 @@ public class Main : MonoBehaviour
     k++;
     subtitle_strings[i,j,k] = "Can you look at pluto for a second?";
     subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_pause_i_voyager_0 = k;
     k++;
     subtitle_strings[i,j,k] = "See how it's a big black ball? Not very interesting.";
     subtitle_cues_delta[i,j,k] = 1f;
@@ -845,6 +890,7 @@ public class Main : MonoBehaviour
     k = 0;
     subtitle_strings[i,j,k] = "Alright- look back to pluto:";
     subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_pause_i_voyager_1 = k;
     k++;
     subtitle_strings[i,j,k] = "where'd it go?!";
     subtitle_cues_delta[i,j,k] = 1f;
@@ -1164,9 +1210,9 @@ public class Main : MonoBehaviour
     spec_neu_reticle = GameObject.Find("Spec_Neu_Reticle");
     spec_sel_reticle = GameObject.Find("Spec_Sel_Reticle");
     eyeray = GameObject.Find("Ray");
-    dom = GameObject.Find("MyDom");
-    dom_oyoff = dom.transform.position.y;
-    dom.transform.position = new Vector3(dom.transform.position.x,dom_oyoff+dom_yoff,dom.transform.position.z);
+    grid = GameObject.Find("MyGrid");
+    grid_oyoff = grid.transform.position.y;
+    grid.transform.position = new Vector3(grid.transform.position.x,grid_oyoff+grid_yoff,grid.transform.position.z);
     ar_group = GameObject.Find("AR");
     ar_camera_project = GameObject.Find("AR_Camera_Project");
     ar_camera_static = GameObject.Find("AR_Camera_Static");
@@ -1359,44 +1405,44 @@ public class Main : MonoBehaviour
     main_camera_skybox.material = skyboxes[cur_scene_i, cur_spec_i];
     portal_camera_next_skybox.material = skyboxes[next_scene_i, (int)SPEC.VIZ];
 
-    //dom
-    //GameObject dom_string;
-    GameObject dom_bulb;
+    //grid
+    //GameObject grid_string;
+    GameObject grid_bulb;
     //kill placement cube
-    GameObject c = dom.transform.GetChild(0).gameObject;
+    GameObject c = grid.transform.GetChild(0).gameObject;
     c.transform.parent = null;
     Destroy(c);
 
-    dom_s = new float[dom_w,dom_h,dom_d];
-    dom_bulbs = new GameObject[dom_w,dom_h,dom_d];
+    grid_s = new float[grid_w,grid_h,grid_d];
+    grid_bulbs = new GameObject[grid_w,grid_h,grid_d];
 
-    for(int i = 0; i < dom_w; i++)
+    for(int i = 0; i < grid_w; i++)
     {
-      for(int j = 0; j < dom_d; j++)
+      for(int j = 0; j < grid_d; j++)
       {
-        float x = -0.5f+((float)i/(dom_w-1f));
-        float z = -0.5f+((float)j/(dom_d-1f));
+        float x = -0.5f+((float)i/(grid_w-1f));
+        float z = -0.5f+((float)j/(grid_d-1f));
         /*
-        dom_string = (GameObject)Instantiate(dom_string_prefab);
-        dom_string.transform.SetParent(dom.transform);
-        dom_string.transform.localPosition = new Vector3(x,0,z);
-        dom_string.transform.localScale = dom_string.transform.localScale*dom.transform.localScale.x; //unity...
+        grid_string = (GameObject)Instantiate(grid_string_prefab);
+        grid_string.transform.SetParent(grid.transform);
+        grid_string.transform.localPosition = new Vector3(x,0,z);
+        grid_string.transform.localScale = grid_string.transform.localScale*grid.transform.localScale.x; //unity...
         */
 
-        for(int k = 0; k < dom_h; k++)
+        for(int k = 0; k < grid_h; k++)
         {
-          float y = -0.5f+((float)k/(dom_h-1f));
-          dom_bulb = (GameObject)Instantiate(dom_bulb_prefab);
-          dom_bulb.transform.SetParent(dom.transform);
-          dom_bulb.transform.localPosition = new Vector3(x,y,z);
-          dom_bulb.transform.localScale = dom_bulb.transform.localScale*dom.transform.localScale.x; //unity...
-          default_dom_s = dom_bulb.transform.localScale.x;
-          dom_s[i,k,j] = 1;
-          dom_bulbs[i,k,j] = dom_bulb;
+          float y = -0.5f+((float)k/(grid_h-1f));
+          grid_bulb = (GameObject)Instantiate(grid_bulb_prefab);
+          grid_bulb.transform.SetParent(grid.transform);
+          grid_bulb.transform.localPosition = new Vector3(x,y,z);
+          grid_bulb.transform.localScale = grid_bulb.transform.localScale*grid.transform.localScale.x; //unity...
+          default_grid_s = grid_bulb.transform.localScale.x;
+          grid_s[i,k,j] = 1;
+          grid_bulbs[i,k,j] = grid_bulb;
         }
       }
     }
-    dom.SetActive(false);
+    grid.SetActive(false);
 
 /*
     //stars
@@ -1537,7 +1583,6 @@ public class Main : MonoBehaviour
     }
 
     SetSpec((int)SPEC.VIZ);
-    spec_t_numb = spec_t_max_numb;
 
     for(int i = 0; i < 3; i++)
       ar_maps[i].SetActive(false);
@@ -1619,7 +1664,7 @@ public class Main : MonoBehaviour
         portal_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
 
         ar_maps[0].SetActive(true);
-        dom.SetActive(false);
+        grid.SetActive(false);
         break;
 
       case (int)SCENE.NOTHING:
@@ -1817,7 +1862,7 @@ public class Main : MonoBehaviour
     ta[cur_scene_i,cur_spec_i] += Time.deltaTime;
     float cur_ta = ta[cur_scene_i,cur_spec_i];
 
-    int label_left_i = 0;
+    //int label_left_i = 0;
     int label_right_i = 0;
     switch(cur_scene_i)
     {
@@ -1834,17 +1879,17 @@ public class Main : MonoBehaviour
         {
           if(old_ta < grid_t) //newly here
           {
-            dom.SetActive(true);
-            dom_yacc = 0.5f;
+            grid.SetActive(true);
+            grid_yacc = 0.5f;
           }
-          if(dom_yacc != 0)
+          if(grid_yacc != 0)
           {
-            dom_yvel += dom_yacc;
-            dom_yoff += dom_yvel;
-            if(dom_yoff > 0) { dom_yoff *= -1f; dom_yvel *= -0.5f; }
-            dom_yvel *= 0.96f;
-            if(Mathf.Abs(dom_yoff) < 1 && Mathf.Abs(dom_yvel) < 1) { dom_yoff = 0; dom_yvel = 0; dom_yacc = 0; }
-            dom.transform.position = new Vector3(dom.transform.position.x,dom_oyoff+dom_yoff,dom.transform.position.z);
+            grid_yvel += grid_yacc;
+            grid_yoff += grid_yvel;
+            if(grid_yoff > 0) { grid_yoff *= -1f; grid_yvel *= -0.5f; }
+            grid_yvel *= 0.96f;
+            if(Mathf.Abs(grid_yoff) < 1 && Mathf.Abs(grid_yvel) < 1) { grid_yoff = 0; grid_yvel = 0; grid_yacc = 0; }
+            grid.transform.position = new Vector3(grid.transform.position.x,grid_oyoff+grid_yoff,grid.transform.position.z);
           }
         }
 
@@ -1856,9 +1901,9 @@ public class Main : MonoBehaviour
 
       case (int)SCENE.VOYAGER:
 
+        /*
         float spec_t = 5f;
 
-        /*
         //use this for timed enable
         if(cur_ta >= spec_t)
         {
@@ -2073,7 +2118,7 @@ public class Main : MonoBehaviour
       out_fail_motion = in_fail_motion-max_fail_motion;
       if(out_fail_motion <= 0) out_fail_motion = 0.00001f;
       in_fail_motion = 0;
-      gaze_t_in = 0;
+      warp_trigger.t_in = 0;
       next_scene_i = cur_scene_i+1;
       scene_rots[next_scene_i] = 0;
       voiceovers_played[(int)SCENE.EXTREME,(int)SPEC.VIZ] = false;
@@ -2171,71 +2216,58 @@ public class Main : MonoBehaviour
     flash_alpha = flash_alpha * flash_alpha;
     alpha_material.SetFloat(alpha_id, flash_alpha);
 
-    float shrink;
-    float rot;
+    cam_spinner.transform.localScale = new Vector3(warp_trigger.shrink, warp_trigger.shrink, warp_trigger.shrink);
+    cam_spinner.transform.localRotation = Quaternion.Euler(0, 0, warp_trigger.rot);
+    warp_trigger.position = gaze_reticle.transform.position;
 
-    shrink = (float)gaze_t_in / (float)gaze_t_max;
-    rot = ((float)gaze_t_run / gaze_t_max) * 5 * 360.0f;
-
-    cam_spinner.transform.localScale = new Vector3(shrink, shrink, shrink);
-    cam_spinner.transform.localRotation = Quaternion.Euler(0, 0, rot);
-
-    float distance = Vector3.Distance(gaze_reticle.transform.position, cam_reticle.transform.position);
     if(
-      (cur_scene_i != (int)SCENE.EARTH && gaze_t_numb <= 0 && distance < 0.3 && voiceovers_played[cur_scene_i,(int)SPEC.COUNT] && in_fail_motion == 0) || //just use this line for normal use...
-      (cur_scene_i == (int)SCENE.EARTH && voiceovers_played[cur_scene_i,(int)SPEC.COUNT] && !voiceover_was_playing) //weird hack for end scene
+        (
+        cur_scene_i != (int)SCENE.EARTH &&
+        voiceovers_played[cur_scene_i,(int)SPEC.COUNT] &&
+        in_fail_motion == 0 &&
+        warp_trigger.tick(cam_reticle.transform.position,Time.deltaTime)
+      )
+        || //just use the above for normal use...
+      (
+        cur_scene_i == (int)SCENE.EARTH &&
+        voiceovers_played[cur_scene_i,(int)SPEC.COUNT] &&
+        !voiceover_was_playing
+      ) //weird hack for end scene
     )
     {
-      if(gaze_t_since < 0)        gaze_t_since = Time.deltaTime;
-      else                        gaze_t_since += Time.deltaTime;
-      if(gaze_t_in == 0) warp_audiosource_ptr = PlaySFX(SFX.WARP);
-      if(gaze_t_in < gaze_t_max)  gaze_t_in += Time.deltaTime;
-      if(gaze_t_in >= gaze_t_max) gaze_t_numb = gaze_t_max_numb;
+      if(warp_trigger.just_in) warp_audiosource_ptr = PlaySFX(SFX.WARP);
 
       //advance
-      if(gaze_t_in >= gaze_t_max)
+      if(warp_trigger.just_triggered)
       {
-        if(warp_audiosource_ptr != null)
-          warp_audiosource_ptr = null;
+        if(warp_audiosource_ptr != null) warp_audiosource_ptr = null;
         if(in_portal_motion == 0 && out_portal_motion == 0)
         {
           in_portal_motion = Time.deltaTime;
           PreSetupNextScene();
         }
-        gaze_t_in = 0;
         in_fail_motion = 0;
       }
     }
     else
     {
-      if(gaze_t_since > 0) gaze_t_since = -Time.deltaTime;
-      else                 gaze_t_since -= Time.deltaTime;
-      if(gaze_t_in > 0)
+      if(warp_audiosource_ptr != null && warp_audiosource_ptr.isPlaying)
       {
-        if(warp_audiosource_ptr != null && warp_audiosource_ptr.isPlaying)
-        {
-          warp_audiosource_ptr.Stop();
-          warp_audiosource_ptr = null;
-        }
-        gaze_t_in = 0;
-        //gaze_t_in -= Time.deltaTime;
+        warp_audiosource_ptr.Stop();
+        warp_audiosource_ptr = null;
       }
     }
-    if(gaze_t_in > 0)   gaze_t_run += Time.deltaTime;
-    else                gaze_t_run = 0;
-    if(gaze_t_numb > 0) gaze_t_numb -= Time.deltaTime;
 
     float distance_viz = Vector3.Distance(spec_viz_reticle.transform.position, cam_reticle.transform.position);
     float distance_gam = Vector3.Distance(spec_gam_reticle.transform.position, cam_reticle.transform.position);
     float distance_neu = Vector3.Distance(spec_neu_reticle.transform.position, cam_reticle.transform.position);
-    if(spec_projection.activeSelf && spec_t_numb <= 0 && (distance_gam < 0.5 || distance_viz < 0.5 || distance_neu < 0.5))
-    {
-      if(spec_t_since < 0)        spec_t_since = Time.deltaTime;
-      else                        spec_t_since += Time.deltaTime;
-      if(spec_t_in < spec_t_max)  spec_t_in += Time.deltaTime;
-      if(spec_t_in >= spec_t_max) spec_t_numb = spec_t_max_numb;
+    if(distance_viz < distance_gam && distance_viz < distance_neu) spec_trigger.position = spec_viz_reticle.transform.position;
+    if(distance_gam < distance_viz && distance_gam < distance_neu) spec_trigger.position = spec_gam_reticle.transform.position;
+    if(distance_neu < distance_gam && distance_neu < distance_viz) spec_trigger.position = spec_neu_reticle.transform.position;
 
-      if(spec_t_in >= spec_t_max)
+    if(spec_projection.activeSelf && spec_trigger.tick(cam_reticle.transform.position,Time.deltaTime))
+    {
+      if(spec_trigger.just_triggered)
       {
         int old_spec = cur_spec_i;
         if(distance_gam <= distance_viz && distance_gam <= distance_neu) SetSpec((int)SPEC.GAM);
@@ -2273,15 +2305,6 @@ public class Main : MonoBehaviour
         }
       }
     }
-    else
-    {
-      if(spec_t_since > 0) spec_t_since = -Time.deltaTime;
-      else                 spec_t_since -= Time.deltaTime;
-      if(spec_t_in > 0)    spec_t_in -= Time.deltaTime;
-    }
-    if(spec_t_in > 0)   spec_t_run += Time.deltaTime;
-    else                spec_t_run = 0;
-    if(spec_t_numb > 0) spec_t_numb -= Time.deltaTime;
 
     scene_rots[cur_scene_i] += scene_rot_deltas[cur_scene_i] * Time.deltaTime;
     while(scene_rots[cur_scene_i] > 3.14159265f * 2.0f) scene_rots[cur_scene_i] -= (3.14159265f * 2.0f);
@@ -2381,29 +2404,29 @@ public class Main : MonoBehaviour
     while(nvec_t > 1) nvec_t -= 1;
     Vector3 nvec_cur = Vector3.Lerp(nvec_start,nvec_end,nvec_t);
     Vector3 nvec_comp = new Vector3(0,0,0);
-    for(int i = 0; i < dom_w; i++)
+    for(int i = 0; i < grid_w; i++)
     {
-      for(int j = 0; j < dom_h; j++)
+      for(int j = 0; j < grid_h; j++)
       {
-        for(int k = 0; k < dom_d; k++)
+        for(int k = 0; k < grid_d; k++)
         {
-          nvec_comp = new Vector3((float)i/(dom_w-1),(float)j/(dom_h-1),(float)k/(dom_d-1));
+          nvec_comp = new Vector3((float)i/(grid_w-1),(float)j/(grid_h-1),(float)k/(grid_d-1));
           float f = Vector3.Distance(nvec_cur,nvec_comp);
           f = (0.2f-f)*5f;
-          dom_s[i,j,k] = Mathf.Clamp(f,0.1f,1f);
-          //dom_s[i,j,k] = Mathf.Sin((((float)i/dom_w)+nwave_t_10)*twopi)*Mathf.Sin((float)j/dom_h*twopi)*Mathf.Sin((float)k/dom_d*twopi);
+          grid_s[i,j,k] = Mathf.Clamp(f,0.1f,1f);
+          //grid_s[i,j,k] = Mathf.Sin((((float)i/grid_w)+nwave_t_10)*twopi)*Mathf.Sin((float)j/grid_h*twopi)*Mathf.Sin((float)k/dom_d*twopi);
         }
       }
     }
 
-    for(int i = 0; i < dom_w; i++)
+    for(int i = 0; i < grid_w; i++)
     {
-      for(int j = 0; j < dom_h; j++)
+      for(int j = 0; j < grid_h; j++)
       {
-        for(int k = 0; k < dom_d; k++)
+        for(int k = 0; k < grid_d; k++)
         {
-          float s = dom_s[i,j,k]*default_dom_s;
-          dom_bulbs[i,j,k].transform.localScale = new Vector3(s,s,s);
+          float s = grid_s[i,j,k]*default_grid_s;
+          grid_bulbs[i,j,k].transform.localScale = new Vector3(s,s,s);
         }
       }
     }

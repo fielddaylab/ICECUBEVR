@@ -3717,7 +3717,7 @@ GameObject:
   m_Component:
   - component: {fileID: 190713139}
   m_Layer: 31
-  m_Name: MyDom
+  m_Name: MyGrid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3893,9 +3893,9 @@ MonoBehaviour:
     type: 2}
   ar_progress_prefab: {fileID: 1187901120155258, guid: 89a27608346844f149790f9b3ec5c919,
     type: 2}
-  dom_string_prefab: {fileID: 1179033797145960, guid: e1531f7eb016e4b9e939552f33b120d1,
+  grid_string_prefab: {fileID: 1179033797145960, guid: e1531f7eb016e4b9e939552f33b120d1,
     type: 2}
-  dom_bulb_prefab: {fileID: 1900122954093648, guid: 1e09b8659d670435395802f7a93d3292,
+  grid_bulb_prefab: {fileID: 1900122954093648, guid: 1e09b8659d670435395802f7a93d3292,
     type: 2}
   ar_check_prefab: {fileID: 1357402303603168, guid: fdcac7dcf24ab454995a0f27cac7e6c3,
     type: 2}
