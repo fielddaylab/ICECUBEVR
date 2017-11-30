@@ -698,6 +698,9 @@ public class Main : MonoBehaviour
     i = (int)SCENE.ICE;
     j = (int)SPEC.VIZ;
     k = 0;
+    subtitle_strings[i,j,k] = "";
+    subtitle_cues_delta[i,j,k] = 1f;
+    k++;
     subtitle_strings[i,j,k] = "Hey!";
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
@@ -808,6 +811,9 @@ public class Main : MonoBehaviour
     i = (int)SCENE.VOYAGER;
     j = (int)SPEC.VIZ;
     k = 0;
+    subtitle_strings[i,j,k] = "";
+    subtitle_cues_delta[i,j,k] = 1f;
+    k++;
     subtitle_strings[i,j,k] = "Hello? ...";
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
@@ -864,6 +870,9 @@ public class Main : MonoBehaviour
 
     j = (int)SPEC.GAM;
     k = 0;
+    subtitle_strings[i,j,k] = "";
+    subtitle_cues_delta[i,j,k] = 1f;
+    k++;
     subtitle_strings[i,j,k] = "Pretty great, right?";
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
@@ -894,6 +903,9 @@ public class Main : MonoBehaviour
 
     j = (int)SPEC.NEU;
     k = 0;
+    subtitle_strings[i,j,k] = "";
+    subtitle_cues_delta[i,j,k] = 1f;
+    k++;
     subtitle_strings[i,j,k] = "Alright- look back to pluto:";
     subtitle_cues_delta[i,j,k] = 1f;
     subtitle_pause_i_voyager_1 = k;
@@ -924,6 +936,9 @@ public class Main : MonoBehaviour
 
     j = (int)SPEC.COUNT;
     k = 0;
+    subtitle_strings[i,j,k] = "";
+    subtitle_cues_delta[i,j,k] = 1f;
+    k++;
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
 
@@ -931,6 +946,9 @@ public class Main : MonoBehaviour
     i = (int)SCENE.NOTHING;
     j = (int)SPEC.VIZ;
     k = 0;
+    subtitle_strings[i,j,k] = "";
+    subtitle_cues_delta[i,j,k] = 1f;
+    k++;
     subtitle_strings[i,j,k] = "Woah.";
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
@@ -1005,6 +1023,9 @@ public class Main : MonoBehaviour
 
     j = (int)SPEC.COUNT;
     k = 0;
+    subtitle_strings[i,j,k] = "";
+    subtitle_cues_delta[i,j,k] = 1f;
+    k++;
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
 
@@ -1012,6 +1033,9 @@ public class Main : MonoBehaviour
     i = (int)SCENE.EXTREME;
     j = (int)SPEC.VIZ;
     k = 0;
+    subtitle_strings[i,j,k] = "";
+    subtitle_cues_delta[i,j,k] = 1f;
+    k++;
     subtitle_strings[i,j,k] = "-ello--?!..";
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
@@ -1035,6 +1059,9 @@ public class Main : MonoBehaviour
 
     j = (int)SPEC.COUNT;
     k = 0;
+    subtitle_strings[i,j,k] = "";
+    subtitle_cues_delta[i,j,k] = 1f;
+    k++;
     subtitle_strings[i,j,k] = "-e -ave the data-%!!!";
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
@@ -1051,6 +1078,9 @@ public class Main : MonoBehaviour
     i = (int)SCENE.EARTH;
     j = (int)SPEC.VIZ;
     k = 0;
+    subtitle_strings[i,j,k] = "";
+    subtitle_cues_delta[i,j,k] = 1f;
+    k++;
     subtitle_strings[i,j,k] = "Wow! You did it!";
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
@@ -1119,6 +1149,9 @@ public class Main : MonoBehaviour
 
     j = (int)SPEC.COUNT;
     k = 0;
+    subtitle_strings[i,j,k] = "";
+    subtitle_cues_delta[i,j,k] = 1f;
+    k++;
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
 
@@ -1126,11 +1159,17 @@ public class Main : MonoBehaviour
     i = (int)SCENE.CREDITS;
     j = (int)SPEC.VIZ;
     k = 0;
+    subtitle_strings[i,j,k] = "";
+    subtitle_cues_delta[i,j,k] = 1f;
+    k++;
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
 
     j = (int)SPEC.COUNT;
     k = 0;
+    subtitle_strings[i,j,k] = "";
+    subtitle_cues_delta[i,j,k] = 1f;
+    k++;
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
 
@@ -1969,7 +2008,7 @@ public class Main : MonoBehaviour
         label_right_i++;
 
         //command
-        if(subtitle_i == subtitle_pause_i_voyager_0 && !advance_passed_voyager_0)
+        if(cur_spec_i == (int)SPEC.GAM && subtitle_i == subtitle_pause_i_voyager_0 && !advance_passed_voyager_0)
         {
           gaze_projection.transform.rotation = rotationFromEuler(getEuler(new Vector3(0f,10f,10f).normalized));
           gaze_reticle.SetActive(true);
@@ -1984,7 +2023,7 @@ public class Main : MonoBehaviour
             }
           }
         }
-        if(subtitle_i == subtitle_pause_i_voyager_1 && !advance_passed_voyager_1)
+        if(cur_spec_i == (int)SPEC.NEU && subtitle_i == subtitle_pause_i_voyager_1 && !advance_passed_voyager_1)
         {
           gaze_projection.transform.rotation = rotationFromEuler(getEuler(new Vector3(0f,-10f,10f).normalized));
           gaze_reticle.SetActive(true);
@@ -2214,8 +2253,8 @@ public class Main : MonoBehaviour
       float old_sub_t = subtitle_t;
       subtitle_t += Time.deltaTime;
       if(
-        old_sub_t  <  subtitle_cues_absolute[cur_scene_i,subtitle_spec,subtitle_i] &&
-        subtitle_t >= subtitle_cues_absolute[cur_scene_i,subtitle_spec,subtitle_i]
+        old_sub_t  <  subtitle_cues_absolute[cur_scene_i,subtitle_spec,subtitle_i+1] &&
+        subtitle_t >= subtitle_cues_absolute[cur_scene_i,subtitle_spec,subtitle_i+1]
       )
       {
         subtitle_i++;
@@ -2234,7 +2273,7 @@ public class Main : MonoBehaviour
           }
           advance_paused = true;
           subtitle_i--;
-          subtitle_t = subtitle_cues_absolute[cur_scene_i,subtitle_spec,subtitle_i]-0.0001f;
+          subtitle_t = subtitle_cues_absolute[cur_scene_i,subtitle_spec,subtitle_i+1]-0.0001f;
         }
         else
         {
@@ -2365,7 +2404,7 @@ public class Main : MonoBehaviour
     if(distance_gam < distance_viz && distance_gam < distance_neu) spec_trigger.position = spec_gam_reticle.transform.position;
     if(distance_neu < distance_gam && distance_neu < distance_viz) spec_trigger.position = spec_neu_reticle.transform.position;
 
-    if(spec_projection.activeSelf && spec_trigger.tick(cam_reticle.transform.position,Time.deltaTime))
+    if(!advance_paused && spec_projection.activeSelf && spec_trigger.tick(cam_reticle.transform.position,Time.deltaTime))
     {
       if(spec_trigger.just_triggered)
       {
