@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using GameAnalyticsSDK;
 
 public class Main : MonoBehaviour
 {
@@ -1622,13 +1621,16 @@ public class Main : MonoBehaviour
 
   void SetupScene()
   {
+    //leaving actualy gameanalytics in (but commented out) so it's easy to find/replace them
     if(cur_scene_i == (int)SCENE.ICE)
-      GameAnalytics.NewProgressionEvent(GAProgressionStatus.Start, "Universe", "Scene_" + cur_scene_i, "viz", 0);
+    {
+      //GameAnalytics.NewProgressionEvent(GAProgressionStatus.Start, "Universe", "Scene_" + cur_scene_i, "viz", 0);
+    }
     else
     {
-      int last_scene_i = cur_scene_i - 1;
-      GameAnalytics.NewProgressionEvent(GAProgressionStatus.Complete, "Universe", "Scene_" + last_scene_i, "viz", 0);
-      GameAnalytics.NewProgressionEvent(GAProgressionStatus.Start,    "Universe", "Scene_" + cur_scene_i,  "viz", 0);
+      //int last_scene_i = cur_scene_i - 1;
+      //GameAnalytics.NewProgressionEvent(GAProgressionStatus.Complete, "Universe", "Scene_" + last_scene_i, "viz", 0);
+      //GameAnalytics.NewProgressionEvent(GAProgressionStatus.Start,    "Universe", "Scene_" + cur_scene_i,  "viz", 0);
     }
 
     SetSpec((int)SPEC.VIZ);
@@ -2144,6 +2146,7 @@ public class Main : MonoBehaviour
 
   void SetSpec(int spec)
   {
+    //leaving actualy gameanalytics in (but commented out) so it's easy to find/replace them
     cur_spec_i = spec;
     switch(spec)
     {
