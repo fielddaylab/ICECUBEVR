@@ -100,7 +100,8 @@ public class Main : MonoBehaviour
   GameObject spec_gam_reticle;
   GameObject spec_neu_reticle;
   GameObject spec_sel_reticle;
-  GameObject eyeray;
+  GameObject gazeray;
+  GameObject gazeball;
   GameObject grid;
   GameObject ar_group;
   GameObject ar_camera_project;
@@ -820,7 +821,7 @@ public class Main : MonoBehaviour
     subtitle_strings[i,j,k] = "You still there?";
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
-    subtitle_strings[i,j,k] = "Haha alright, made it in one piece.";
+    subtitle_strings[i,j,k] = "Alright, made it in one piece.";
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
     subtitle_strings[i,j,k] = "Take a second to look around and find your bearings-";
@@ -832,7 +833,7 @@ public class Main : MonoBehaviour
     subtitle_strings[i,j,k] = "further out in space than any other human!";
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
-    subtitle_strings[i,j,k] = "Haha that said- we have a job to do.";
+    subtitle_strings[i,j,k] = "That said- we have a job to do.";
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
     subtitle_strings[i,j,k] = "You have to follow the path of the neutrino";
@@ -913,7 +914,7 @@ public class Main : MonoBehaviour
     subtitle_strings[i,j,k] = "where'd it go?!";
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
-    subtitle_strings[i,j,k] = "Haha your helmet is now only sensing neutrino particles:";
+    subtitle_strings[i,j,k] = "Your helmet is now only sensing neutrino particles:";
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
     subtitle_strings[i,j,k] = "but neutrinos pass through just about all matter!";
@@ -1255,7 +1256,8 @@ public class Main : MonoBehaviour
     spec_gam_reticle = GameObject.Find("Spec_Gam_Reticle");
     spec_neu_reticle = GameObject.Find("Spec_Neu_Reticle");
     spec_sel_reticle = GameObject.Find("Spec_Sel_Reticle");
-    eyeray = GameObject.Find("Ray");
+    gazeray = GameObject.Find("Ray");
+    gazeball = GameObject.Find("Ball");
     grid = GameObject.Find("MyGrid");
     grid_oyoff = grid.transform.position.y;
     grid.transform.position = new Vector3(grid.transform.position.x,grid_oyoff+grid_yoff,grid.transform.position.z);
@@ -1423,8 +1425,9 @@ public class Main : MonoBehaviour
     anti_gaze_pt = new Vector3(-330f, -350f, 575f);
     anti_gaze_cam_euler = getCamEuler(anti_gaze_pt);
 
-    eyeray.GetComponent<LineRenderer>().SetPosition(0, anti_gaze_pt);
-    eyeray.GetComponent<LineRenderer>().SetPosition(1, gaze_pt);
+    gazeray.GetComponent<LineRenderer>().SetPosition(0, anti_gaze_pt);
+    gazeray.GetComponent<LineRenderer>().SetPosition(1, gaze_pt);
+    gazeball.transform.position = gaze_pt;
 
     for(int i = 0; i < (int)SPEC.COUNT; i++)
     {
@@ -1681,7 +1684,8 @@ public class Main : MonoBehaviour
         gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
         portal_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
 
-        eyeray.SetActive(false);
+        gazeray.SetActive(false);
+        gazeball.SetActive(false);
 
         break;
 
@@ -1874,7 +1878,8 @@ public class Main : MonoBehaviour
       case (int)SCENE.CREDITS:
 
         gaze_reticle.SetActive(false);
-        eyeray.SetActive(false);
+        gazeray.SetActive(false);
+        gazeball.SetActive(false);
 
         gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
         portal_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
@@ -1948,7 +1953,10 @@ public class Main : MonoBehaviour
         //ray
         if(cur_ta >= beam_t)
           if(old_ta < beam_t) //newly here
-            eyeray.SetActive(true);
+          {
+            gazeray.SetActive(true);
+            gazeball.SetActive(true);
+          }
 
         //command
         if(subtitle_i == subtitle_pause_i_ice_0 && !advance_passed_ice_0)
@@ -2536,24 +2544,21 @@ public class Main : MonoBehaviour
       }
     }
 
-    Vector3 nvec_start = new Vector3(1.2f,1.2f,-0.2f);
-    Vector3 nvec_dir   = new Vector3(-1f,-1f,1f).normalized;
-    Vector3 nvec_end   = nvec_start+nvec_dir*10f;
-    float nvec_t = nwave_t_10/5;
-    while(nvec_t > 1) nvec_t -= 1;
-    Vector3 nvec_cur = Vector3.Lerp(nvec_start,nvec_end,nvec_t);
-    Vector3 nvec_comp = new Vector3(0,0,0);
+    float ball_t = (nwave_t_10%2f)/2f;
+    gazeball.transform.position = Vector3.Lerp(gaze_pt,anti_gaze_pt,ball_t);
+    Vector3 ball_pos = gazeball.transform.position;
+    ball_pos -= grid_bulbs[grid_w-1,grid_h-1,0].transform.position;
+    ball_pos /= 3f;
+    ball_pos += grid_bulbs[grid_w-1,grid_h-1,0].transform.position;
     for(int i = 0; i < grid_w; i++)
     {
       for(int j = 0; j < grid_h; j++)
       {
         for(int k = 0; k < grid_d; k++)
         {
-          nvec_comp = new Vector3((float)i/(grid_w-1),(float)j/(grid_h-1),(float)k/(grid_d-1));
-          float f = Vector3.Distance(nvec_cur,nvec_comp);
-          f = (0.2f-f)*5f;
+          float f = Vector3.Distance(ball_pos,grid_bulbs[i,j,k].transform.position);
+          f = (30f-f)/30f;
           grid_s[i,j,k] = Mathf.Clamp(f,0.1f,1f);
-          //grid_s[i,j,k] = Mathf.Sin((((float)i/grid_w)+nwave_t_10)*twopi)*Mathf.Sin((float)j/grid_h*twopi)*Mathf.Sin((float)k/dom_d*twopi);
         }
       }
     }
