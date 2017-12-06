@@ -4,6 +4,17 @@ using UnityEngine;
 
 public class Main : MonoBehaviour
 {
+
+  void HandleHMDMounted()
+  {
+    Debug.Log("ON");
+  }
+
+  void HandleHMDUnmounted()
+  {
+    Debug.Log("OFF");
+  }
+
   public class gaze_trigger
   {
     public Vector3 position = new Vector3(0f,0f,0f);
@@ -510,12 +521,12 @@ public class Main : MonoBehaviour
   }
 
 
-  void HandleHMDMounted()
+  void MyHandleHMDMounted()
   {
     // Do stuff
   }
 
-  void HandleHMDUnmounted()
+  void MyHandleHMDUnmounted()
   {
     // Do stuff
   }
@@ -590,6 +601,10 @@ public class Main : MonoBehaviour
 
   void Start()
   {
+    OVRManager.HMDMounted += MyHandleHMDMounted;
+    OVRManager.HMDUnmounted += MyHandleHMDUnmounted;
+    Application.runInBackground = true;
+
     scene_names = new string[(int)SCENE.COUNT];
     for(int i = 0; i < (int)SCENE.COUNT; i++)
     {
@@ -1579,7 +1594,6 @@ public class Main : MonoBehaviour
 
     MapVols();
     SetupScene();
-
   }
 
   //called just before portal to next scene appears
