@@ -5,16 +5,6 @@ using UnityEngine;
 public class Main : MonoBehaviour
 {
 
-  void HandleHMDMounted()
-  {
-    Debug.Log("ON");
-  }
-
-  void HandleHMDUnmounted()
-  {
-    Debug.Log("OFF");
-  }
-
   public class gaze_trigger
   {
     public Vector3 position = new Vector3(0f,0f,0f);
@@ -521,14 +511,14 @@ public class Main : MonoBehaviour
   }
 
 
-  void MyHandleHMDMounted()
+  void HandleHMDMounted()
   {
-    // Do stuff
+    Debug.Log("ON");
   }
 
-  void MyHandleHMDUnmounted()
+  void HandleHMDUnmounted()
   {
-    // Do stuff
+    Debug.Log("OFF");
   }
 
   void reStart()
@@ -601,8 +591,8 @@ public class Main : MonoBehaviour
 
   void Start()
   {
-    OVRManager.HMDMounted += MyHandleHMDMounted;
-    OVRManager.HMDUnmounted += MyHandleHMDUnmounted;
+    OVRManager.HMDMounted += HandleHMDMounted;
+    OVRManager.HMDUnmounted += HandleHMDUnmounted;
     Application.runInBackground = true;
 
     scene_names = new string[(int)SCENE.COUNT];
