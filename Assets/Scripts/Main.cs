@@ -591,6 +591,7 @@ public class Main : MonoBehaviour
 
   void Start()
   {
+    Debug.Log("DOING");
     OVRManager.HMDMounted += HandleHMDMounted;
     OVRManager.HMDUnmounted += HandleHMDUnmounted;
     Application.runInBackground = true;
