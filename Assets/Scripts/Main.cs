@@ -309,6 +309,7 @@ public class Main : MonoBehaviour
   bool advance_passed_voyager_0 = false;
   bool advance_passed_voyager_1 = false;
   bool advance_paused = false;
+  bool hmd_mounted = false;
   bool[,] voiceovers_played;
   AudioSource music_audiosource;
   bool music_was_playing;
@@ -514,11 +515,16 @@ public class Main : MonoBehaviour
   void HandleHMDMounted()
   {
     Debug.Log("ON");
+    hmd_mounted = true;
   }
 
   void HandleHMDUnmounted()
   {
     Debug.Log("OFF");
+    reStart();
+    SetSpec((int)SPEC.VIZ);
+    SetupScene();
+    hmd_mounted = false;
   }
 
   void reStart()
@@ -530,6 +536,20 @@ public class Main : MonoBehaviour
         voiceovers_played[i,j] = false;
       }
     }
+    voiceover_was_playing = false;
+    music_was_playing = false;
+    voiceover_audiosource.Stop();
+    music_audiosource.Stop();
+
+    subtitles_text.text = "";
+    subtitle_i = 0;
+    subtitle_t = 0;
+    subtitle_spec = (int)SPEC.VIZ;
+
+    grid_yoff = -1000f;
+    grid_yvel = 0f;
+    grid_yacc = 0f;
+    grid.transform.position = new Vector3(grid.transform.position.x,grid_oyoff+grid_yoff,grid.transform.position.z);
 
     //auto skip these
     voiceovers_played[(int)SCENE.ICE,(int)SPEC.NEU]     = true;
@@ -587,6 +607,10 @@ public class Main : MonoBehaviour
     credits_i = 0;
     credits_t = 0f;
 
+    advance_paused = false;
+    gaze_reticle.SetActive(false);
+    gazeray.SetActive(false);
+    gazeball.SetActive(false);
   }
 
   void Start()
@@ -1237,8 +1261,6 @@ public class Main : MonoBehaviour
 
     ta = new float[(int)SCENE.COUNT, (int)SPEC.COUNT];
 
-    reStart();
-
     default_layer = LayerMask.NameToLayer("Default");
 
     camera_house = GameObject.Find("CameraHouse");
@@ -1584,6 +1606,7 @@ public class Main : MonoBehaviour
     Destroy(star, 0f);
 */
 
+    reStart();
     MapVols();
     SetupScene();
   }
@@ -1922,7 +1945,7 @@ public class Main : MonoBehaviour
   void UpdateScene()
   {
     float old_ta = ta[cur_scene_i,cur_spec_i];
-    if(!advance_paused) ta[cur_scene_i,cur_spec_i] += Time.deltaTime;
+    if(!advance_paused && hmd_mounted) ta[cur_scene_i,cur_spec_i] += Time.deltaTime;
     float cur_ta = ta[cur_scene_i,cur_spec_i];
 
     //int label_left_i = 0;
@@ -2209,6 +2232,11 @@ public class Main : MonoBehaviour
 
     if(Input.GetKeyDown("space"))
     {
+      HandleHMDUnmounted();
+    }
+    if(Input.GetKeyUp("space"))
+    {
+      HandleHMDMounted();
     }
 
     if(in_portal_motion > 0) in_portal_motion += Time.deltaTime * 0.8f;
@@ -2527,7 +2555,7 @@ public class Main : MonoBehaviour
     {
       if(dumb_delay_t < dumb_delay_t_max)
       {
-        dumb_delay_t += Time.deltaTime;
+        if(hmd_mounted) dumb_delay_t += Time.deltaTime;
         if(dumb_delay_t >= dumb_delay_t_max)//newly done with delay
         {
           voiceover_audiosource.clip = voiceovers[cur_scene_i,cur_spec_i];
