@@ -1242,7 +1242,8 @@ public class Main : MonoBehaviour
     default_layer = LayerMask.NameToLayer("Default");
 
     camera_house = GameObject.Find("CameraHouse");
-    main_camera = GameObject.Find("Main Camera");
+    //main_camera = GameObject.Find("Main Camera");
+    main_camera = GameObject.Find("CenterEyeAnchor");
     main_camera_skybox = main_camera.GetComponent<Skybox>();
     portal_projection = GameObject.Find("Portal_Projection");
     portal = GameObject.Find("Portal");
