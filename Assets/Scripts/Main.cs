@@ -611,6 +611,8 @@ public class Main : MonoBehaviour
     gaze_reticle.SetActive(false);
     gazeray.SetActive(false);
     gazeball.SetActive(false);
+    ar_alert.SetActive(false);
+    ar_timer.SetActive(false);
   }
 
   void Start()
@@ -2007,7 +2009,7 @@ public class Main : MonoBehaviour
         }
         if(subtitle_i == subtitle_pause_i_ice_1 && !advance_passed_ice_1)
         {
-          gaze_projection.transform.rotation = rotationFromEuler(getEuler(new Vector3(0f,-10f,10f).normalized));
+          gaze_projection.transform.rotation = rotationFromEuler(getEuler(new Vector3(0f,-20f,10f).normalized));
           gaze_reticle.SetActive(true);
           advance_trigger.position = gaze_reticle.transform.position;
           if(advance_trigger.tick(cam_reticle.transform.position,Time.deltaTime))
