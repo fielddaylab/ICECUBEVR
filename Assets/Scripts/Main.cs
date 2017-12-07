@@ -272,6 +272,8 @@ public class Main : MonoBehaviour
   [Range(0.0f, 1.0f)]
   public float credits_neu_music_vol = 1.0f;
 
+  public GoogleAnalyticsV4 ga;
+
   int alpha_id;
   float flash_alpha;
   int time_mod_twelve_pi_id;
@@ -514,13 +516,12 @@ public class Main : MonoBehaviour
 
   void HandleHMDMounted()
   {
-    Debug.Log("ON");
     hmd_mounted = true;
+    ga.StopSession();
   }
 
   void HandleHMDUnmounted()
   {
-    Debug.Log("OFF");
     reStart();
     SetSpec((int)SPEC.VIZ);
     SetupScene();
@@ -613,11 +614,12 @@ public class Main : MonoBehaviour
     gazeball.SetActive(false);
     ar_alert.SetActive(false);
     ar_timer.SetActive(false);
+
+    ga.StartSession();
   }
 
   void Start()
   {
-    Debug.Log("DOING");
     OVRManager.HMDMounted += HandleHMDMounted;
     OVRManager.HMDUnmounted += HandleHMDUnmounted;
     Application.runInBackground = true;
