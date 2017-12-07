@@ -2049,7 +2049,7 @@ public class Main : MonoBehaviour
         //command
         if(cur_spec_i == (int)SPEC.GAM && subtitle_i == subtitle_pause_i_voyager_0 && !advance_passed_voyager_0)
         {
-          gaze_projection.transform.rotation = rotationFromEuler(getEuler(new Vector3(0f,10f,10f).normalized));
+          gaze_projection.transform.rotation = rotationFromEuler(getCamEuler(pluto[0].transform.position));
           gaze_reticle.SetActive(true);
           advance_trigger.position = gaze_reticle.transform.position;
           if(advance_trigger.tick(cam_reticle.transform.position,Time.deltaTime))
@@ -2064,7 +2064,7 @@ public class Main : MonoBehaviour
         }
         if(cur_spec_i == (int)SPEC.NEU && subtitle_i == subtitle_pause_i_voyager_1 && !advance_passed_voyager_1)
         {
-          gaze_projection.transform.rotation = rotationFromEuler(getEuler(new Vector3(0f,-10f,10f).normalized));
+          gaze_projection.transform.rotation = rotationFromEuler(getCamEuler(pluto[0].transform.position));
           gaze_reticle.SetActive(true);
           advance_trigger.position = gaze_reticle.transform.position;
           if(advance_trigger.tick(cam_reticle.transform.position,Time.deltaTime))
