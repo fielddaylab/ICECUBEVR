@@ -41,6 +41,6 @@ Material:
     m_Colors:
     - _AtmosphereColor: {r: 0.6313726, g: 0.7411765, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _LightDir: {r: 2.07, g: -2.25, b: 2.74, a: 4.74}
+    - _LightDir: {r: -0.1945, g: 0.1005, b: -0.5999, a: 0.768}
     - _SkyColor: {r: 0.08235294, g: 0.18431373, b: 0.3529412, a: 1}
     - _SunsetColor: {r: 0.8980392, g: 0.4117647, b: 0.14509805, a: 1}
