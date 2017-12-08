@@ -132,7 +132,6 @@ public class Main : MonoBehaviour
   GameObject[] ar_checks;
 
   GameObject[] icecube;
-  GameObject[] voyager;
   GameObject[] pluto;
   GameObject[] vearth;
   GameObject[] milky;
@@ -161,9 +160,6 @@ public class Main : MonoBehaviour
   Vector3 lazy_look_ahead;
   Vector3 very_lazy_look_ahead;
   Vector3 player_head;
-  Vector3 default_satellite_position;
-  Vector3 satellite_position;
-  Vector3 satellite_velocity;
 
   public int starting_scene = 0;
 
@@ -576,8 +572,6 @@ public class Main : MonoBehaviour
     jitter = 0;
     jitter_countdown = 0;
     jitter_state = 0;
-
-    satellite_position = default_satellite_position;
 
     next_scene_i = starting_scene;
     cur_scene_i = next_scene_i;
@@ -1401,7 +1395,6 @@ public class Main : MonoBehaviour
     ar_timer.SetActive(false);
 
     icecube   = new GameObject[(int)SPEC.COUNT];
-    voyager   = new GameObject[(int)SPEC.COUNT];
     pluto     = new GameObject[(int)SPEC.COUNT];
     vearth    = new GameObject[(int)SPEC.COUNT];
     milky     = new GameObject[(int)SPEC.COUNT];
@@ -1412,7 +1405,6 @@ public class Main : MonoBehaviour
     for(int i = 0; i < (int)SPEC.COUNT; i++)
     {
       icecube[i]   = GameObject.Find("Icecube_"   + spec_names[i]);
-      voyager[i]   = GameObject.Find("Voyager_"   + spec_names[i]);
       pluto[i]     = GameObject.Find("Pluto_"     + spec_names[i]);
       vearth[i]    = GameObject.Find("VEarth_"    + spec_names[i]);
       milky[i]     = GameObject.Find("Milky_"     + spec_names[i]);
@@ -1435,11 +1427,6 @@ public class Main : MonoBehaviour
 
     default_portal_scale = portal.transform.localScale;
     default_portal_position = portal.transform.position;
-
-    default_satellite_position = new Vector3(4f, 1.5f, 10);
-    satellite_velocity = new Vector3(0, 0, -0.5f);
-    for(int i = 0; i < voyager.Length; i++)
-      voyager[i].transform.position = satellite_position;
 
     default_look_ahead = new Vector3(0, 0, 1);
     look_ahead = default_look_ahead;
@@ -1469,7 +1456,7 @@ public class Main : MonoBehaviour
     earth[0].transform.position = anti_gaze_pt.normalized*600;
 
     scene_centers[(int)SCENE.ICE]     = icecube[  0].transform.position;
-    scene_centers[(int)SCENE.VOYAGER] = voyager[  0].transform.position;
+    scene_centers[(int)SCENE.VOYAGER] = pluto[    0].transform.position;
     scene_centers[(int)SCENE.NOTHING] = milky[    0].transform.position;
     scene_centers[(int)SCENE.EXTREME] = blackhole[0].transform.position;
     scene_centers[(int)SCENE.EARTH]   = earth[    0].transform.position;
@@ -1727,13 +1714,6 @@ public class Main : MonoBehaviour
       case (int)SCENE.VOYAGER:
         advance_passed_voyager_0 = false;
         advance_passed_voyager_1 = false;
-
-        ar_label_rights[label_right_i].transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-        ar_label_rights[    label_right_i].transform.position = voyager[0].transform.position;
-        ar_label_right_kids[label_right_i].transform.localPosition = new Vector3(25,1,10);
-        ar_label_rights[label_right_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_rights[label_right_i].transform.position));
-        ar_label_right_texts[label_right_i].text = "VOYAGER";
-        label_right_i++;
 
         ar_label_rights[label_right_i].transform.localScale = new Vector3(10f, 10f, 10f);
         ar_label_rights[    label_right_i].transform.position = pluto[0].transform.position;
@@ -2043,12 +2023,6 @@ public class Main : MonoBehaviour
         */
         if(!spec_projection.activeSelf && voiceovers_played[cur_scene_i,(int)SPEC.VIZ] && !voiceover_was_playing)
           spec_projection.SetActive(true);
-
-        for(int i = 0; i < voyager.Length; i++)
-          voyager[i].transform.position = satellite_position;
-        ar_label_rights[    label_right_i].transform.position = voyager[0].transform.position;
-        ar_label_rights[label_right_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_rights[label_right_i].transform.position));
-        label_right_i++;
 
         //command
         if(cur_spec_i == (int)SPEC.GAM && subtitle_i == subtitle_pause_i_voyager_0 && !advance_passed_voyager_0)
@@ -2372,10 +2346,6 @@ public class Main : MonoBehaviour
     spec_euler = getEuler(very_lazy_look_ahead);
     spec_euler.x = -3.141592f / 3f;
     spec_projection.transform.rotation = rotationFromEuler(spec_euler);
-
-    satellite_position += satellite_velocity * Time.deltaTime;
-    if(cur_scene_i != 1)
-      satellite_position = default_satellite_position;
 
     if(in_portal_motion > 0)
     {
