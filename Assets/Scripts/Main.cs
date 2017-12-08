@@ -2424,7 +2424,10 @@ public class Main : MonoBehaviour
     if(distance_neu < distance_gam && distance_neu < distance_viz) spec_trigger.position = spec_neu_reticle.transform.position;
     if(cur_scene_i == (int)SCENE.VOYAGER && !voiceovers_played[cur_scene_i,(int)SPEC.GAM]) spec_trigger.position = spec_gam_reticle.transform.position; //ensure you can only select gamma to start voyager selection
 
-    if(!advance_paused && spec_projection.activeSelf && spec_trigger.tick(cam_reticle.transform.position,Time.deltaTime))
+    if(
+      !(cur_scene_i == (int)SCENE.VOYAGER && voiceover_was_playing) &&
+      !advance_paused && spec_projection.activeSelf && spec_trigger.tick(cam_reticle.transform.position,Time.deltaTime)
+      )
     {
       if(spec_trigger.just_triggered)
       {
