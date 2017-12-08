@@ -60,6 +60,14 @@ public class Main : MonoBehaviour
       return ret;
     }
 
+    public void reset()
+    {
+      this.t_in           = 0f;
+      this.t_numb         = 0f;
+      this.just_in        = false;
+      this.just_triggered = false;
+    }
+
   }
 
   public string[] credit_strings = new string[]
@@ -463,6 +471,7 @@ public class Main : MonoBehaviour
   string[,] layer_names;
   GameObject[,] scene_groups;
   float[,] ta; //"time alive" (timed amt in scene/spectrum pairs)
+  int[] blackhole_spec_triggered;
   float scan_t = 5f; //time required before you can consider a spectrum "scanned"
   int default_layer;
 
@@ -482,6 +491,7 @@ public class Main : MonoBehaviour
   gaze_trigger advance_trigger;
   gaze_trigger spec_trigger;
   gaze_trigger warp_trigger;
+  gaze_trigger blackhole_trigger;
 
   float dumb_delay_t_max; //prevent anything interesting til this point
   float dumb_delay_t;
@@ -564,6 +574,9 @@ public class Main : MonoBehaviour
       for(int j = 0; j < (int)SPEC.COUNT; j++)
         ta[i,j] = 0;
 
+    for(int i = 0; i < (int)SPEC.COUNT; i++)
+      blackhole_spec_triggered[i] = 0;
+
     for(int i = 0; i < (int)SCENE.COUNT; i++)
       scene_rots[i] = 0f;
 
@@ -591,11 +604,6 @@ public class Main : MonoBehaviour
     out_fail_motion = 0;
     max_fail_motion = 1;
 
-    advance_trigger = new gaze_trigger();
-    spec_trigger    = new gaze_trigger();
-    warp_trigger    = new gaze_trigger();
-    warp_trigger.t_max_numb = 4f;
-
     dumb_delay_t_max = 3f;
     dumb_delay_t = 0f;
 
@@ -608,6 +616,11 @@ public class Main : MonoBehaviour
     gazeball.SetActive(false);
     ar_alert.SetActive(false);
     ar_timer.SetActive(false);
+
+    advance_trigger.reset();
+    spec_trigger.reset();
+    warp_trigger.reset();
+    blackhole_trigger.reset();
 
     ga.StartSession();
   }
@@ -1259,6 +1272,14 @@ public class Main : MonoBehaviour
 
     ta = new float[(int)SCENE.COUNT, (int)SPEC.COUNT];
 
+    blackhole_spec_triggered = new int[(int)SPEC.COUNT];
+
+    advance_trigger = new gaze_trigger();
+    spec_trigger    = new gaze_trigger();
+    warp_trigger    = new gaze_trigger();
+    warp_trigger.t_max_numb = 4f;
+    blackhole_trigger = new gaze_trigger();
+
     default_layer = LayerMask.NameToLayer("Default");
 
     camera_house = GameObject.Find("CameraHouse");
@@ -1661,6 +1682,12 @@ public class Main : MonoBehaviour
     gaze_reticle.SetActive(false);
 
     main_camera_skybox.material = skyboxes[cur_scene_i, cur_spec_i];
+
+    if(cur_scene_i != (int)SCENE.ICE)
+    {
+      gazeray.SetActive(true);
+      gazeball.SetActive(true);
+    }
 
     AnimationCurve curve;
     float lw;
@@ -2075,6 +2102,29 @@ public class Main : MonoBehaviour
         float seconds_left = 60 - timer_t;
         if(seconds_left > 0)
         {
+          if(blackhole_spec_triggered[cur_spec_i] == 0)
+          {
+            if(!gaze_reticle.activeSelf) gaze_reticle.SetActive(true);
+            gaze_projection.transform.rotation = rotationFromEuler(getCamEuler(blackhole[0].transform.position));
+            blackhole_trigger.position = gaze_reticle.transform.position;
+            if(blackhole_trigger.tick(cam_reticle.transform.position,Time.deltaTime))
+            {
+              if(blackhole_trigger.just_triggered)
+              {
+                gaze_reticle.SetActive(false);
+                blackhole_spec_triggered[cur_spec_i] = 1;
+                blackhole_trigger.reset();
+                bool all_done = true;
+                for(int i = 0; i < (int)SPEC.COUNT; i++) all_done = (all_done && blackhole_spec_triggered[i] == 1);
+                if(all_done)
+                {
+                  gaze_projection.transform.rotation = rotationFromEuler(anti_gaze_cam_euler);
+                  gaze_reticle.SetActive(true);
+                }
+              }
+            }
+          }
+
           ar_timer_text.text = "00:" + Mathf.Floor(seconds_left) + ":" + Mathf.Floor((seconds_left - Mathf.Floor(seconds_left)) * 100);
           float bar_y = -2;
           float bar_x = -11;
@@ -2082,7 +2132,8 @@ public class Main : MonoBehaviour
           bool play_end = true;
           for(int i = 0; i < (int)SPEC.COUNT; i++)
           {
-            float t = Mathf.Min(1,(ta[cur_scene_i,i]/scan_t));
+            float t = blackhole_spec_triggered[i];
+            if(t == 0 && i == cur_spec_i) t = Mathf.Min(1f,(blackhole_trigger.t_in/blackhole_trigger.t_max));
             ar_progress_lines[i].SetPosition(1, new Vector3(bar_x+bar_w*t, bar_y, 0));
             if(t == 1 && !ar_checks[i].activeSelf)
             {
@@ -2172,6 +2223,8 @@ public class Main : MonoBehaviour
     portal_camera_next.GetComponent<Camera>().cullingMask = (1 << layers[next_scene_i, (int)SPEC.VIZ]);
     main_camera_skybox.material = skyboxes[cur_scene_i, cur_spec_i];
     portal_camera_next_skybox.material = skyboxes[next_scene_i, (int)SPEC.VIZ];
+
+    if(cur_scene_i == (int)SCENE.EXTREME) blackhole_trigger.reset();
   }
 
   float nwave_t_1 = 0;
