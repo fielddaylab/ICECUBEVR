@@ -141,7 +141,8 @@ public class Main : MonoBehaviour
   GameObject[] ar_progresses;
   GameObject[] ar_progress_offsets;
   LineRenderer[] ar_progress_lines;
-  GameObject[] ar_checks;
+  GameObject[] ar_label_checks;
+  GameObject[] ar_spec_checks;
 
   GameObject[] icecube;
   GameObject[] pluto;
@@ -1347,7 +1348,8 @@ public class Main : MonoBehaviour
     ar_label_bh_texts = new TextMesh[MAX_LABELS];
 
     //technically isn't connected to max labels, but as there's a label per line, it's at least upper bound
-    ar_checks           = new GameObject[MAX_LABELS];
+    ar_label_checks     = new GameObject[MAX_LABELS];
+    ar_spec_checks      = new GameObject[MAX_LABELS];
     ar_progresses       = new GameObject[MAX_LABELS];
     ar_progress_offsets = new GameObject[MAX_LABELS];
     ar_progress_lines   = new LineRenderer[MAX_LABELS];
@@ -1433,8 +1435,9 @@ public class Main : MonoBehaviour
         k++;
       }
 
-      ar_checks[i] = (GameObject)Instantiate(ar_check_prefab);
-      ar_checks[i].transform.parent = ar_label_bh_kids[i].transform;
+      ar_label_checks[i] = (GameObject)Instantiate(ar_check_prefab);
+      ar_label_checks[i].transform.parent = ar_label_bh_kids[i].transform;
+      ar_spec_checks[i] = (GameObject)Instantiate(ar_check_prefab); //just to ensure full instantiate- actually set details below (unrelated to labels)
 
       ar_progress_offsets[i] = (GameObject)Instantiate(ar_progress_prefab);
       ar_progress_offsets[i].transform.parent = ar_group.transform;
@@ -1444,6 +1447,15 @@ public class Main : MonoBehaviour
       ar_progress_lines[i].widthCurve = curve;
       for(int j = 0; j < 2; j++)
         ar_progress_lines[i].SetPosition(j, new Vector3(0, 0, 0));
+    }
+
+    ar_spec_checks[0].transform.parent = spec_viz_reticle.transform;
+    ar_spec_checks[1].transform.parent = spec_gam_reticle.transform;
+    ar_spec_checks[2].transform.parent = spec_neu_reticle.transform;
+    for(int i = 0; i < 3; i++)
+    {
+      ar_spec_checks[i].transform.localPosition = new Vector3(0.0f,-1.0f,0.0f);
+      ar_spec_checks[i].transform.localScale = new Vector3(1.0f,1.0f,1.0f);
     }
 
     ar_alert.SetActive(false);
@@ -1745,7 +1757,8 @@ public class Main : MonoBehaviour
       ar_label_left_kids[ i].transform.localPosition = new Vector3(0f,0f,0f);
       ar_label_right_kids[i].transform.localPosition = new Vector3(0f,0f,0f);
       ar_label_bh_kids[   i].transform.localPosition = new Vector3(0f,0f,0f);
-      ar_checks[i].SetActive(false);
+      ar_label_checks[i].SetActive(false);
+      ar_spec_checks[i].SetActive(false);
 
       ar_progress_lines[i].widthCurve = curve;
       for(int j = 0; j < 2; j++)
@@ -2172,9 +2185,10 @@ public class Main : MonoBehaviour
             float t = blackhole_spec_triggered[i];
             if(t == 0 && i == cur_spec_i) t = Mathf.Min(1f,(blackhole_trigger.t_in/blackhole_trigger.t_max));
             ar_progress_lines[i].SetPosition(1, new Vector3(bar_x+bar_w*t, bar_y, 0));
-            if(t == 1 && !ar_checks[i].activeSelf)
+            if(t == 1 && !ar_label_checks[i].activeSelf)
             {
-              ar_checks[i].SetActive(true);
+              ar_label_checks[i].SetActive(true);
+              ar_spec_checks[i].SetActive(true);
               PlaySFX(SFX.COMPLETE);
             }
             if(t < 1) play_end = false;
@@ -2345,6 +2359,8 @@ public class Main : MonoBehaviour
     if(in_fail_motion > max_fail_motion)
     {
       //FAIL
+      for(int i = 0; i < (int)SPEC.COUNT; i++)
+        blackhole_spec_triggered[i] = 0;
       out_fail_motion = in_fail_motion-max_fail_motion;
       if(out_fail_motion <= 0) out_fail_motion = 0.00001f;
       in_fail_motion = 0;
