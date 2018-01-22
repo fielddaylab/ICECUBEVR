@@ -746,107 +746,101 @@ public class Main : MonoBehaviour
     j = (int)SPEC.VIZ;
     k = 0;
     subtitle_strings[i,j,k] = "";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 0.001f;
     k++;
-    subtitle_strings[i,j,k] = "Hey!";
-    subtitle_cues_delta[i,j,k] = 1f;
-    k++;
-    subtitle_strings[i,j,k] = "Come in!";
-    subtitle_cues_delta[i,j,k] = 1;
+    subtitle_strings[i,j,k] = "Hey! Come in!";
+    subtitle_cues_delta[i,j,k] = 1f;//1
     k++;
     subtitle_strings[i,j,k] = "... Hello? ...";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 1f;//2
     k++;
     subtitle_strings[i,j,k] = "Sorry, we're still getting the kinks worked out of this new suit.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 2.9f;//4
     k++;
     subtitle_strings[i,j,k] = "Let me know if this is working-";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 1.5f;//6
     k++;
     subtitle_strings[i,j,k] = "I'm booting up the augmented reality overlay in your helmet now...";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 4f;//10
     k++;
     subtitle_strings[i,j,k] = "Ok. Can you look up at the gaze point for me?";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 2.5f;//13
     subtitle_pause_i_ice_0 = k;
     k++;
     subtitle_strings[i,j,k] = "Great! Now look at the one at your feet.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 2f;//15
     subtitle_pause_i_ice_1 = k;
     k++;
     subtitle_strings[i,j,k] = "Alright! Everything seems to be in order.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 2.25f;//16
     k++;
     subtitle_strings[i,j,k] = "Welcome to Ice Cube!";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 2f;//18
     k++;
     subtitle_strings[i,j,k] = "I'm glad you could make it all the way";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 1.5f;//20
     k++;
-    subtitle_strings[i,j,k] = "to antarctica for this mission.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "down to antarctica for this mission.";
+    subtitle_cues_delta[i,j,k] = 1.5f;//22
     k++;
     subtitle_strings[i,j,k] = "Before we send you off,";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 2f;//24
     k++;
     subtitle_strings[i,j,k] = "let's brief you on why you're here:";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 2f;//25
     k++;
     subtitle_strings[i,j,k] = "The Ice Cube Research Facility detects neutrino particles";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 2.75f;//29
     k++;
     subtitle_strings[i,j,k] = "sent from deep out in space.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 1.2f;//30
     k++;
     subtitle_strings[i,j,k] = "I'll show you the sensors on your helmet overlay.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 2f;//32
     k++;
     subtitle_strings[i,j,k] = "See that grid below the facility?";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 2f;//35
     k++;
     subtitle_strings[i,j,k] = "Each dot is a sensor that detects light";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 3f;//38
     k++;
     subtitle_strings[i,j,k] = "from a passing neutrino particle.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 2f;//39
     k++;
-    subtitle_strings[i,j,k] = "Woah! It's just detected one now!";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "Look! It's just detected one now!";
+    subtitle_cues_delta[i,j,k] = 3f;//42
     k++;
-    subtitle_strings[i,j,k] = "This is perfect- we can use the sensor data";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "This is great timing-";
+    subtitle_cues_delta[i,j,k] = 2f;//44
+    k++;
+    subtitle_strings[i,j,k] = "we'll use the sensor data";
+    subtitle_cues_delta[i,j,k] = 1f;//45
     k++;
     subtitle_strings[i,j,k] = "to pinpoint where this came from in outer space...";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 2f;//47
     k++;
     subtitle_strings[i,j,k] = "annnnnd... done!";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 2f;//49
     k++;
-    subtitle_strings[i,j,k] = "Alright, this is where you come in.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "Now your job is to follow this trajectory";
+    subtitle_cues_delta[i,j,k] = 3f;//52
     k++;
-    subtitle_strings[i,j,k] = "We want you to follow this trajectory";
-    subtitle_cues_delta[i,j,k] = 1f;
-    k++;
-    subtitle_strings[i,j,k] = "out into space to find out what it is";
-    subtitle_cues_delta[i,j,k] = 1f;
-    k++;
-    subtitle_strings[i,j,k] = "that's shooting these neutrino particles at us.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "out into space to find the source";
+    subtitle_cues_delta[i,j,k] = 2f;//54
     k++;
     subtitle_strings[i,j,k] = "You're going to use your suit's Impossible Drive";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 3f;//57
     k++;
-    subtitle_strings[i,j,k] = "to follow the path of the neutrino-";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "and follow the path of the neutrino-";
+    subtitle_cues_delta[i,j,k] = 2f;//59
     k++;
-    subtitle_strings[i,j,k] = "don't worry, all you have do to is";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "All you have do to is";
+    subtitle_cues_delta[i,j,k] = 1f;//60
     k++;
     subtitle_strings[i,j,k] = "look at the gaze point at the end of the path...";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 2f;//62
     k++;
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 2f;
     k++;
 
     j = (int)SPEC.COUNT;
@@ -862,55 +856,55 @@ public class Main : MonoBehaviour
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
     subtitle_strings[i,j,k] = "Hello? ...";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 0.5f;//1
     k++;
     subtitle_strings[i,j,k] = "You still there?";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 0.5f;//1
     k++;
-    subtitle_strings[i,j,k] = "Alright, made it in one piece.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "Did you make it in one piece?";
+    subtitle_cues_delta[i,j,k] = 1f;//2
     k++;
     subtitle_strings[i,j,k] = "Take a second to look around and find your bearings-";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 3f;//5
     k++;
     subtitle_strings[i,j,k] = "it's probably pretty cool to be";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 2f;//7
     k++;
-    subtitle_strings[i,j,k] = "further out in space than any other human!";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "further out in space than any other human has ever been!";
+    subtitle_cues_delta[i,j,k] = 2f;//9
     k++;
-    subtitle_strings[i,j,k] = "That said- we have a job to do.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "Now you have a job to do.";
+    subtitle_cues_delta[i,j,k] = 2f;//11
     k++;
-    subtitle_strings[i,j,k] = "You have to follow the path of the neutrino";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "Follow the path of the neutrino";
+    subtitle_cues_delta[i,j,k] = 2f;//13
     k++;
-    subtitle_strings[i,j,k] = "that was detected by the Ice Cube Research facility";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "that was detected by Ice Cube";
+    subtitle_cues_delta[i,j,k] = 1f;//14
     k++;
-    subtitle_strings[i,j,k] = "to find out what's at the other end.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "to discover the source.";
+    subtitle_cues_delta[i,j,k] = 2f;//16
     k++;
     subtitle_strings[i,j,k] = "While we're waiting for the Impossible Drive to recharge,";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 3f;//19
     k++;
     subtitle_strings[i,j,k] = "let's go over some other features of your suit.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 2f;//21
     k++;
     subtitle_strings[i,j,k] = "If you look at your feet,";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 2f;//23
     k++;
     subtitle_strings[i,j,k] = "you can use the gaze points to";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 1f;//24
     k++;
-    subtitle_strings[i,j,k] = "switch out your helmet viewer.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "switch out your helmet's view.";
+    subtitle_cues_delta[i,j,k] = 2f;//26
     k++;
     subtitle_strings[i,j,k] = "Go ahead-";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 1f;//27
     k++;
-    subtitle_strings[i,j,k] = "look at your feet and switch to xray vision.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "look at your feet and switch to xray view.";
+    subtitle_cues_delta[i,j,k] = 3f;//30
     k++;
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
@@ -921,29 +915,32 @@ public class Main : MonoBehaviour
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
     subtitle_strings[i,j,k] = "Pretty great, right?";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 2f;//2
     k++;
     subtitle_strings[i,j,k] = "Look around- check out the galaxy!";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 2f;//4
     k++;
     subtitle_strings[i,j,k] = "This is what the universe looks like when we see with xrays.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 4f;//8
     k++;
     subtitle_strings[i,j,k] = "Your helmet is detecting xrays";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 2f;//10
     k++;
-    subtitle_strings[i,j,k] = "in the same way your eye would _normally_ detect light.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "in the same way your eye would normally detect light.";
+    subtitle_cues_delta[i,j,k] = 2f;//12
     k++;
     subtitle_strings[i,j,k] = "Can you look at pluto for a second?";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 2f;//14
     subtitle_pause_i_voyager_0 = k;
     k++;
-    subtitle_strings[i,j,k] = "See how it's a big black ball? Not very interesting.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "See how it's just a big black ball?";
+    subtitle_cues_delta[i,j,k] = 2f;//16
+    k++;
+    subtitle_strings[i,j,k] = "That's because xrays don't pass through it.";
+    subtitle_cues_delta[i,j,k] = 3f;//19
     k++;
     subtitle_strings[i,j,k] = "Now, let's switch to neutrino vision.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 2f;//21
     k++;
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
@@ -954,29 +951,32 @@ public class Main : MonoBehaviour
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
     subtitle_strings[i,j,k] = "Alright- look back to pluto:";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 2f;//2
     subtitle_pause_i_voyager_1 = k;
     k++;
     subtitle_strings[i,j,k] = "where'd it go?!";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 1f;//3
     k++;
-    subtitle_strings[i,j,k] = "Your helmet is now only sensing neutrino particles:";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "Pluto seems to have disappeared!";
+    subtitle_cues_delta[i,j,k] = 1f;//4
     k++;
-    subtitle_strings[i,j,k] = "but neutrinos pass through just about all matter!";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "Your helmet is now only sensing neutrino particles.";
+    subtitle_cues_delta[i,j,k] = 3f;//7
+    k++;
+    subtitle_strings[i,j,k] = "Neutrinos pass through just about everything,";
+    subtitle_cues_delta[i,j,k] = 3f;//10
+    k++;
+    subtitle_strings[i,j,k] = "Even whole planets!";
+    subtitle_cues_delta[i,j,k] = 1f;//11
     k++;
     subtitle_strings[i,j,k] = "It's like pluto doesn't even exist to them!";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 3f;//13
     k++;
-    subtitle_strings[i,j,k] = "Your Impossible Drive is almost done recharging-";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "When you're ready,";
+    subtitle_cues_delta[i,j,k] = 0.5f;//15
     k++;
-    subtitle_strings[i,j,k] = "we've got to keep following this neutrino that was detected by Ice Cube.";
-    subtitle_cues_delta[i,j,k] = 1f;
-    k++;
-    subtitle_strings[i,j,k] = "Look to the end of the path when you're ready!";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "Look to the gaze point at the end of the neutrino path.";
+    subtitle_cues_delta[i,j,k] = 2.5f;//18
     k++;
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
@@ -996,74 +996,77 @@ public class Main : MonoBehaviour
     subtitle_strings[i,j,k] = "";
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
-    subtitle_strings[i,j,k] = "Woah.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "We're getting some... pretty intense readings.";
+    subtitle_cues_delta[i,j,k] = 2f;//2
     k++;
-    subtitle_strings[i,j,k] = "I'm getting some... pretty intense readings.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "You're... really far out in space.";
+    subtitle_cues_delta[i,j,k] = 3f;//5
     k++;
-    subtitle_strings[i,j,k] = "You're... _really_ far out in space.";
-    subtitle_cues_delta[i,j,k] = 1f;
-    k++;
-    subtitle_strings[i,j,k] = "While your Impossible Drive is recharging,";
-    subtitle_cues_delta[i,j,k] = 1f;
-    k++;
-    subtitle_strings[i,j,k] = "I figure I should let you in on the details of your mission.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "Ok- time to brief you with the details of your mission.";
+    subtitle_cues_delta[i,j,k] = 3f;//8
     k++;
     subtitle_strings[i,j,k] = "As you've seen, we've given your suit the ability";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 3f;//11
     k++;
     subtitle_strings[i,j,k] = "to see in three different ways:";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 1f;//12
     k++;
     subtitle_strings[i,j,k] = "visible light, xray vision, and neutrino detection.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 4f;//16
     k++;
-    subtitle_strings[i,j,k] = "These are three things scientists often look for";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "The first two have been used for decades to look out into space.";
+    subtitle_cues_delta[i,j,k] = 4f;//20
     k++;
-    subtitle_strings[i,j,k] = "to see what's in outer space.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "But if we want to see really far,";
+    subtitle_cues_delta[i,j,k] = 2f;//22
     k++;
-    subtitle_strings[i,j,k] = "But until now, neutrinos have been one of";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "Neutrinos are the only thing that will work.";
+    subtitle_cues_delta[i,j,k] = 2f;//24
     k++;
-    subtitle_strings[i,j,k] = "the only things that really make it to earth from this far out-";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "That's why we need the Ice Cube Observatory.";
+    subtitle_cues_delta[i,j,k] = 3f;//27
     k++;
-    subtitle_strings[i,j,k] = "and we need the Ice Cube Facility in antartica to have any chance at catching them!";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "The arrays of sensors in antartica";
+    subtitle_cues_delta[i,j,k] = 3f;//30
     k++;
-    subtitle_strings[i,j,k] = "Now that you're out there,";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "allow us to detect neutrinos from deep space.";
+    subtitle_cues_delta[i,j,k] = 2f;//32
     k++;
-    subtitle_strings[i,j,k] = "we want you to scan the source of this neutrino";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "That helps us map out parts of the universe";
+    subtitle_cues_delta[i,j,k] = 3f;//35
     k++;
-    subtitle_strings[i,j,k] = "we've detected back at earth.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "invisible to other telescopes.";
+    subtitle_cues_delta[i,j,k] = 1f;//36
     k++;
-    subtitle_strings[i,j,k] = "You'll have to scan it using each";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "The question you have to answer is:";
+    subtitle_cues_delta[i,j,k] = 3f;//39
     k++;
-    subtitle_strings[i,j,k] = "of the three method's we've given you.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "What sent the neutrino that";
+    subtitle_cues_delta[i,j,k] = 2f;//41
     k++;
-    subtitle_strings[i,j,k] = "Do you hear me?";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "Ice Cube detected back at earth?";
+    subtitle_cues_delta[i,j,k] = 2f;//43
     k++;
-    subtitle_strings[i,j,k] = "When you get to the source of the neutrino,";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "When you find the source at the end of your journey,";
+    subtitle_cues_delta[i,j,k] = 3f;//46
     k++;
-    subtitle_strings[i,j,k] = "we want you to scan it using each one of your available vision modules.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "you'll need to collect data from it";
+    subtitle_cues_delta[i,j,k] = 1f;//47
+    k++;
+    subtitle_strings[i,j,k] = "using each of the three methods we've given you.";
+    subtitle_cues_delta[i,j,k] = 2f;//49
+    k++;
+    subtitle_strings[i,j,k] = "You'll use your visible light,";
+    subtitle_cues_delta[i,j,k] = 2f;//51
+    k++;
+    subtitle_strings[i,j,k] = "XRay, and Neutrino view to collect these readings.";
+    subtitle_cues_delta[i,j,k] = 4f;//55
     k++;
     subtitle_strings[i,j,k] = "Ok. Things might get dicey going forward.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 4f;//59
     k++;
     subtitle_strings[i,j,k] = "Good luck.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 3f;//61
     k++;
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
@@ -1083,23 +1086,30 @@ public class Main : MonoBehaviour
     subtitle_strings[i,j,k] = "";
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
-    subtitle_strings[i,j,k] = "-ello--?!..";
+    subtitle_strings[i,j,k] = "Look at the black hole to collect the data!";
+    subtitle_cues_delta[i,j,k] = 4f;
+    k++;
+    subtitle_cues_delta[i,j,k] = 2f;
+    k++;
+
+    j = (int)SPEC.GAM;
+    k = 0;
+    subtitle_strings[i,j,k] = "";
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
-    subtitle_strings[i,j,k] = "-ome in!!!-..";
+    subtitle_strings[i,j,k] = "Look up at the black hole, and collect the XRay readings!";
+    subtitle_cues_delta[i,j,k] = 4f;
+    k++;
+    subtitle_cues_delta[i,j,k] = 2f;
+    k++;
+
+    j = (int)SPEC.NEU;
+    k = 0;
+    subtitle_strings[i,j,k] = "";
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
-    subtitle_strings[i,j,k] = ".@%  -t's -.!@ -LACK HOLE!-.-%#";
-    subtitle_cues_delta[i,j,k] = 1f;
-    k++;
-    subtitle_strings[i,j,k] = "You need -o SCAN IT WIT-..";
-    subtitle_cues_delta[i,j,k] = 1f;
-    k++;
-    subtitle_strings[i,j,k] = "-ACH OF YOUR VISI-..@$ MODULES!--";
-    subtitle_cues_delta[i,j,k] = 1f;
-    k++;
-    subtitle_strings[i,j,k] = "..-o it quick--ly and GET OUT OF THER---1!!...";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "Look back at the black hole, and collect the neutrino readings!";
+    subtitle_cues_delta[i,j,k] = 4f;
     k++;
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
@@ -1109,14 +1119,11 @@ public class Main : MonoBehaviour
     subtitle_strings[i,j,k] = "";
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
-    subtitle_strings[i,j,k] = "-e -ave the data-%!!!";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "You did it! We have the data!";
+    subtitle_cues_delta[i,j,k] = 3f;
     k++;
-    subtitle_strings[i,j,k] = "-ollow th-.. neutrino particle's -../ath";
-    subtitle_cues_delta[i,j,k] = 1f;
-    k++;
-    subtitle_strings[i,j,k] = "back t-.. earth!...-- HURRY!";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "Now follow the neutrino path back to earth!";
+    subtitle_cues_delta[i,j,k] = 3f;
     k++;
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
@@ -1129,67 +1136,70 @@ public class Main : MonoBehaviour
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
     subtitle_strings[i,j,k] = "Wow! You did it!";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 2f;//2
     k++;
-    subtitle_strings[i,j,k] = "I... I can't believe you're alive!";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "I... can't believe you're alive!";
+    subtitle_cues_delta[i,j,k] = 0.5f;//2
     k++;
     subtitle_strings[i,j,k] = "....I mean, congratulations, agent!";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 1.5f;//4
     k++;
-    subtitle_strings[i,j,k] = "So... yeah- it looks like the source";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "It looks like the source";
+    subtitle_cues_delta[i,j,k] = 2f;//6
     k++;
     subtitle_strings[i,j,k] = "of the neutrino particle we detected with Ice Cube";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 3f;//9
     k++;
     subtitle_strings[i,j,k] = "was a black hole!";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 1f;//10
     k++;
-    subtitle_strings[i,j,k] = "Black holes are _extreme_ objects...";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "Black holes are one of the strangest,";
+    subtitle_cues_delta[i,j,k] = 2f;//12
     k++;
-    subtitle_strings[i,j,k] = "I.. well I mean I guess you know that... but... anyways:";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "most extreme objects in the whole universe!";
+    subtitle_cues_delta[i,j,k] = 2f;//14
     k++;
-    subtitle_strings[i,j,k] = "they emit _really high energy_ neutrinos.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "Did you know that black holes can have the mass";
+    subtitle_cues_delta[i,j,k] = 3f;//17
     k++;
-    subtitle_strings[i,j,k] = "But because neutrinos pass through most matter";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "of several million suns?";
+    subtitle_cues_delta[i,j,k] = 2f;//19
     k++;
-    subtitle_strings[i,j,k] = "-as you saw with pluto-,";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "One spoonful of black hole could weigh as much";
+    subtitle_cues_delta[i,j,k] = 3f;//22
     k++;
-    subtitle_strings[i,j,k] = "they're _really hard to detect_.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "as a whole planet!";
+    subtitle_cues_delta[i,j,k] = 1f;//23
     k++;
-    subtitle_strings[i,j,k] = "Fortunately, ICE CUBE has found a way to catch em!";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "They also emit high energy neutrinos";
+    subtitle_cues_delta[i,j,k] = 3f;//26
     k++;
-    subtitle_strings[i,j,k] = "So, we at Ice Cube, cought a neutrino that was emitted from a black hole,";
-    subtitle_cues_delta[i,j,k] = 1f;
-    k++;
-    subtitle_strings[i,j,k] = "millions of light years away!";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "that travel millions of lightyears back to earth.";
+    subtitle_cues_delta[i,j,k] = 2f;//28
     k++;
     subtitle_strings[i,j,k] = "It would have gone totally unnoticed";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 3f;//31
     k++;
-    subtitle_strings[i,j,k] = "if it weren't for the brilliant scientists";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "if it weren't for the scientists at Ice Cube.";
+    subtitle_cues_delta[i,j,k] = 2f;//33
     k++;
-    subtitle_strings[i,j,k] = "working in antartica.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_strings[i,j,k] = "Black holes are very hard to detect-";
+    subtitle_cues_delta[i,j,k] = 3f;//36
+    k++;
+    subtitle_strings[i,j,k] = "well- because they're black!";
+    subtitle_cues_delta[i,j,k] = 1f;//37
+    k++;
+    subtitle_strings[i,j,k] = "It's impossible to see something black on a black background of space!";
+    subtitle_cues_delta[i,j,k] = 4f;//41
+    k++;
+    subtitle_strings[i,j,k] = "Fortunately, ICE CUBE has found a way to observe them using neutrinos!";
+    subtitle_cues_delta[i,j,k] = 4f;//45
     k++;
     subtitle_strings[i,j,k] = "Well, that's mission complete on our end.";
-    subtitle_cues_delta[i,j,k] = 1f;
-    k++;
-    subtitle_strings[i,j,k] = "We'll let you enjoy your little space walk.";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 4f;//49
     k++;
     subtitle_strings[i,j,k] = "Until next time!";
-    subtitle_cues_delta[i,j,k] = 1f;
+    subtitle_cues_delta[i,j,k] = 1f;//50
     k++;
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
@@ -1520,7 +1530,7 @@ public class Main : MonoBehaviour
       vearth[i].transform.position = anti_gaze_pt;
       nearth[i].transform.position = anti_gaze_pt;
     }
-    earth[0].transform.position = anti_gaze_pt.normalized*600;
+    earth[0].transform.position = anti_gaze_pt.normalized*600+new Vector3(0.0f,500.0f,0.0f);
 
     scene_centers[(int)SCENE.ICE]     = icecube[  0].transform.position;
     scene_centers[(int)SCENE.VOYAGER] = pluto[    0].transform.position;
@@ -2016,9 +2026,9 @@ public class Main : MonoBehaviour
 
       case (int)SCENE.ICE:
 
-        float grid_t = 7f+dumb_delay_t_max;
-        float pulse_t = 15f+dumb_delay_t_max;
-        float beam_t = 17f+dumb_delay_t_max;
+        float grid_t = 32f+dumb_delay_t_max;
+        float pulse_t = 42f+dumb_delay_t_max;
+        float beam_t = 49f+dumb_delay_t_max;
 
         //pulse
         if(cur_ta < pulse_t) nwave_t_10 = 0;
@@ -2227,7 +2237,7 @@ public class Main : MonoBehaviour
 
       case (int)SCENE.EARTH:
 
-        earth[0].transform.position = anti_gaze_pt.normalized*600;
+        earth[0].transform.position = anti_gaze_pt.normalized*600+new Vector3(0.0f,500.0f,0.0f);
 
         break;
 
