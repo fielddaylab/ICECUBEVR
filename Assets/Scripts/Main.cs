@@ -569,8 +569,7 @@ public class Main : MonoBehaviour
     voiceovers_played[(int)SCENE.ICE,(int)SPEC.GAM]     = true;
     voiceovers_played[(int)SCENE.NOTHING,(int)SPEC.NEU] = true;
     voiceovers_played[(int)SCENE.NOTHING,(int)SPEC.GAM] = true;
-    voiceovers_played[(int)SCENE.EXTREME,(int)SPEC.NEU] = true;
-    voiceovers_played[(int)SCENE.EXTREME,(int)SPEC.GAM] = true;
+    voiceovers_played[(int)SCENE.EARTH,(int)SPEC.VIZ]   = true;
     voiceovers_played[(int)SCENE.EARTH,(int)SPEC.NEU]   = true;
     voiceovers_played[(int)SCENE.EARTH,(int)SPEC.GAM]   = true;
     voiceovers_played[(int)SCENE.CREDITS,(int)SPEC.NEU] = true;
@@ -1086,7 +1085,28 @@ public class Main : MonoBehaviour
     subtitle_strings[i,j,k] = "";
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
-    subtitle_strings[i,j,k] = "Look down and select XRay!";
+    subtitle_strings[i,j,k] = "Hello?";
+    subtitle_cues_delta[i,j,k] = 1f;
+    k++;
+    subtitle_strings[i,j,k] = "Do you read me?";
+    subtitle_cues_delta[i,j,k] = 1f;
+    k++;
+    subtitle_strings[i,j,k] = "You've discovered a black hole!";
+    subtitle_cues_delta[i,j,k] = 3f;
+    k++;
+    subtitle_strings[i,j,k] = "You need to scan it with each";
+    subtitle_cues_delta[i,j,k] = 2f;
+    k++;
+    subtitle_strings[i,j,k] = "of your vision modules quickly!";
+    subtitle_cues_delta[i,j,k] = 2f;
+    k++;
+    subtitle_strings[i,j,k] = "Then get OUT of there!";
+    subtitle_cues_delta[i,j,k] = 3f;
+    k++;
+    subtitle_strings[i,j,k] = "Make sure you've selected visibile light vision-";
+    subtitle_cues_delta[i,j,k] = 2f;
+    k++;
+    subtitle_strings[i,j,k] = "look at the black hole and collect visible light readings!";
     subtitle_cues_delta[i,j,k] = 4f;
     k++;
     subtitle_cues_delta[i,j,k] = 2f;
@@ -1129,8 +1149,34 @@ public class Main : MonoBehaviour
     k++;
 
     //EARTH
-    i = (int)SCENE.EARTH;
     j = (int)SPEC.VIZ;
+    k = 0;
+    subtitle_strings[i,j,k] = "";
+    subtitle_cues_delta[i,j,k] = 1f;
+    k++;
+    subtitle_cues_delta[i,j,k] = 1f;
+    k++;
+
+
+    j = (int)SPEC.GAM;
+    k = 0;
+    subtitle_strings[i,j,k] = "";
+    subtitle_cues_delta[i,j,k] = 1f;
+    k++;
+    subtitle_cues_delta[i,j,k] = 1f;
+    k++;
+
+
+    j = (int)SPEC.NEU;
+    k = 0;
+    subtitle_strings[i,j,k] = "";
+    subtitle_cues_delta[i,j,k] = 1f;
+    k++;
+    subtitle_cues_delta[i,j,k] = 1f;
+    k++;
+
+    i = (int)SCENE.EARTH;
+    j = (int)SPEC.COUNT;
     k = 0;
     subtitle_strings[i,j,k] = "";
     subtitle_cues_delta[i,j,k] = 1f;
@@ -1200,14 +1246,6 @@ public class Main : MonoBehaviour
     k++;
     subtitle_strings[i,j,k] = "Until next time!";
     subtitle_cues_delta[i,j,k] = 1f;//50
-    k++;
-    subtitle_cues_delta[i,j,k] = 1f;
-    k++;
-
-    j = (int)SPEC.COUNT;
-    k = 0;
-    subtitle_strings[i,j,k] = "";
-    subtitle_cues_delta[i,j,k] = 1f;
     k++;
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
