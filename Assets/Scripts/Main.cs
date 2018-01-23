@@ -1086,7 +1086,7 @@ public class Main : MonoBehaviour
     subtitle_strings[i,j,k] = "";
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
-    subtitle_strings[i,j,k] = "Look at the black hole to collect the data!";
+    subtitle_strings[i,j,k] = "Look down and select XRay!";
     subtitle_cues_delta[i,j,k] = 4f;
     k++;
     subtitle_cues_delta[i,j,k] = 2f;
@@ -1530,7 +1530,7 @@ public class Main : MonoBehaviour
       vearth[i].transform.position = anti_gaze_pt;
       nearth[i].transform.position = anti_gaze_pt;
     }
-    earth[0].transform.position = anti_gaze_pt.normalized*600+new Vector3(0.0f,500.0f,0.0f);
+    earth[0].transform.position = anti_gaze_pt.normalized*600+new Vector3(0.0f,0.0f,0.0f);
 
     scene_centers[(int)SCENE.ICE]     = icecube[  0].transform.position;
     scene_centers[(int)SCENE.VOYAGER] = pluto[    0].transform.position;
