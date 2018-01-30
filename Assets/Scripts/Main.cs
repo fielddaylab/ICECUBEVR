@@ -569,7 +569,6 @@ public class Main : MonoBehaviour
     voiceovers_played[(int)SCENE.ICE,(int)SPEC.GAM]     = true;
     voiceovers_played[(int)SCENE.NOTHING,(int)SPEC.NEU] = true;
     voiceovers_played[(int)SCENE.NOTHING,(int)SPEC.GAM] = true;
-    voiceovers_played[(int)SCENE.EARTH,(int)SPEC.VIZ]   = true;
     voiceovers_played[(int)SCENE.EARTH,(int)SPEC.NEU]   = true;
     voiceovers_played[(int)SCENE.EARTH,(int)SPEC.GAM]   = true;
     voiceovers_played[(int)SCENE.CREDITS,(int)SPEC.NEU] = true;
@@ -928,7 +927,7 @@ public class Main : MonoBehaviour
     subtitle_strings[i,j,k] = "in the same way your eye would normally detect light.";
     subtitle_cues_delta[i,j,k] = 2f;//12
     k++;
-    subtitle_strings[i,j,k] = "Can you look at pluto for a second?";
+    subtitle_strings[i,j,k] = "Can you look at Pluto for a second?";
     subtitle_cues_delta[i,j,k] = 2f;//14
     subtitle_pause_i_voyager_0 = k;
     k++;
@@ -949,7 +948,7 @@ public class Main : MonoBehaviour
     subtitle_strings[i,j,k] = "";
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
-    subtitle_strings[i,j,k] = "Alright- look back to pluto:";
+    subtitle_strings[i,j,k] = "Alright- look back to Pluto:";
     subtitle_cues_delta[i,j,k] = 2f;//2
     subtitle_pause_i_voyager_1 = k;
     k++;
@@ -968,7 +967,7 @@ public class Main : MonoBehaviour
     subtitle_strings[i,j,k] = "Even whole planets!";
     subtitle_cues_delta[i,j,k] = 1f;//11
     k++;
-    subtitle_strings[i,j,k] = "It's like pluto doesn't even exist to them!";
+    subtitle_strings[i,j,k] = "It's like Pluto doesn't even exist to them!";
     subtitle_cues_delta[i,j,k] = 3f;//13
     k++;
     subtitle_strings[i,j,k] = "When you're ready,";
@@ -1022,7 +1021,7 @@ public class Main : MonoBehaviour
     subtitle_strings[i,j,k] = "Neutrinos are the only thing that will work.";
     subtitle_cues_delta[i,j,k] = 2f;//24
     k++;
-    subtitle_strings[i,j,k] = "That's why we need the Ice Cube Observatory.";
+    subtitle_strings[i,j,k] = "That's why we need the Ice Cube observatory.";
     subtitle_cues_delta[i,j,k] = 3f;//27
     k++;
     subtitle_strings[i,j,k] = "The arrays of sensors in antartica";
@@ -1149,34 +1148,8 @@ public class Main : MonoBehaviour
     k++;
 
     //EARTH
-    j = (int)SPEC.VIZ;
-    k = 0;
-    subtitle_strings[i,j,k] = "";
-    subtitle_cues_delta[i,j,k] = 1f;
-    k++;
-    subtitle_cues_delta[i,j,k] = 1f;
-    k++;
-
-
-    j = (int)SPEC.GAM;
-    k = 0;
-    subtitle_strings[i,j,k] = "";
-    subtitle_cues_delta[i,j,k] = 1f;
-    k++;
-    subtitle_cues_delta[i,j,k] = 1f;
-    k++;
-
-
-    j = (int)SPEC.NEU;
-    k = 0;
-    subtitle_strings[i,j,k] = "";
-    subtitle_cues_delta[i,j,k] = 1f;
-    k++;
-    subtitle_cues_delta[i,j,k] = 1f;
-    k++;
-
     i = (int)SCENE.EARTH;
-    j = (int)SPEC.COUNT;
+    j = (int)SPEC.VIZ;
     k = 0;
     subtitle_strings[i,j,k] = "";
     subtitle_cues_delta[i,j,k] = 1f;
@@ -1249,6 +1222,31 @@ public class Main : MonoBehaviour
     k++;
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
+
+    j = (int)SPEC.GAM;
+    k = 0;
+    subtitle_strings[i,j,k] = "";
+    subtitle_cues_delta[i,j,k] = 1f;
+    k++;
+    subtitle_cues_delta[i,j,k] = 1f;
+    k++;
+
+    j = (int)SPEC.NEU;
+    k = 0;
+    subtitle_strings[i,j,k] = "";
+    subtitle_cues_delta[i,j,k] = 1f;
+    k++;
+    subtitle_cues_delta[i,j,k] = 1f;
+    k++;
+
+    j = (int)SPEC.COUNT;
+    k = 0;
+    subtitle_strings[i,j,k] = "";
+    subtitle_cues_delta[i,j,k] = 1f;
+    k++;
+    subtitle_cues_delta[i,j,k] = 1f;
+    k++;
+
 
     //CREDITS
     i = (int)SCENE.CREDITS;
@@ -2298,7 +2296,7 @@ public class Main : MonoBehaviour
 
     }
 
-    if(!gaze_reticle.activeSelf && voiceovers_played[cur_scene_i,(int)SPEC.COUNT])
+    if(!gaze_reticle.activeSelf && voiceovers_played[cur_scene_i,(int)SPEC.COUNT] && cur_scene_i != (int)SCENE.CREDITS)
       gaze_reticle.SetActive(true);
   }
 
