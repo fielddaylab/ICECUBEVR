@@ -902,7 +902,7 @@ public class Main : MonoBehaviour
     subtitle_strings[i,j,k] = "Go ahead-";
     subtitle_cues_delta[i,j,k] = 1f;//27
     k++;
-    subtitle_strings[i,j,k] = "look at your feet and switch to xray view.";
+    subtitle_strings[i,j,k] = "look at your feet and switch to X-ray view.";
     subtitle_cues_delta[i,j,k] = 3f;//30
     k++;
     subtitle_cues_delta[i,j,k] = 1f;
@@ -919,10 +919,10 @@ public class Main : MonoBehaviour
     subtitle_strings[i,j,k] = "Look around- check out the galaxy!";
     subtitle_cues_delta[i,j,k] = 2f;//4
     k++;
-    subtitle_strings[i,j,k] = "This is what the universe looks like when we see with xrays.";
+    subtitle_strings[i,j,k] = "This is what the universe looks like when we see with X-rays.";
     subtitle_cues_delta[i,j,k] = 4f;//8
     k++;
-    subtitle_strings[i,j,k] = "Your helmet is detecting xrays";
+    subtitle_strings[i,j,k] = "Your helmet is detecting X-rays";
     subtitle_cues_delta[i,j,k] = 2f;//10
     k++;
     subtitle_strings[i,j,k] = "in the same way your eye would normally detect light.";
@@ -935,7 +935,7 @@ public class Main : MonoBehaviour
     subtitle_strings[i,j,k] = "See how it's just a big black ball?";
     subtitle_cues_delta[i,j,k] = 2f;//16
     k++;
-    subtitle_strings[i,j,k] = "That's because xrays don't pass through it.";
+    subtitle_strings[i,j,k] = "That's because X-rays don't pass through it.";
     subtitle_cues_delta[i,j,k] = 3f;//19
     k++;
     subtitle_strings[i,j,k] = "Now, let's switch to neutrino vision.";
@@ -1010,7 +1010,7 @@ public class Main : MonoBehaviour
     subtitle_strings[i,j,k] = "to see in three different ways:";
     subtitle_cues_delta[i,j,k] = 1f;//12
     k++;
-    subtitle_strings[i,j,k] = "visible light, xray vision, and neutrino detection.";
+    subtitle_strings[i,j,k] = "Visible light, X-ray vision, and neutrino detection.";
     subtitle_cues_delta[i,j,k] = 4f;//16
     k++;
     subtitle_strings[i,j,k] = "The first two have been used for decades to look out into space.";
@@ -1043,7 +1043,7 @@ public class Main : MonoBehaviour
     subtitle_strings[i,j,k] = "What sent the neutrino that";
     subtitle_cues_delta[i,j,k] = 2f;//41
     k++;
-    subtitle_strings[i,j,k] = "Ice Cube detected back at earth?";
+    subtitle_strings[i,j,k] = "Ice Cube detected back at Earth?";
     subtitle_cues_delta[i,j,k] = 2f;//43
     k++;
     subtitle_strings[i,j,k] = "When you find the source at the end of your journey,";
@@ -1058,7 +1058,7 @@ public class Main : MonoBehaviour
     subtitle_strings[i,j,k] = "You'll use your visible light,";
     subtitle_cues_delta[i,j,k] = 2f;//51
     k++;
-    subtitle_strings[i,j,k] = "XRay, and Neutrino view to collect these readings.";
+    subtitle_strings[i,j,k] = "X-ray, and neutrino view to collect these readings.";
     subtitle_cues_delta[i,j,k] = 4f;//55
     k++;
     subtitle_strings[i,j,k] = "Ok. Things might get dicey going forward.";
@@ -1117,7 +1117,7 @@ public class Main : MonoBehaviour
     subtitle_strings[i,j,k] = "";
     subtitle_cues_delta[i,j,k] = 1f;
     k++;
-    subtitle_strings[i,j,k] = "Look up at the black hole, and collect the XRay readings!";
+    subtitle_strings[i,j,k] = "Look up at the black hole, and collect the X-ray readings!";
     subtitle_cues_delta[i,j,k] = 4f;
     k++;
     subtitle_cues_delta[i,j,k] = 2f;
@@ -1142,7 +1142,7 @@ public class Main : MonoBehaviour
     subtitle_strings[i,j,k] = "You did it! We have the data!";
     subtitle_cues_delta[i,j,k] = 3f;
     k++;
-    subtitle_strings[i,j,k] = "Now follow the neutrino path back to earth!";
+    subtitle_strings[i,j,k] = "Now follow the neutrino path back to Earth!";
     subtitle_cues_delta[i,j,k] = 3f;
     k++;
     subtitle_cues_delta[i,j,k] = 1f;
@@ -1220,7 +1220,7 @@ public class Main : MonoBehaviour
     subtitle_strings[i,j,k] = "They also emit high energy neutrinos";
     subtitle_cues_delta[i,j,k] = 3f;//26
     k++;
-    subtitle_strings[i,j,k] = "that travel millions of lightyears back to earth.";
+    subtitle_strings[i,j,k] = "that travel millions of lightyears back to Earth.";
     subtitle_cues_delta[i,j,k] = 2f;//28
     k++;
     subtitle_strings[i,j,k] = "It would have gone totally unnoticed";
@@ -1238,7 +1238,7 @@ public class Main : MonoBehaviour
     subtitle_strings[i,j,k] = "It's impossible to see something black on a black background of space!";
     subtitle_cues_delta[i,j,k] = 4f;//41
     k++;
-    subtitle_strings[i,j,k] = "Fortunately, ICE CUBE has found a way to observe them using neutrinos!";
+    subtitle_strings[i,j,k] = "Fortunately, IceCube has found a way to observe them using neutrinos!";
     subtitle_cues_delta[i,j,k] = 4f;//45
     k++;
     subtitle_strings[i,j,k] = "Well, that's mission complete on our end.";
@@ -1827,7 +1827,7 @@ public class Main : MonoBehaviour
         ar_label_rights[    label_right_i].transform.position = icecube[0].transform.position;
         ar_label_right_kids[label_right_i].transform.localPosition = new Vector3(20,0,-20);
         ar_label_rights[label_right_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_rights[label_right_i].transform.position));
-        ar_label_right_texts[label_right_i].text = "ICE CUBE";
+        ar_label_right_texts[label_right_i].text = "ICECUBE";
         label_right_i++;
 
         gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
@@ -1915,7 +1915,7 @@ public class Main : MonoBehaviour
         ar_label_bhs[    label_bh_i].transform.position = blackhole[0].transform.position;
         ar_label_bh_kids[label_bh_i].transform.localPosition = new Vector3(27,0,0);
         ar_label_bhs[label_bh_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_bhs[label_bh_i].transform.position));
-        ar_label_bh_texts[label_bh_i].text = "XRAY";
+        ar_label_bh_texts[label_bh_i].text = "X-RAY";
 
         ar_progress_offsets[label_bh_i].transform.localScale = ar_label_bhs[label_bh_i].transform.localScale;
         ar_progress_offsets[label_bh_i].transform.position   = ar_label_bh_kids[label_bh_i].transform.position;
@@ -1989,7 +1989,7 @@ public class Main : MonoBehaviour
         ar_label_lefts[    label_left_i].transform.position = earth[0].transform.position;
         ar_label_left_kids[label_left_i].transform.localPosition = new Vector3(-5,0,0);
         ar_label_lefts[label_left_i].transform.rotation = rotationFromEuler(getCamEuler(ar_label_lefts[label_left_i].transform.position));
-        ar_label_left_texts[label_left_i].text = "ICE CUBE";
+        ar_label_left_texts[label_left_i].text = "ICECUBE";
         label_left_i++;
 
         ar_label_rights[label_right_i].transform.localScale = new Vector3(8f, 8f, 8f);
@@ -2276,6 +2276,7 @@ public class Main : MonoBehaviour
       case (int)SCENE.EARTH:
 
         earth[0].transform.position = anti_gaze_pt.normalized*600+new Vector3(0.0f,500.0f,0.0f);
+        warp_trigger.just_triggered = true;
 
         break;
 
@@ -2308,7 +2309,7 @@ public class Main : MonoBehaviour
     switch(spec)
     {
       case (int)SPEC.GAM: spec_sel_reticle.transform.position = spec_gam_reticle.transform.position;
-        //GameAnalytics.NewProgressionEvent (GAProgressionStatus.Start, "Universe", "Scene_" + cur_scene_i, "xray", 0);
+        //GameAnalytics.NewProgressionEvent (GAProgressionStatus.Start, "Universe", "Scene_" + cur_scene_i, "X-ray", 0);
         break;
       case (int)SPEC.VIZ: spec_sel_reticle.transform.position = spec_viz_reticle.transform.position;
         //GameAnalytics.NewProgressionEvent (GAProgressionStatus.Start, "Universe", "Scene_" + cur_scene_i, "viz", 0);
