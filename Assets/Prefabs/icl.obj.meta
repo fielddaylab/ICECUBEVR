@@ -1,9 +1,7 @@
 fileFormatVersion: 2
 guid: 600027a3ac58c73469fed013567c20aa
-timeCreated: 1473194446
-licenseType: Free
 ModelImporter:
-  serializedVersion: 19
+  serializedVersion: 22
   fileIDToRecycleName:
     100000: Bottom_Door1
     100002: Bottom_Door2
@@ -206,26 +204,209 @@ ModelImporter:
     4300072: Top_Window4
     4300074: Top_Window5
     4300076: Top_Window6
+    2186277476908879412: ImportLogs
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Bottom_Door1Mat
+    second: {fileID: 2100000, guid: 1b34a6b5d3d8c447d82a69826fc28cb6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Bottom_Door2Mat
+    second: {fileID: 2100000, guid: b28c7730035664fc6afdc5de3ef4d7c0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Bottom_Door3Mat
+    second: {fileID: 2100000, guid: a20467b3b50034fa9bd54eccd563fe17, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Bottom_StructureMat
+    second: {fileID: 2100000, guid: dc9f33dd1683a4859825d82131975962, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Bottom_Window1Mat
+    second: {fileID: 2100000, guid: 72f02f064e8b74211b1aa27d3ee48208, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Bottom_Window2Mat
+    second: {fileID: 2100000, guid: 465b4197512344a848a72b07f558ca07, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Bottom_Window3Mat
+    second: {fileID: 2100000, guid: 950b0c016f6f4453f9bbd57c8b375ddd, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Bottom_Window4Mat
+    second: {fileID: 2100000, guid: 41e5989db85874de58b05bc3a0eb7ad7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Bottom_Window5Mat
+    second: {fileID: 2100000, guid: 068728257bf744f26bd4071cd987bd1d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Frame_Foot10Mat
+    second: {fileID: 2100000, guid: da4c8412867564d0d9a5f08d0f76bfe2, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Frame_Foot1Mat
+    second: {fileID: 2100000, guid: 0d856b8544bcb4b489bd01e2f90955e7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Frame_Foot2Mat
+    second: {fileID: 2100000, guid: 5dfffe1a37ba443f091d0e48935941c5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Frame_Foot3Mat
+    second: {fileID: 2100000, guid: df96e9658412d49ba9a828883b3d5644, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Frame_Foot4Mat
+    second: {fileID: 2100000, guid: 987a26b655f1b4c5384ff0e267ec91f7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Frame_Foot5Mat
+    second: {fileID: 2100000, guid: b5638c8a6334c45a49fabc51817aaf0e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Frame_Foot6Mat
+    second: {fileID: 2100000, guid: b449a5f77951441bdbb0f8c7e28afc6f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Frame_Foot7Mat
+    second: {fileID: 2100000, guid: a3ba11af3c1c948218888a3a94ef4561, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Frame_Foot8Mat
+    second: {fileID: 2100000, guid: 70292646252364c489f06682877bc43c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Frame_Foot9Mat
+    second: {fileID: 2100000, guid: cf2e668ad94a4482c914ab2b5f01561d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Frame_LeftBridgeMat
+    second: {fileID: 2100000, guid: 9fde98788d953431faa74eb41ad13d7c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Frame_LeftTowerMat
+    second: {fileID: 2100000, guid: f4c94c98ae87c4dfe81da67d668cdaf4, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Frame_MiscrailsMat
+    second: {fileID: 2100000, guid: 7ef8241998e034564b43ff5e8d3a469f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Frame_RightBridgeMat
+    second: {fileID: 2100000, guid: 9a6fc8fbb0e6f4d8b96ea9f4252a11c2, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Frame_RightTowerMat
+    second: {fileID: 2100000, guid: 4ff47779312054f84a4aa9b77d6e70b3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Frame_StairsMat
+    second: {fileID: 2100000, guid: 3a32e858fc7144487a8fc9297c94716c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Frame_SupportMat
+    second: {fileID: 2100000, guid: 71656aa361aed46daa2de96edbc5aacb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Frame_ToprailMat
+    second: {fileID: 2100000, guid: 6b800372158134f38910b1242a860568, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Top_Door1Mat
+    second: {fileID: 2100000, guid: 79ceb15ad426041d0afab9827a41fd2d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Top_StructureMat
+    second: {fileID: 2100000, guid: f4694c24f1f7549889b0327884ba4e1c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Top_Window1Mat
+    second: {fileID: 2100000, guid: 6e8b5bca5e50842528413fd2bec7f2f3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Top_Window2Mat
+    second: {fileID: 2100000, guid: afc70eb1f91054027a21d6c9818d4dd0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Top_Window3Mat
+    second: {fileID: 2100000, guid: 37be032c76c3d41be9e04fd57e7b8d1b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Top_Window4Mat
+    second: {fileID: 2100000, guid: 5aea4324774a542ea8dfae50915a579e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Top_Window5Mat
+    second: {fileID: 2100000, guid: 5fd142f59af594925afa7360720dffd4, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Top_Window6Mat
+    second: {fileID: 2100000, guid: a8967b6202d3244d182b474f3c00fa21, type: 2}
   materials:
     importMaterials: 1
     materialName: 0
     materialSearch: 1
+    materialLocation: 0
   animations:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
     resampleCurves: 1
     optimizeGameObjects: 0
     motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
     animationCompression: 1
     animationRotationError: 0.5
     animationPositionError: 0.5
     animationScaleError: 0.5
     animationWrapMode: 0
     extraExposedTransformPaths: []
+    extraUserProperties: []
     clipAnimations: []
     isReadable: 1
   meshes:
@@ -233,13 +414,18 @@ ModelImporter:
     globalScale: 1
     meshCompression: 0
     addColliders: 0
+    importVisibility: 0
     importBlendShapes: 1
+    importCameras: 0
+    importLights: 0
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
     optimizeMeshForGPU: 1
     keepQuads: 0
     weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 1
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
@@ -249,9 +435,11 @@ ModelImporter:
     normalSmoothAngle: 60
     normalImportMode: 0
     tangentImportMode: 3
+    normalCalculationMode: 0
   importAnimation: 1
   copyAvatar: 0
   humanDescription:
+    serializedVersion: 2
     human: []
     skeleton: []
     armTwist: 0.5
@@ -262,7 +450,10 @@ ModelImporter:
     legStretch: 0.05
     feetSpacing: 0
     rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
     hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 0
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   animationType: 0
   humanoidOversampling: 1
