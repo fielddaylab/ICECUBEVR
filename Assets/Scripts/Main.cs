@@ -128,6 +128,7 @@ public class Main : MonoBehaviour
   float reticle_d;
   GameObject gaze_projection;
   GameObject gaze_reticle;
+  GameObject begin;
   GameObject spec_projection;
   GameObject spec_viz_reticle;
   GameObject spec_gam_reticle;
@@ -653,7 +654,9 @@ public class Main : MonoBehaviour
     warp_trigger.reset();
     blackhole_trigger.reset();
 
+    ga.StopSession();
     ga.StartSession();
+    begin.SetActive(true);
   }
 
   void Start()
@@ -1379,6 +1382,7 @@ public class Main : MonoBehaviour
     reticle_d = cam_reticle.transform.position.z;
     gaze_projection = GameObject.Find("Gaze_Projection");
     gaze_reticle = GameObject.Find("Gaze_Reticle");
+    begin = GameObject.Find("Begin_Text");
     spec_projection = GameObject.Find("Spec_Projection");
     spec_viz_reticle = GameObject.Find("Spec_Viz_Reticle");
     spec_gam_reticle = GameObject.Find("Spec_Gam_Reticle");
@@ -2128,7 +2132,7 @@ public class Main : MonoBehaviour
         //command
         if(subtitle_i == subtitle_pause_i_ice_0 && !advance_passed_ice_0)
         {
-          gaze_projection.transform.rotation = rotationFromEuler(getEuler(new Vector3(0f,0f,10f).normalized));
+          gaze_projection.transform.rotation = rotationFromEuler(getEuler(new Vector3(-5f,5f,10f).normalized));
           gaze_reticle.SetActive(true);
           advance_trigger.position = gaze_reticle.transform.position;
           if(advance_trigger.tick(cam_reticle.transform.position,Time.deltaTime))
@@ -2137,6 +2141,7 @@ public class Main : MonoBehaviour
             {
               advance_passed_ice_0 = true;
               gaze_reticle.SetActive(false);
+              begin.SetActive(false);
               gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
             }
           }
