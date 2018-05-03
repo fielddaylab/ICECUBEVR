@@ -129,6 +129,8 @@ public class Main : MonoBehaviour
   GameObject gaze_projection;
   GameObject gaze_reticle;
   GameObject begin;
+  GameObject fdlogo;
+  float fdlogo_a;
   GameObject spec_projection;
   GameObject spec_viz_reticle;
   GameObject spec_gam_reticle;
@@ -202,6 +204,7 @@ public class Main : MonoBehaviour
 
   public int starting_scene = 0;
 
+  public Material fdlogo_material;
   public Material alpha_material;
   public GameObject star_prefab;
   public GameObject ar_label_left_prefab;
@@ -657,6 +660,8 @@ public class Main : MonoBehaviour
     ga.StopSession();
     ga.StartSession();
     begin.SetActive(true);
+    fdlogo.SetActive(true);
+    fdlogo_a = 0.0001f;
   }
 
   void Start()
@@ -1383,6 +1388,8 @@ public class Main : MonoBehaviour
     gaze_projection = GameObject.Find("Gaze_Projection");
     gaze_reticle = GameObject.Find("Gaze_Reticle");
     begin = GameObject.Find("Begin_Text");
+    fdlogo = GameObject.Find("FDLogo");
+    fdlogo_a = 0f;
     spec_projection = GameObject.Find("Spec_Projection");
     spec_viz_reticle = GameObject.Find("Spec_Viz_Reticle");
     spec_gam_reticle = GameObject.Find("Spec_Gam_Reticle");
@@ -2378,6 +2385,11 @@ public class Main : MonoBehaviour
   float nwave_t_10 = 0;
   void Update()
   {
+    if(fdlogo_a > 0 && !begin.activeSelf) //0-1 = 0-1, 1-2 = 1-0
+    {
+      fdlogo_a += 0.002f;
+      if(fdlogo_a > 2f) fdlogo_a = 0f;
+    }
     nwave_t_1  += Time.deltaTime;
     nwave_t_10 += Time.deltaTime;
     while(nwave_t_1  > 1)  nwave_t_1  -= 1f;
@@ -2576,6 +2588,16 @@ public class Main : MonoBehaviour
     flash_alpha = flash_alpha * flash_alpha;
     flash_alpha = flash_alpha * flash_alpha;
     alpha_material.SetFloat(alpha_id, flash_alpha);
+    if(fdlogo_a > 0f)
+    {
+      float a = 0f;
+      if(fdlogo_a < 0.25f) a = 0f;
+      else if(fdlogo_a < 0.5f) a = (fdlogo_a-0.25f)/0.25f;
+      else if(fdlogo_a < 0.75f) a = 1f;
+      else if(fdlogo_a < 1.25f) a = 1f-((fdlogo_a-1f)/0.25f);
+      else if(fdlogo_a < 2f) a = 0f;
+      fdlogo_material.SetFloat(alpha_id, a);
+    }
 
     cam_spinner.transform.localScale = new Vector3(warp_trigger.shrink, warp_trigger.shrink, warp_trigger.shrink);
     cam_spinner.transform.localRotation = Quaternion.Euler(0, 0, warp_trigger.rot);
