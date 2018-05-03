@@ -314,8 +314,10 @@ public class Main : MonoBehaviour
   int subtitle_spec;
   int subtitle_pause_i_ice_0 = 0;
   int subtitle_pause_i_ice_1 = 0;
+  int subtitle_pause_i_ice_2 = 0;
   bool advance_passed_ice_0 = false;
   bool advance_passed_ice_1 = false;
+  bool advance_passed_ice_2 = false;
   int subtitle_pause_i_voyager_0 = 0;
   int subtitle_pause_i_voyager_1 = 0;
   bool advance_passed_voyager_0 = false;
@@ -745,6 +747,7 @@ public class Main : MonoBehaviour
     k = 0;
     subtitle_strings[i,j,k] = "";
     subtitle_cues_delta[i,j,k] = 0.001f;
+    subtitle_pause_i_ice_0 = k;
     k++;
     subtitle_strings[i,j,k] = "Hey! Come in!";
     subtitle_cues_delta[i,j,k] = 1f;//1
@@ -763,11 +766,11 @@ public class Main : MonoBehaviour
     k++;
     subtitle_strings[i,j,k] = "Ok. Can you look up at the gaze point for me?";
     subtitle_cues_delta[i,j,k] = 2.5f;//13
-    subtitle_pause_i_ice_0 = k;
+    subtitle_pause_i_ice_1 = k;
     k++;
     subtitle_strings[i,j,k] = "Great! Now look at the one at your feet.";
     subtitle_cues_delta[i,j,k] = 2f;//15
-    subtitle_pause_i_ice_1 = k;
+    subtitle_pause_i_ice_2 = k;
     k++;
     subtitle_strings[i,j,k] = "Alright! Everything seems to be in order.";
     subtitle_cues_delta[i,j,k] = 2.25f;//16
@@ -1820,6 +1823,7 @@ public class Main : MonoBehaviour
       case (int)SCENE.ICE:
         advance_passed_ice_0 = false;
         advance_passed_ice_1 = false;
+        advance_passed_ice_2 = false;
 
         ar_label_rights[label_right_i].transform.localScale = new Vector3(3f, 3f, 3f);
         ar_label_rights[    label_right_i].transform.position = icecube[0].transform.position;
@@ -2099,7 +2103,7 @@ public class Main : MonoBehaviour
         //command
         if(subtitle_i == subtitle_pause_i_ice_0 && !advance_passed_ice_0)
         {
-          gaze_projection.transform.rotation = rotationFromEuler(getEuler(new Vector3(0f,10f,10f).normalized));
+          gaze_projection.transform.rotation = rotationFromEuler(getEuler(new Vector3(0f,0f,10f).normalized));
           gaze_reticle.SetActive(true);
           advance_trigger.position = gaze_reticle.transform.position;
           if(advance_trigger.tick(cam_reticle.transform.position,Time.deltaTime))
@@ -2114,7 +2118,7 @@ public class Main : MonoBehaviour
         }
         if(subtitle_i == subtitle_pause_i_ice_1 && !advance_passed_ice_1)
         {
-          gaze_projection.transform.rotation = rotationFromEuler(getEuler(new Vector3(0f,-20f,10f).normalized));
+          gaze_projection.transform.rotation = rotationFromEuler(getEuler(new Vector3(0f,10f,10f).normalized));
           gaze_reticle.SetActive(true);
           advance_trigger.position = gaze_reticle.transform.position;
           if(advance_trigger.tick(cam_reticle.transform.position,Time.deltaTime))
@@ -2122,6 +2126,21 @@ public class Main : MonoBehaviour
             if(advance_trigger.just_triggered)
             {
               advance_passed_ice_1 = true;
+              gaze_reticle.SetActive(false);
+              gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
+            }
+          }
+        }
+        if(subtitle_i == subtitle_pause_i_ice_2 && !advance_passed_ice_2)
+        {
+          gaze_projection.transform.rotation = rotationFromEuler(getEuler(new Vector3(0f,-20f,10f).normalized));
+          gaze_reticle.SetActive(true);
+          advance_trigger.position = gaze_reticle.transform.position;
+          if(advance_trigger.tick(cam_reticle.transform.position,Time.deltaTime))
+          {
+            if(advance_trigger.just_triggered)
+            {
+              advance_passed_ice_2 = true;
               gaze_reticle.SetActive(false);
               gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
             }
@@ -2437,6 +2456,7 @@ public class Main : MonoBehaviour
         if(
           (cur_scene_i == (int)SCENE.ICE                                    && !advance_passed_ice_0     && subtitle_i == subtitle_pause_i_ice_0+1)     ||
           (cur_scene_i == (int)SCENE.ICE                                    && !advance_passed_ice_1     && subtitle_i == subtitle_pause_i_ice_1+1)     ||
+          (cur_scene_i == (int)SCENE.ICE                                    && !advance_passed_ice_2     && subtitle_i == subtitle_pause_i_ice_2+1)     ||
           (cur_scene_i == (int)SCENE.VOYAGER && cur_spec_i == (int)SPEC.GAM && !advance_passed_voyager_0 && subtitle_i == subtitle_pause_i_voyager_0+1) ||
           (cur_scene_i == (int)SCENE.VOYAGER && cur_spec_i == (int)SPEC.NEU && !advance_passed_voyager_1 && subtitle_i == subtitle_pause_i_voyager_1+1)
         )
