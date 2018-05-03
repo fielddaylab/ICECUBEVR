@@ -70,17 +70,42 @@ public class Main : MonoBehaviour
 
   }
 
-  public string[] credit_strings = new string[]
+  string[] credit_strings = new string[]
   {
     "", //needs empty string at beginning so it starts off empty
-    "Me",
-    "You",
-    "Him",
-    "Her",
-    "Them",
-    "Everybody",
-    "Else",
-    "", //needs empty string at end so it eventually shuts up
+    "",
+    "Virtual",
+    "Antartica",
+    "Produced by",
+    "FIELD DAY",
+    "in collaboration with",
+    "Living Enviroments Labratory",
+    "Principal Investigator",
+    "Kevin Ponto",
+    "VR Producer, Audio Engineering",
+    "David Gagnon",
+    "Art Direction",
+    "Sarah Gagnon",
+    "Software Engineering",
+    "Phil Dougherty",
+    "UI/UX, 2D Art",
+    "Eric Lang",
+    "3D Modeling",
+    "Eric Peterson",
+    "Script Writing",
+    "Lindy Biller",
+    "Music, Sound",
+    "Andrew Fitzpatrick",
+    "Design Consulting, Playtest Coordination",
+    "Ross Tredinnick",
+    "Subject Expert",
+    "Silvia Bravo",
+    "Subject Expert",
+    "James Madsen",
+    "Evaluation",
+    "Rebecca Cors",
+    "Thanks",
+    "for Playing!", //needs empty string at end so it eventually shuts up
   };
   int credits_i;
   float credits_t;
