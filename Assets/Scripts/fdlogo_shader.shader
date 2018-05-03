@@ -50,7 +50,7 @@
       {
         // sample the texture
         fixed4 col = tex2D(_MainTex, i.uv);
-        col.a = alpha;
+        col.a *= alpha;
         return col;
       }
       ENDCG
