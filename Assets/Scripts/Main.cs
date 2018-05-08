@@ -206,6 +206,7 @@ public class Main : MonoBehaviour
 
   public Material fdlogo_material;
   public Material alpha_material;
+  public Material dim_alpha_material;
   public GameObject star_prefab;
   public GameObject ar_label_left_prefab;
   public GameObject ar_label_right_prefab;
@@ -315,6 +316,7 @@ public class Main : MonoBehaviour
 
   int alpha_id;
   float flash_alpha;
+  float dim_alpha;
   int time_mod_twelve_pi_id;
   float time_mod_twelve_pi;
   int jitter_id;
@@ -616,6 +618,7 @@ public class Main : MonoBehaviour
       scene_rots[i] = 0f;
 
     flash_alpha = 0;
+    dim_alpha = 1;
     time_mod_twelve_pi = 0;
     jitter = 0;
     jitter_countdown = 0;
@@ -2388,7 +2391,12 @@ public class Main : MonoBehaviour
     if(fdlogo_a > 0 && !begin.activeSelf) //0-1 = 0-1, 1-2 = 1-0
     {
       fdlogo_a += 0.002f;
-      if(fdlogo_a > 2f) fdlogo_a = 0f;
+      dim_alpha = 1f-(fdlogo_a/2f);
+      if(fdlogo_a > 2f)
+      {
+        fdlogo_a = 0f;
+        dim_alpha = 0f;
+      }
     }
     nwave_t_1  += Time.deltaTime;
     nwave_t_10 += Time.deltaTime;
@@ -2588,6 +2596,7 @@ public class Main : MonoBehaviour
     flash_alpha = flash_alpha * flash_alpha;
     flash_alpha = flash_alpha * flash_alpha;
     alpha_material.SetFloat(alpha_id, flash_alpha);
+    dim_alpha_material.SetFloat(alpha_id, 0.8f*dim_alpha);
     if(fdlogo_a > 0f)
     {
       float a = 0f;
