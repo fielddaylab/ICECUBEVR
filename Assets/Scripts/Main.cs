@@ -128,7 +128,9 @@ public class Main : MonoBehaviour
   float reticle_d;
   GameObject gaze_projection;
   GameObject gaze_reticle;
-  GameObject begin;
+  GameObject begin_text;
+  GameObject restart_text;
+  GameObject resume_text;
   GameObject fdlogo;
   float fdlogo_a;
   GameObject spec_projection;
@@ -513,6 +515,7 @@ public class Main : MonoBehaviour
   int[] blackhole_spec_triggered;
   float scan_t = 5f; //time required before you can consider a spectrum "scanned"
   int default_layer;
+  bool querying_continue = false;
 
   bool mouse_captured;
   bool mouse_just_captured;
@@ -527,6 +530,8 @@ public class Main : MonoBehaviour
   float out_fail_motion;
   float max_fail_motion;
 
+  gaze_trigger restart_trigger;
+  gaze_trigger resume_trigger;
   gaze_trigger advance_trigger;
   gaze_trigger spec_trigger;
   gaze_trigger warp_trigger;
@@ -562,15 +567,17 @@ public class Main : MonoBehaviour
   void HandleHMDMounted()
   {
     hmd_mounted = true;
-    ga.StopSession();
   }
 
   void HandleHMDUnmounted()
   {
-    reStart();
-    SetSpec((int)SPEC.VIZ);
-    SetupScene();
     hmd_mounted = false;
+    if(advance_passed_ice_0)// at beginning anyways
+    {
+      querying_continue = true;
+      restart_text.SetActive(true);
+      resume_text.SetActive(true);
+    }
   }
 
   void reStart()
@@ -655,6 +662,8 @@ public class Main : MonoBehaviour
     ar_alert.SetActive(false);
     ar_timer.SetActive(false);
 
+    restart_trigger.reset();
+    resume_trigger.reset();
     advance_trigger.reset();
     spec_trigger.reset();
     warp_trigger.reset();
@@ -662,9 +671,12 @@ public class Main : MonoBehaviour
 
     ga.StopSession();
     ga.StartSession();
-    begin.SetActive(true);
+    begin_text.SetActive(true);
+    restart_text.SetActive(false);
+    resume_text.SetActive(false);
     fdlogo.SetActive(true);
     fdlogo_a = 0.0001f;
+    querying_continue = false;
   }
 
   void Start()
@@ -1365,6 +1377,10 @@ public class Main : MonoBehaviour
 
     blackhole_spec_triggered = new int[(int)SPEC.COUNT];
 
+    restart_trigger = new gaze_trigger();
+    restart_trigger.range = 0.5f;
+    resume_trigger  = new gaze_trigger();
+    resume_trigger.range = 0.5f;
     advance_trigger = new gaze_trigger();
     spec_trigger    = new gaze_trigger();
     warp_trigger    = new gaze_trigger();
@@ -1390,7 +1406,9 @@ public class Main : MonoBehaviour
     reticle_d = cam_reticle.transform.position.z;
     gaze_projection = GameObject.Find("Gaze_Projection");
     gaze_reticle = GameObject.Find("Gaze_Reticle");
-    begin = GameObject.Find("Begin_Text");
+    begin_text = GameObject.Find("Begin_Text");
+    restart_text = GameObject.Find("Restart_Text");
+    resume_text = GameObject.Find("Resume_Text");
     fdlogo = GameObject.Find("FDLogo");
     fdlogo_a = 0f;
     spec_projection = GameObject.Find("Spec_Projection");
@@ -1666,6 +1684,16 @@ public class Main : MonoBehaviour
       }
     }
     grid.SetActive(false);
+
+    gaze_reticle.SetActive(true);
+
+    gaze_projection.transform.rotation = rotationFromEuler(getEuler(new Vector3(-5f,2f,10f).normalized));
+    restart_trigger.position = gaze_reticle.transform.position;
+
+    gaze_projection.transform.rotation = rotationFromEuler(getEuler(new Vector3( 5f,2f,10f).normalized));
+    resume_trigger.position = gaze_reticle.transform.position;
+
+    gaze_reticle.SetActive(false);
 
 /*
     //stars
@@ -2100,6 +2128,36 @@ public class Main : MonoBehaviour
     if(!advance_paused && hmd_mounted) ta[cur_scene_i,cur_spec_i] += Time.deltaTime;
     float cur_ta = ta[cur_scene_i,cur_spec_i];
 
+    if(querying_continue)
+    {
+      if(!hmd_mounted) return;
+
+      if(restart_trigger.tick(cam_reticle.transform.position,Time.deltaTime))
+      {
+        if(restart_trigger.just_triggered)
+        {
+          querying_continue = false;
+          restart_text.SetActive(false);
+          resume_text.SetActive(false);
+          reStart();
+          SetSpec((int)SPEC.VIZ);
+          SetupScene();
+        }
+      }
+
+      if(resume_trigger.tick(cam_reticle.transform.position,Time.deltaTime))
+      {
+        if(resume_trigger.just_triggered)
+        {
+          querying_continue = false;
+          restart_text.SetActive(false);
+          resume_text.SetActive(false);
+        }
+      }
+
+      return;
+    }
+
     switch(cur_scene_i)
     {
 
@@ -2140,7 +2198,7 @@ public class Main : MonoBehaviour
           }
 
         //command
-        if(subtitle_i == subtitle_pause_i_ice_0 && !advance_passed_ice_0)
+        if(subtitle_i == subtitle_pause_i_ice_0 && !advance_passed_ice_0 && hmd_mounted)
         {
           gaze_projection.transform.rotation = rotationFromEuler(getEuler(new Vector3(-5f,5f,10f).normalized));
           gaze_reticle.SetActive(true);
@@ -2151,7 +2209,7 @@ public class Main : MonoBehaviour
             {
               advance_passed_ice_0 = true;
               gaze_reticle.SetActive(false);
-              begin.SetActive(false);
+              begin_text.SetActive(false);
               gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
             }
           }
@@ -2388,9 +2446,9 @@ public class Main : MonoBehaviour
   float nwave_t_10 = 0;
   void Update()
   {
-    if(fdlogo_a > 0 && !begin.activeSelf) //0-1 = 0-1, 1-2 = 1-0
+    if(fdlogo_a > 0 && !begin_text.activeSelf) //0-1 = 0-1, 1-2 = 1-0
     {
-      fdlogo_a += 0.002f;
+      fdlogo_a += 0.004f;
       dim_alpha = 1f-(fdlogo_a/2f);
       if(fdlogo_a > 2f)
       {
@@ -2596,7 +2654,11 @@ public class Main : MonoBehaviour
     flash_alpha = flash_alpha * flash_alpha;
     flash_alpha = flash_alpha * flash_alpha;
     alpha_material.SetFloat(alpha_id, flash_alpha);
-    dim_alpha_material.SetFloat(alpha_id, 0.8f*dim_alpha);
+    {
+      float a = dim_alpha;
+      if(querying_continue) dim_alpha = 1;
+      dim_alpha_material.SetFloat(alpha_id, 0.8f*a);
+    }
     if(fdlogo_a > 0f)
     {
       float a = 0f;
@@ -2605,7 +2667,8 @@ public class Main : MonoBehaviour
       else if(fdlogo_a < 0.75f) a = 1f;
       else if(fdlogo_a < 1.25f) a = 1f-((fdlogo_a-1f)/0.25f);
       else if(fdlogo_a < 2f) a = 0f;
-      fdlogo_material.SetFloat(alpha_id, a);
+      //fdlogo_material.SetFloat(alpha_id, a);
+      fdlogo_material.SetFloat(alpha_id, 0);
     }
 
     cam_spinner.transform.localScale = new Vector3(warp_trigger.shrink, warp_trigger.shrink, warp_trigger.shrink);
