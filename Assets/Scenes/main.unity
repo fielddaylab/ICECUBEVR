@@ -18191,7 +18191,6 @@ GameObject:
   m_Component:
   - component: {fileID: 865053882}
   - component: {fileID: 865053881}
-  - component: {fileID: 865053880}
   m_Layer: 0
   m_Name: AR_Camera_Static
   m_TagString: Untagged
@@ -18199,13 +18198,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!92 &865053880
-Behaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 865053879}
-  m_Enabled: 1
 --- !u!20 &865053881
 Camera:
   m_ObjectHideFlags: 0
@@ -34597,7 +34589,7 @@ Camera:
   m_Depth: 1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 257
+    m_Bits: 2147483905
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -51525,6 +51517,7 @@ MonoBehaviour:
   useRotationTracking: 1
   useIPDInPositionTracking: 1
   resetTrackerOnLoad: 0
+  AllowRecenter: 1
 --- !u!114 &2113146565
 MonoBehaviour:
   m_ObjectHideFlags: 0
