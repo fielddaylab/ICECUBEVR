@@ -2,14 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
-using UnityEngine.Networking;
 
 
 public class ONSPProfiler : MonoBehaviour
 {
-    // Import functions
-    public const string strONSPS = "AudioPluginOculusSpatializer";
-
     public bool profilerEnabled = false;
     const int DEFAULT_PORT = 2121;
     public int port = DEFAULT_PORT;
@@ -19,7 +15,7 @@ public class ONSPProfiler : MonoBehaviour
         Application.runInBackground = true;
         if (profilerEnabled)
         {
-            Debug.Log("Oculus Audio Profiler enabled, IP address = " + Network.player.ipAddress);
+            Debug.Log("Oculus Audio Profiler enabled.");
         }
     }
 
@@ -33,9 +29,11 @@ public class ONSPProfiler : MonoBehaviour
         ONSP_SetProfilerEnabled(profilerEnabled);
     }
 
+	// Import functions
+    public const string strONSPS = "AudioPluginOculusSpatializer";
+	
     [DllImport(strONSPS)]
     private static extern int ONSP_SetProfilerEnabled(bool enabled);
-
     [DllImport(strONSPS)]
     private static extern int ONSP_SetProfilerPort(int port);
 }
