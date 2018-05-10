@@ -131,7 +131,6 @@ public class Main : MonoBehaviour
   GameObject begin_text;
   GameObject restart_text;
   GameObject resume_text;
-  GameObject fdlogo;
   float fdlogo_a;
   GameObject spec_projection;
   GameObject spec_viz_reticle;
@@ -674,7 +673,6 @@ public class Main : MonoBehaviour
     begin_text.SetActive(true);
     restart_text.SetActive(false);
     resume_text.SetActive(false);
-    fdlogo.SetActive(true);
     fdlogo_a = 0.0001f;
     querying_continue = false;
   }
@@ -1409,7 +1407,6 @@ public class Main : MonoBehaviour
     begin_text = GameObject.Find("Begin_Text");
     restart_text = GameObject.Find("Restart_Text");
     resume_text = GameObject.Find("Resume_Text");
-    fdlogo = GameObject.Find("FDLogo");
     fdlogo_a = 0f;
     spec_projection = GameObject.Find("Spec_Projection");
     spec_viz_reticle = GameObject.Find("Spec_Viz_Reticle");
@@ -1783,6 +1780,7 @@ public class Main : MonoBehaviour
     reStart();
     MapVols();
     SetupScene();
+    SetSpec((int)SPEC.GAM); //specific to reStart
   }
 
   //called just before portal to next scene appears
@@ -2142,6 +2140,7 @@ public class Main : MonoBehaviour
           reStart();
           SetSpec((int)SPEC.VIZ);
           SetupScene();
+          SetSpec((int)SPEC.GAM); //specific to reStart
         }
       }
 
@@ -2210,6 +2209,7 @@ public class Main : MonoBehaviour
               advance_passed_ice_0 = true;
               gaze_reticle.SetActive(false);
               begin_text.SetActive(false);
+    	      SetSpec((int)SPEC.VIZ);
               gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
             }
           }
@@ -2656,7 +2656,7 @@ public class Main : MonoBehaviour
     alpha_material.SetFloat(alpha_id, flash_alpha);
     {
       float a = dim_alpha;
-      if(querying_continue) dim_alpha = 1;
+      if(querying_continue) a = 1;
       dim_alpha_material.SetFloat(alpha_id, 0.8f*a);
     }
     if(fdlogo_a > 0f)
