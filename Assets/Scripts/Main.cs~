@@ -2656,7 +2656,7 @@ public class Main : MonoBehaviour
     alpha_material.SetFloat(alpha_id, flash_alpha);
     {
       float a = dim_alpha;
-      if(querying_continue) a = 1;
+      if(querying_continue) dim_alpha = 1;
       dim_alpha_material.SetFloat(alpha_id, 0.8f*a);
     }
     if(fdlogo_a > 0f)
