@@ -131,7 +131,10 @@ public class Main : MonoBehaviour
   GameObject begin_text;
   GameObject restart_text;
   GameObject resume_text;
-  float fdlogo_a;
+  float void_t;
+  float target_void_t;
+  int pushed_scene;
+  float intro_t;
   GameObject spec_projection;
   GameObject spec_viz_reticle;
   GameObject spec_gam_reticle;
@@ -205,9 +208,9 @@ public class Main : MonoBehaviour
 
   public int starting_scene = 0;
 
-  public Material fdlogo_material;
   public Material alpha_material;
   public Material dim_alpha_material;
+  public Material black_alpha_material;
   public GameObject star_prefab;
   public GameObject ar_label_left_prefab;
   public GameObject ar_label_right_prefab;
@@ -515,6 +518,7 @@ public class Main : MonoBehaviour
   float scan_t = 5f; //time required before you can consider a spectrum "scanned"
   int default_layer;
   bool querying_continue = false;
+  bool query_continue_result = true;//true = continue, false = restart
 
   bool mouse_captured;
   bool mouse_just_captured;
@@ -566,17 +570,13 @@ public class Main : MonoBehaviour
   void HandleHMDMounted()
   {
     hmd_mounted = true;
+    if(!begin_text.activeSelf && !querying_continue && target_void_t != 0) target_void_t = 0; //undoes a quick unmount-mount
   }
 
   void HandleHMDUnmounted()
   {
     hmd_mounted = false;
-    if(advance_passed_ice_0)// at beginning anyways
-    {
-      querying_continue = true;
-      restart_text.SetActive(true);
-      resume_text.SetActive(true);
-    }
+    if(!begin_text.activeSelf && !querying_continue && target_void_t != 1) target_void_t = 1;
   }
 
   void reStart()
@@ -670,10 +670,11 @@ public class Main : MonoBehaviour
 
     ga.StopSession();
     ga.StartSession();
-    begin_text.SetActive(true);
     restart_text.SetActive(false);
     resume_text.SetActive(false);
-    fdlogo_a = 0.0001f;
+    intro_t = 0.001f; //> 0, but essentially 0
+    begin_text.SetActive(true);
+    advance_paused = true;
     querying_continue = false;
   }
 
@@ -1407,7 +1408,6 @@ public class Main : MonoBehaviour
     begin_text = GameObject.Find("Begin_Text");
     restart_text = GameObject.Find("Restart_Text");
     resume_text = GameObject.Find("Resume_Text");
-    fdlogo_a = 0f;
     spec_projection = GameObject.Find("Spec_Projection");
     spec_viz_reticle = GameObject.Find("Spec_Viz_Reticle");
     spec_gam_reticle = GameObject.Find("Spec_Gam_Reticle");
@@ -1777,6 +1777,10 @@ public class Main : MonoBehaviour
     Destroy(star, 0f);
 */
 
+    void_t = 0;
+    target_void_t = 0;
+    query_continue_result = true;
+    pushed_scene = (int)SCENE.ICE;
     reStart();
     MapVols();
     SetupScene();
@@ -2126,7 +2130,7 @@ public class Main : MonoBehaviour
     if(!advance_paused && hmd_mounted) ta[cur_scene_i,cur_spec_i] += Time.deltaTime;
     float cur_ta = ta[cur_scene_i,cur_spec_i];
 
-    if(querying_continue)
+    if(querying_continue && target_void_t != 1)
     {
       if(!hmd_mounted) return;
 
@@ -2134,13 +2138,8 @@ public class Main : MonoBehaviour
       {
         if(restart_trigger.just_triggered)
         {
-          querying_continue = false;
-          restart_text.SetActive(false);
-          resume_text.SetActive(false);
-          reStart();
-          SetSpec((int)SPEC.VIZ);
-          SetupScene();
-          SetSpec((int)SPEC.GAM); //specific to reStart
+	  target_void_t = 1;
+	  query_continue_result = false;
         }
       }
 
@@ -2148,9 +2147,9 @@ public class Main : MonoBehaviour
       {
         if(resume_trigger.just_triggered)
         {
-          querying_continue = false;
-          restart_text.SetActive(false);
-          resume_text.SetActive(false);
+	  target_void_t = 1;
+	  if(cur_scene_i == (int)SCENE.ICE) query_continue_result = false;
+	  query_continue_result = true;
         }
       }
 
@@ -2197,7 +2196,7 @@ public class Main : MonoBehaviour
           }
 
         //command
-        if(subtitle_i == subtitle_pause_i_ice_0 && !advance_passed_ice_0 && hmd_mounted)
+        if(subtitle_i == subtitle_pause_i_ice_0 && !advance_passed_ice_0 && hmd_mounted && !querying_continue)
         {
           gaze_projection.transform.rotation = rotationFromEuler(getEuler(new Vector3(-5f,5f,10f).normalized));
           gaze_reticle.SetActive(true);
@@ -2446,13 +2445,55 @@ public class Main : MonoBehaviour
   float nwave_t_10 = 0;
   void Update()
   {
-    if(fdlogo_a > 0 && !begin_text.activeSelf) //0-1 = 0-1, 1-2 = 1-0
+    float old_void_t = void_t;
+         if(void_t < target_void_t) void_t += 0.05f;
+    else if(void_t > target_void_t) void_t -= 0.05f;
+    void_t = Mathf.Clamp(void_t,0f,1f);
+    if(old_void_t < 1f && void_t == 1f)
     {
-      fdlogo_a += 0.004f;
-      dim_alpha = 1f-(fdlogo_a/2f);
-      if(fdlogo_a > 2f)
+	if(!querying_continue) //was in play, now in query
+	{
+	  pushed_scene = cur_scene_i;
+	  reStart();
+	  querying_continue = true;
+          begin_text.SetActive(false);
+	  SetupScene();
+	  SetSpec((int)SPEC.GAM); //specific to reStart
+	  restart_text.SetActive(true);
+	  resume_text.SetActive(true);
+	}
+	else //was in query, now in play
+	{
+	  reStart();
+	  querying_continue = false;
+          restart_text.SetActive(false);
+	  resume_text.SetActive(false);
+	  if(query_continue_result) //continue
+	  {
+	    next_scene_i = pushed_scene;
+	    cur_scene_i = next_scene_i;
+	    next_scene_i = (next_scene_i + 1) % ((int)SCENE.COUNT);
+	    SetupScene();
+            begin_text.SetActive(false);
+          }
+	  else //reset
+	  {
+            SetupScene();
+            SetSpec((int)SPEC.GAM); //specific to reStart
+            begin_text.SetActive(true);
+	  }
+
+	}
+	target_void_t = 0;
+    }
+
+    if(intro_t > 0 && hmd_mounted && !begin_text.activeSelf && !querying_continue)
+    {
+      intro_t += 0.002f;
+      dim_alpha = 1f-intro_t;
+      if(intro_t > 1f)
       {
-        fdlogo_a = 0f;
+        intro_t = 0f;
         dim_alpha = 0f;
       }
     }
@@ -2659,17 +2700,8 @@ public class Main : MonoBehaviour
       if(querying_continue) a = 1;
       dim_alpha_material.SetFloat(alpha_id, 0.8f*a);
     }
-    if(fdlogo_a > 0f)
-    {
-      float a = 0f;
-      if(fdlogo_a < 0.25f) a = 0f;
-      else if(fdlogo_a < 0.5f) a = (fdlogo_a-0.25f)/0.25f;
-      else if(fdlogo_a < 0.75f) a = 1f;
-      else if(fdlogo_a < 1.25f) a = 1f-((fdlogo_a-1f)/0.25f);
-      else if(fdlogo_a < 2f) a = 0f;
-      //fdlogo_material.SetFloat(alpha_id, a);
-      fdlogo_material.SetFloat(alpha_id, 0);
-    }
+
+    black_alpha_material.SetFloat(alpha_id, void_t);
 
     cam_spinner.transform.localScale = new Vector3(warp_trigger.shrink, warp_trigger.shrink, warp_trigger.shrink);
     cam_spinner.transform.localRotation = Quaternion.Euler(0, 0, warp_trigger.rot);
@@ -2830,7 +2862,7 @@ public class Main : MonoBehaviour
     {
       if(dumb_delay_t < dumb_delay_t_max)
       {
-        if(hmd_mounted) dumb_delay_t += Time.deltaTime;
+        if(hmd_mounted && !begin_text.activeSelf) dumb_delay_t += Time.deltaTime;
         if(dumb_delay_t >= dumb_delay_t_max)//newly done with delay
         {
           voiceover_audiosource.clip = voiceovers[cur_scene_i,cur_spec_i];
