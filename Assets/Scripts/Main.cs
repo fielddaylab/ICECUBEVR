@@ -79,7 +79,7 @@ public class Main : MonoBehaviour
     "Produced by",
     "FIELD DAY",
     "in collaboration with",
-    "Living Enviroments Labratory",
+    "Living Environments Labratory",
     "Principal Investigator",
     "Kevin Ponto",
     "VR Producer, Audio Engineering",
@@ -2161,9 +2161,9 @@ public class Main : MonoBehaviour
 
       case (int)SCENE.ICE:
 
-        float grid_t = 32f+dumb_delay_t_max;
-        float pulse_t = 42f+dumb_delay_t_max;
-        float beam_t = 49f+dumb_delay_t_max;
+        float grid_t = 32f;
+        float pulse_t = 42f;
+        float beam_t = 49f;
 
         //pulse
         if(cur_ta < pulse_t) nwave_t_10 = 0;
