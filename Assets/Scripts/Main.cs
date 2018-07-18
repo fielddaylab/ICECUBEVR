@@ -2138,8 +2138,8 @@ public class Main : MonoBehaviour
       {
         if(restart_trigger.just_triggered)
         {
-	  target_void_t = 1;
-	  query_continue_result = false;
+          target_void_t = 1;
+          query_continue_result = false;
         }
       }
 
@@ -2147,9 +2147,9 @@ public class Main : MonoBehaviour
       {
         if(resume_trigger.just_triggered)
         {
-	  target_void_t = 1;
-	  if(cur_scene_i == (int)SCENE.ICE) query_continue_result = false;
-	  query_continue_result = true;
+          target_void_t = 1;
+          if(cur_scene_i == (int)SCENE.ICE) query_continue_result = false;
+          else                              query_continue_result = true;
         }
       }
 
@@ -2208,7 +2208,7 @@ public class Main : MonoBehaviour
               advance_passed_ice_0 = true;
               gaze_reticle.SetActive(false);
               begin_text.SetActive(false);
-    	      SetSpec((int)SPEC.VIZ);
+              SetSpec((int)SPEC.VIZ);
               gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
             }
           }
