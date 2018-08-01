@@ -2535,6 +2535,10 @@ public class Main : MonoBehaviour
     {
       HandleHMDMounted();
     }
+    if(Input.GetKeyDown("s"))
+    {
+      ScreenCapture.CaptureScreenshot("screeny.png", 10);
+    }
 
     if(in_portal_motion > 0) in_portal_motion += Time.deltaTime * 0.8f;
     if(in_portal_motion > max_portal_motion)
