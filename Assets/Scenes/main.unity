@@ -24812,6 +24812,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1b5217e0365d246fa1b49e0108a8ef3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  legacyResolutionScaling: 0
   targetFps: 30
   maxWidth: 1280
   maxHeight: 720
