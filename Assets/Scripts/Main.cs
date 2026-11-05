@@ -1846,6 +1846,10 @@ public class Main : MonoBehaviour
     gaze_reticle.SetActive(false);
 
     main_camera_skybox.material = skyboxes[cur_scene_i, cur_spec_i];
+    //N6: the frames right after a skybox swap are texture-upload bound, not
+    //fill bound, so the pacing governor must discard them (2s ignore window)
+    //instead of reading them as a reason to drop the 3D render scale.
+    WebGLPerfGovernor.NotifySceneSwap();
 
     if(cur_scene_i != (int)SCENE.ICE)
     {
@@ -2437,6 +2441,7 @@ public class Main : MonoBehaviour
     portal_camera_next.GetComponent<Camera>().cullingMask = (1 << layers[next_scene_i, (int)SPEC.VIZ]);
     main_camera_skybox.material = skyboxes[cur_scene_i, cur_spec_i];
     portal_camera_next_skybox.material = skyboxes[next_scene_i, (int)SPEC.VIZ];
+    WebGLPerfGovernor.NotifySceneSwap(); //N6: see SetupScene
 
     if(cur_scene_i == (int)SCENE.EXTREME) blackhole_trigger.reset();
   }

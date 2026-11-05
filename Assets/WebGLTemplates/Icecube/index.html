@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity WebGL Player | %UNITY_WEB_NAME%</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
+    <!--
+      icecube N6 pacing shim.
+
+      Must stay ABOVE the Unity loader: Unity captures
+      window.requestAnimationFrame when its main loop starts, so the wrapper has
+      to be installed before UnityLoader.js runs or the main loop keeps a
+      reference to the native function and the half-rate gate never applies.
+
+      What it does:
+        1. Half-rate gate. With halfRate on, a queued rAF callback is forwarded
+           only on every second native vsync, i.e. 30 ticks per 60 vsyncs. This
+           is a *vsync-aligned* 30 fps: unlike Application.targetFrameRate (which
+           switches Unity's main loop to setTimeout and immediately adds jitter),
+           every forwarded tick still lands on a real vsync boundary.
+        2. Main-loop work time. performance.now() is sampled around the
+           forwarded callback, so window.icecubeRaf.lastWorkMs is the duration of
+           the previous main-loop tick (script + render submit), NOT the
+           vsync-to-vsync delta. The N6 governor decides on this number; the
+           frame delta (and Time.smoothDeltaTime in particular) is useless for
+           that because at a locked 30 fps it reads ~33 ms whether the frame had
+           5 ms or 32 ms of work in it.
+
+      Owner decision C8 is bound to "hard lock 30": halfRate defaults to true and
+      there is deliberately no query-string override. window.icecubeSetHalfRate()
+      exists for diagnostics from the console only.
+    -->
+    <script>
+      (function () {
+        'use strict';
+        if (typeof window === 'undefined') { return; }
+        if (window.icecubeRaf) { return; }   // never double-wrap
+
+        var nativeRaf = window.requestAnimationFrame;
+        var nativeCaf = window.cancelAnimationFrame;
+        if (typeof nativeRaf !== 'function') { return; }   // nothing to wrap
+        nativeRaf = nativeRaf.bind(window);
+        nativeCaf = (typeof nativeCaf === 'function') ? nativeCaf.bind(window) : null;
+
+        var now = (window.performance && window.performance.now)
+          ? function () { return window.performance.now(); }
+          : function () { return Date.now(); };
+
+        var state = {
+          version: 1,
+          halfRate: true,          // C8: hard lock 30
+          vsyncTicks: 0,           // native vsyncs observed
+          forwardedTicks: 0,       // ticks handed to the callbacks
+          skippedTicks: 0,
+          lastWorkMs: 0,           // previous forwarded tick's work duration
+          workSampleSeq: 0,
+          native: nativeRaf
+        };
+
+        var queue = [];            // callbacks waiting for the next forwarded tick
+        var nextHandle = 1;
+        var driverPending = false;
+
+        function startDriver() {
+          if (driverPending) { return; }
+          driverPending = true;
+          nativeRaf(driver);
+        }
+
+        function driver(timestamp) {
+          driverPending = false;
+          state.vsyncTicks++;
+
+          // Half-rate gate: forward on even native ticks only.
+          var forward = !state.halfRate || (state.vsyncTicks % 2) === 0;
+          if (!forward) {
+            state.skippedTicks++;
+            if (queue.length) { startDriver(); }
+            return;
+          }
+
+          var batch = queue;
+          queue = [];
+          state.forwardedTicks++;
+
+          var t0 = now();
+          for (var i = 0; i < batch.length; i++) {
+            var entry = batch[i];
+            if (entry.cancelled) { continue; }
+            try {
+              entry.cb(timestamp);
+            } catch (e) {
+              // A throwing callback must not kill the pacing driver.
+              try { console.error('[icecube] rAF callback threw', e); } catch (e2) { /* ignore */ }
+            }
+          }
+          var work = now() - t0;
+          if (work >= 0 && isFinite(work)) {
+            state.lastWorkMs = work;
+            state.workSampleSeq++;
+          }
+
+          if (queue.length) { startDriver(); }
+        }
+
+        window.requestAnimationFrame = function (cb) {
+          if (typeof cb !== 'function') { return 0; }
+          var handle = nextHandle++;
+          queue.push({ handle: handle, cb: cb, cancelled: false });
+          startDriver();
+          return handle;
+        };
+
+        window.cancelAnimationFrame = function (handle) {
+          for (var i = 0; i < queue.length; i++) {
+            if (queue[i].handle === handle) { queue[i].cancelled = true; return; }
+          }
+        };
+        window.webkitCancelAnimationFrame = window.cancelAnimationFrame;
+        window.webkitRequestAnimationFrame = window.requestAnimationFrame;
+
+        window.icecubeRaf = state;
+        window.icecubeHalfRate = true;
+
+        // Diagnostics only (console). Returns the value actually in effect.
+        window.icecubeSetHalfRate = function (on) {
+          var want = !!on;
+          state.halfRate = want;
+          window.icecubeHalfRate = want;
+          try { console.log('[icecube] rAF shim halfRate=' + want); } catch (e) { /* ignore */ }
+          return want;
+        };
+
+        // Work time for the governor jslib; 0 when the tab is hidden because rAF
+        // is throttled/stopped there and a stale sample would look like a stall.
+        window.icecubeWorkMs = function () {
+          if (typeof document !== 'undefined' && document.hidden) { return 0; }
+          return state.lastWorkMs;
+        };
+
+        try {
+          console.log('[icecube] rAF shim active halfRate=' + state.halfRate);
+        } catch (e) { /* ignore */ }
+      })();
+    </script>
+    <script src="TemplateData/UnityProgress.js"></script>
+    <script src="%UNITY_WEBGL_LOADER_URL%"></script>
+    <script>
+      var unityInstance = UnityLoader.instantiate("unityContainer", "%UNITY_WEBGL_BUILD_URL%", {onProgress: UnityProgress});
+    </script>
+  </head>
+  <body>
+    <div class="webgl-content">
+      <div id="unityContainer" style="width: %UNITY_WIDTH%px; height: %UNITY_HEIGHT%px"></div>
+      <div class="footer">
+        <div class="webgl-logo"></div>
+        <div class="fullscreen" onclick="unityInstance.SetFullscreen(1)"></div>
+        <div class="title">%UNITY_WEB_NAME%</div>
+      </div>
+    </div>
+  </body>
+</html>

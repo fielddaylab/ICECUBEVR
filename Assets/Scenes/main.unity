@@ -24812,15 +24812,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1b5217e0365d246fa1b49e0108a8ef3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetFps: 30
-  maxWidth: 1280
-  maxHeight: 720
-  minWidth: 640
-  minHeight: 360
-  interval: 2
-  stepDown: 0.85
-  stepUp: 1.08
+  governorEnabled: 1
+  ladder:
+  - 1
+  - 0.85
+  - 0.71
+  - 0.6
+  - 0.5
   particleScale: 0.35
+  verboseLog: 0
 --- !u!4 &919186134
 Transform:
   m_ObjectHideFlags: 0
