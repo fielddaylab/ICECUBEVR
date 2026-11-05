@@ -21,6 +21,28 @@ public class Main : MonoBehaviour
     public float shrink = 0f;
     public float rot    = 0f;
 
+    //Per-frame dwell telemetry for the overlay reticle (card N9).
+    //
+    //shrink is (t_in / t_max): it is the monotonic 0..1 ramp, and the confirm
+    //branch below fires on the same tick that clamps t_in to t_max, so this
+    //reads exactly 1.0 on the confirming frame. Six trigger instances tick per
+    //frame but at most one is in range (they are gated by scene/phase), so the
+    //reticle takes the max. Main.Update() calls ResetFrame() before any
+    //trigger ticks; ReticleView.LateUpdate() reads after all of them.
+    //
+    //Nothing here feeds back into gating: t_max, t_max_numb, range and the
+    //spacebar fallback are untouched.
+    public static float frame_progress       = 0f;
+    public static bool  frame_in_range       = false;
+    public static bool  frame_just_triggered = false;
+
+    public static void ResetFrame()
+    {
+      frame_progress       = 0f;
+      frame_in_range       = false;
+      frame_just_triggered = false;
+    }
+
     public gaze_trigger()
     {}
 
@@ -56,6 +78,14 @@ public class Main : MonoBehaviour
 
       this.shrink = (this.t_in/this.t_max);
       this.rot    = (this.t_in/this.t_max)*5f*360.0f;
+
+      //publish for ReticleView (card N9); read-only, no gating effect
+      if(ret)
+      {
+        if(this.shrink > frame_progress) frame_progress = this.shrink;
+        frame_in_range = true;
+      }
+      if(this.just_triggered) frame_just_triggered = true;
 
       return ret;
     }
@@ -126,6 +156,11 @@ public class Main : MonoBehaviour
   GameObject cam_reticle;
   GameObject cam_spinner;
   float reticle_d;
+  //The overlay-canvas reticle (card N9). Replaces the Cam_Reticle /
+  //Cam_Spinner_Reticle quads, which still exist but no longer render:
+  //cam_reticle.transform.position is the gaze pointer for all six triggers and
+  //reticle_d reads its z, so the GameObjects must stay.
+  ReticleView ui_reticle;
   GameObject gaze_projection;
   GameObject gaze_reticle;
   GameObject begin_text;
@@ -1403,6 +1438,7 @@ public class Main : MonoBehaviour
     cam_reticle = GameObject.Find("Cam_Reticle");
     cam_spinner = GameObject.Find("Cam_Spinner");
     reticle_d = cam_reticle.transform.position.z;
+    BindUIReticle();
     gaze_projection = GameObject.Find("Gaze_Projection");
     gaze_reticle = GameObject.Find("Gaze_Reticle");
     begin_text = GameObject.Find("Begin_Text");
@@ -2414,6 +2450,35 @@ public class Main : MonoBehaviour
 
     if(!gaze_reticle.activeSelf && voiceovers_played[cur_scene_i,(int)SPEC.COUNT] && cur_scene_i != (int)SCENE.CREDITS)
       gaze_reticle.SetActive(true);
+
+    SyncUIReticle();
+  }
+
+  //---- overlay reticle (card N9) ----------------------------------------
+  //
+  //Visibility contract: the crosshair is always on screen (it is the aim
+  //point), but it dims to disarmedAlpha whenever there is no gaze target to
+  //confirm. gaze_reticle.activeSelf is exactly that signal and is left under
+  //the existing scene logic's control - this card does not change when gaze
+  //targets appear (that is card N10), nor t_max / t_max_numb / range / the
+  //spacebar fallback.
+  void BindUIReticle()
+  {
+    ui_reticle = ReticleView.instance;
+    if(ui_reticle == null)
+    {
+      GameObject go = GameObject.Find("Reticle");
+      if(go != null) ui_reticle = go.GetComponent<ReticleView>();
+    }
+    if(ui_reticle == null)
+      Debug.LogWarning("Main: no ReticleView in the scene; run icecube/Reticle/Setup Scene Reticle");
+  }
+
+  void SyncUIReticle()
+  {
+    if(ui_reticle == null) return;
+    ui_reticle.armed = gaze_reticle != null && gaze_reticle.activeSelf;
+    ui_reticle.SetVisible(true);
   }
 
   void SetSpec(int spec)
@@ -2445,6 +2510,11 @@ public class Main : MonoBehaviour
   float nwave_t_10 = 0;
   void Update()
   {
+    //Clear last frame's dwell telemetry before any trigger ticks (card N9).
+    //Done here rather than in ReticleView so the values cannot go stale if
+    //the reticle is absent or inactive.
+    gaze_trigger.ResetFrame();
+
     float old_void_t = void_t;
          if(void_t < target_void_t) void_t += 0.05f;
     else if(void_t > target_void_t) void_t -= 0.05f;
@@ -2707,8 +2777,12 @@ public class Main : MonoBehaviour
 
     black_alpha_material.SetFloat(alpha_id, void_t);
 
-    cam_spinner.transform.localScale = new Vector3(warp_trigger.shrink, warp_trigger.shrink, warp_trigger.shrink);
-    cam_spinner.transform.localRotation = Quaternion.Euler(0, 0, warp_trigger.rot);
+    //The spinner quad no longer renders (card N9: dwell is the overlay ring
+    //fill), so these two per-frame transform writes are dead weight. The
+    //derived warp_trigger.shrink / .rot values are still computed in tick();
+    //the spinner sprites and this object are kept so the look can be restored.
+    //cam_spinner.transform.localScale = new Vector3(warp_trigger.shrink, warp_trigger.shrink, warp_trigger.shrink);
+    //cam_spinner.transform.localRotation = Quaternion.Euler(0, 0, warp_trigger.rot);
     warp_trigger.position = gaze_reticle.transform.position;
 
     if(
