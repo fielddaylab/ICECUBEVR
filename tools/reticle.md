@@ -39,6 +39,13 @@ it moves the reticle to the native-resolution overlay. Camera reduction belongs
 to card N11 (portal/AR camera gating). The frame-time p50 criterion still
 applies and should hold or improve.
 
+## Cross-check against N8
+
+`tools/camera_audit.md` (card N8) independently lists `Cam_Reticle`,
+`Cam_Spinner` and `Cam_Spinner_Reticle` as "found as GameObject only (**no
+Camera component**)" and classifies every `cam_reticle` reference in `Main.cs`
+as a `.transform` read. The table below agrees with it line for line.
+
 ## Kill criterion: not triggered
 
 The card says: *if Main.cs reads the reticle cameras' projection for gaze math,
@@ -105,8 +112,11 @@ frame_in_range       = any trigger in range this frame
 frame_just_triggered = any trigger confirmed this frame
 ```
 
-`ReticleView.LateUpdate` reads them and calls `gaze_trigger.ResetFrame()`, so
-the values never leak across frames. Writing is one compare per tick and no
+`Main.Update()` calls `gaze_trigger.ResetFrame()` at its top, before any
+trigger ticks (every `tick` call site is inside `Update` / `UpdateScene`), and
+`ReticleView.LateUpdate` reads the fields after all of them, so the values never
+leak across frames and the reticle stays a pure observer even if it is absent
+or inactive. Writing is one compare per tick and no
 allocation. At most one trigger is in range at a time (they are gated by
 scene/phase), and `max` is the correct reduction if that ever stops being true.
 
