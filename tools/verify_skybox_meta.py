@@ -11,20 +11,22 @@ Checked, per texture under Assets/Resources/Skybox:
   * ``maxTextureSize: 2048``       (owner decision C5 -> 2048 per face)
   * ``compressionQuality: 50``
   * ``textureCompression: 1``      (Compressed, not CompressedLQ)
-  * one of the two accepted format states:
-      - ``textureFormat: 28`` + ``crunchedCompression: 1``  (DXT1Crunched, default)
-      - ``textureFormat: 10`` + ``crunchedCompression: 0``  (DXT1, the kill-criterion
-        fallback that SkyboxImportSettings.Apply selects per texture when crunch
-        made the imported artifact larger than plain DXT1)
+  * the format state selected by ``--expect-format`` (default ``crunched``):
+      - ``crunched``: ``textureFormat: 28`` + ``crunchedCompression: 1``
+        (RGB Crunched DXT1, the card's default)
+      - ``dxt1``: ``textureFormat: 10`` + ``crunchedCompression: 0``
+        (plain DXT1, the kill-criterion fallback; use it only after flipping
+        ``SkyboxImportSettings.UseCrunch`` to false and re-running Apply)
+    Every texture must be in the SAME state - a mixed tree is a failure.
   * top level ``enableMipMap: 1``, ``filterMode: 2`` (trilinear) and
     ``alphaUsage: 0`` (skybox needs no alpha; keeps Automatic off DXT5)
+  * no ``.bak`` files anywhere under the scanned root
 
-Exit 0 when every texture passes, 1 otherwise. The summary line reports how
-many textures are in each format state. ``--max-uncrunched N`` fails the run
-if more than N textures sit on the uncrunched fallback (default: unlimited).
+Exit 0 when every texture passes, 1 otherwise.
 
-    python3 tools/verify_skybox_meta.py            # terse
-    python3 tools/verify_skybox_meta.py --verbose  # one line per texture
+    python3 tools/verify_skybox_meta.py                       # terse
+    python3 tools/verify_skybox_meta.py --verbose             # one line per texture
+    python3 tools/verify_skybox_meta.py --expect-format dxt1  # kill-criterion state
 """
 from __future__ import annotations
 
@@ -50,11 +52,12 @@ EXPECTED_PLATFORM = {
     "compressionQuality": CRUNCH_QUALITY,
     "textureCompression": COMPRESSION_COMPRESSED,
 }
-# (textureFormat, crunchedCompression) -> state name
-ACCEPTED_FORMATS = {
-    (DXT1_CRUNCHED, 1): "DXT1Crunched",
-    (DXT1, 0): "DXT1",
+# --expect-format name -> (textureFormat, crunchedCompression)
+FORMAT_STATES = {
+    "crunched": (DXT1_CRUNCHED, 1),  # RGB Crunched DXT1 (default)
+    "dxt1": (DXT1, 0),               # plain DXT1 (kill-criterion fallback)
 }
+FORMAT_NAMES = {v: k for k, v in FORMAT_STATES.items()}
 EXPECTED_TOP_LEVEL = {
     "enableMipMap": 1,
     "filterMode": FILTER_TRILINEAR,
@@ -123,8 +126,8 @@ def parse_meta(meta_path: Path) -> tuple[dict[str, int], dict[str, int] | None]:
     return top, webgl
 
 
-def check(texture: Path) -> tuple[list[str], str | None]:
-    """Return (problems, format state name or None)."""
+def check(texture: Path, expect_format: str) -> tuple[list[str], str | None]:
+    """Return (problems, observed format state name or None)."""
     meta = texture.with_suffix(texture.suffix + ".meta")
     if not meta.is_file():
         return [f"{texture}: missing .meta"], None
@@ -141,12 +144,14 @@ def check(texture: Path) -> tuple[list[str], str | None]:
             problems.append(f"{texture}: WebGL {key}={got!r} expected {want}")
 
     fmt_key = (webgl.get("textureFormat"), webgl.get("crunchedCompression"))
-    state = ACCEPTED_FORMATS.get(fmt_key)
-    if state is None:
+    state = FORMAT_NAMES.get(fmt_key)
+    want_fmt, want_crunch = FORMAT_STATES[expect_format]
+    if fmt_key != (want_fmt, want_crunch):
         problems.append(
             f"{texture}: WebGL textureFormat={fmt_key[0]!r} "
             f"crunchedCompression={fmt_key[1]!r} expected "
-            f"({DXT1_CRUNCHED},1)=DXT1Crunched or ({DXT1},0)=DXT1"
+            f"textureFormat={want_fmt} crunchedCompression={want_crunch} "
+            f"({expect_format})"
         )
 
     for key, want in EXPECTED_TOP_LEVEL.items():
@@ -157,15 +162,22 @@ def check(texture: Path) -> tuple[list[str], str | None]:
     return problems, state
 
 
+def find_bak_files(root: Path) -> list[Path]:
+    if not root.is_dir():
+        return []
+    return sorted(p for p in root.rglob("*.bak") if p.is_file())
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--root", default=str(SKYBOX_ROOT),
                     help="skybox directory to scan (default %(default)s)")
     ap.add_argument("--verbose", "-v", action="store_true",
                     help="print one line per texture")
-    ap.add_argument("--max-uncrunched", type=int, default=None, metavar="N",
-                    help="fail if more than N textures use the uncrunched "
-                         "DXT1 fallback (default: no limit)")
+    ap.add_argument("--expect-format", choices=sorted(FORMAT_STATES),
+                    default="crunched",
+                    help="format state every texture must be in "
+                         "(default %(default)s; 'dxt1' is the kill-criterion fallback)")
     args = ap.parse_args(argv)
 
     root = Path(args.root)
@@ -175,9 +187,9 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     all_problems: list[str] = []
-    counts = {name: 0 for name in ACCEPTED_FORMATS.values()}
+    counts = {name: 0 for name in FORMAT_STATES}
     for tex in textures:
-        problems, state = check(tex)
+        problems, state = check(tex, args.expect_format)
         all_problems.extend(problems)
         if state is not None:
             counts[state] += 1
@@ -185,25 +197,20 @@ def main(argv: list[str] | None = None) -> int:
             print(("ok   " if not problems else "FAIL ")
                   + f"{tex}  [{state or '?'}]")
 
-    uncrunched = counts["DXT1"]
-    if args.max_uncrunched is not None and uncrunched > args.max_uncrunched:
-        all_problems.append(
-            f"{uncrunched} textures on the uncrunched DXT1 fallback, "
-            f"limit is {args.max_uncrunched}")
+    for bak in find_bak_files(root):
+        all_problems.append(f"{bak}: .bak file inside the asset tree (guard)")
 
     for p in all_problems:
         print("FAIL " + p, file=sys.stderr)
 
+    summary = (f"textures={len(textures)} expect={args.expect_format} "
+               f"maxTextureSize={MAX_FACE_SIZE} quality={CRUNCH_QUALITY} "
+               f"crunched={counts['crunched']} dxt1={counts['dxt1']}")
     if all_problems:
-        print(f"SKYBOX_META_VERIFY result=Failed textures={len(textures)} "
-              f"failures={len(all_problems)} crunched={counts['DXT1Crunched']} "
-              f"uncrunched={uncrunched}")
+        print(f"SKYBOX_META_VERIFY result=Failed failures={len(all_problems)} {summary}")
         return 1
 
-    print(f"SKYBOX_META_VERIFY result=Succeeded textures={len(textures)} "
-          f"failures=0 maxTextureSize={MAX_FACE_SIZE} "
-          f"crunched={counts['DXT1Crunched']} uncrunched={uncrunched} "
-          f"quality={CRUNCH_QUALITY}")
+    print(f"SKYBOX_META_VERIFY result=Succeeded failures=0 {summary}")
     return 0
 
 

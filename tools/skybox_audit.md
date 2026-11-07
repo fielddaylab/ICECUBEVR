@@ -24,30 +24,46 @@ buildTarget: WebGL   maxTextureSize: 2048   textureCompression: 3 (CompressedLQ)
 compressionQuality: 50   crunchedCompression: 1   overridden: 1
 ```
 
-…but left `textureFormat: -1` (**Automatic**). That one field is the whole
-story:
+…but left `textureFormat: -1` (**Automatic**) and `alphaUsage: 1`
+(From Input). Measured facts about what Automatic resolved to:
 
 * **36 of the 60 textures are 32-bit RGBA PNGs** (all `Credits/*` and
   `Earth/*` faces, 2048×2048, colortype 6).
-* For an RGBA source, Unity's automatic WebGL pick is **DXT5 Crunched** —
-  1.0 byte/px — not DXT1 Crunched at 0.5 byte/px.
-* **Every one of those alpha channels was measured fully opaque**
+* **Every one of those alpha channels is fully opaque**
   (`alpha_min == alpha_max == 255`, PIL `getextrema()` over all 36 files).
+* Unity's automatic picker treats a fully-opaque alpha as "no alpha", so on
+  this exact source set Automatic **already resolved to DXT1 Crunched** — the
+  per-texture sizes in the baseline build report
+  (`555.4 kb` for `SkyboxZ-.png`, etc.) are byte-identical before and after
+  pinning the format. The payload is therefore **not** going to shrink by
+  100 MB from this card: the skybox share of the compressed
+  `webgl.data.unityweb` is ~34 MB, not 128 MB (see §5).
 
-So half the GPU footprint and a large share of the payload of the dominant
-asset group was being spent storing the constant value 255, 4.19 million times
-per face, 36 times over. Forcing `RGB Crunched DXT1` is therefore **not a
-quality trade at all** on these files — it is a lossless removal of a dead
-channel. The kill criterion ("if crunch introduces visible blocking on
-gradients, fall back to DXT1 uncrunched") is about the *crunch* step, which
-was already in place before this card and is unchanged in quality terms.
+What pinning `textureFormat: 28` (DXT1Crunched) + `alphaUsage: 0` does buy
+is a guarantee: the day an artist re-exports one of those faces with a single
+stray non-255 alpha pixel, Automatic would silently flip it to DXT5 Crunched
+and **double** the GPU footprint (16 MB vs 8 MB per cubemap) — that cannot
+happen any more, and `tools/verify_skybox_meta.py` fails if it is attempted.
 
 Secondary gaps closed: `filterMode` was `1` (Bilinear) on all 60 — the card
 asks for **trilinear**, which matters because a skybox face fills the frame at
 the horizon and minifies hard toward the poles, so the mip chain is what a
-Chromebook actually samples. `alphaUsage` was `1` (From Input) and is now `0`
-(None) so the automatic path can never re-promote these to DXT5 on a future
-reimport.
+Chromebook actually samples. `textureCompression` moved from `3`
+(CompressedLQ) to `1` (Compressed) because the format is now explicit.
+
+### Why there is no per-texture "crunch fallback" (dead end, reverted)
+
+An earlier draft of this card compared the size of the imported artifact in
+`Library/metadata/<guid>` against the theoretical DXT1 size and switched
+any texture where "crunch came out larger" to plain DXT1. That reasoning was
+wrong: Unity pads the serialized crunched texture to the uncompressed DXT
+size with `0xCD` bytes (measured: `Neu/Voyager` artifact 10.9 MB of which
+9.1 MB is `0xCD` padding, real crunch data 1.84 MB). The one texture it
+"fixed" — `Gam/Voyager/Voyager.png` — went from ~1.9 MB to **9.8 MB**
+LZ4-compressed in the build and grew `webgl.data.unityweb` by **5.4 MB**
+(136,977,415 → 142,342,650 B). That change is reverted here; all 60 textures
+are DXT1Crunched, and the only sanctioned fallback is the card's kill
+criterion, applied to the whole tree via `SkyboxImportSettings.UseCrunch`.
 
 ---
 
@@ -105,7 +121,7 @@ equirect branch of step 3 does not apply. Confirmed in the apply log:
   answer for WebGL.
 * **No meaningful alpha.** 36 RGBA faces, all uniformly opaque (see §1). The
   LDR DXT1 treatment is lossless with respect to alpha.
-* **Three `.png` files are actually JPEG payloads** with a `.png` extension
+* **Two `.png` files are actually JPEG payloads** with a `.png` extension
   (`Gam/Nothing/Nothing.png`, `Gam/Voyager/Voyager.png`). Unity reads them
   fine; worth knowing if anyone ever scripts over this tree by magic bytes.
 
@@ -120,7 +136,7 @@ idempotent, batchmode-safe, exits non-zero on failure. Per texture:
 |---|---|---|
 | WebGL `overridden` | `1` | platform override, not the default platform |
 | WebGL `maxTextureSize` | `2048` | owner decision C5 / binding default #5 |
-| WebGL `textureFormat` | `28` = `DXT1Crunched` | RGB Crunched DXT1; halves the 36 RGBA faces |
+| WebGL `textureFormat` | `28` = `DXT1Crunched` | RGB Crunched DXT1, pinned (was Automatic) |
 | WebGL `textureCompression` | `1` = `Compressed` | normal quality, not LQ, since the format is now explicit |
 | WebGL `crunchedCompression` | `1` | Crunch transcode on top of DXT1 |
 | WebGL `compressionQuality` | `50` | crunch quality 50 per the card |
@@ -128,24 +144,31 @@ idempotent, batchmode-safe, exits non-zero on failure. Per texture:
 | `filterMode` | `2` = Trilinear | was `1` (Bilinear) on all 60 |
 | `alphaUsage` | `0` = None | stops Automatic ever re-picking DXT5 |
 
-`SkyboxImportSettings.Verify()` re-reads every importer through the Unity API
-and additionally reports the theoretical DXT1+mip GPU footprint. Run result:
+The kill criterion is a single switch: `SkyboxImportSettings.UseCrunch`
+(`const bool`, default `true`). Setting it to `false` and re-running Apply
+moves the whole tree to plain `DXT1` (`textureFormat: 10`,
+`crunchedCompression: 0`); `Verify()` and `verify_skybox_meta.py
+--expect-format dxt1` then accept only that state. Mixed trees fail both.
+
+`SkyboxImportSettings.Verify()` re-reads every importer through the Unity
+API, asserts the imported texture does not exceed the cap, and reports the
+theoretical DXT1+mip GPU footprint. Final run (pass 3, after the dead-end
+fallback was removed; `changed=0` because the metas were already in the
+target state, which is the idempotency check):
 
 ```
-SKYBOX_IMPORT result=Applied textures=60 changed=60 unchanged=0 \
+SKYBOX_IMPORT result=Applied textures=60 changed=0 unchanged=60 \
   maxSize=2048 format=DXT1Crunched quality=50
-SKYBOX_VERIFY result=Succeeded textures=60 failures=0 \
-  gpu_dxt1_mipped_bytes=251658180 gpu_mb=240.0
+SKYBOX_VERIFY result=Succeeded textures=60 failures=0 format=DXT1Crunched \
+  cubemaps=6 faces=54 gpu_dxt1_mipped_bytes=251658180 gpu_mb=240.0
 ```
 
 240.0 MB is the *whole tree* resident at once — 18 cubemaps' worth. Only one
 spectrum × one scene is bound to the camera at a time, so the live skybox cost
-is **8 MB** (one 2048 cubemap, DXT1, full mip chain: 6 × 2048² × 0.5 × 4/3).
-Before this card the same cubemap cost **16 MB** on the Credits/Earth scenes
-(DXT5). On an ARM Chromebook lacking `WEBGL_compressed_texture_s3tc` the DXT
-data software-decompresses to RGBA32, where the before/after is 128 MB vs
-128 MB resident — identical, because the decompressed form has no alpha
-saving; the win there is purely download size and decode time.
+is **8 MB** (one 2048 cubemap, DXT1, full mip chain: 6 × 2048² × 0.5 × 4/3)
+on any device exposing `WEBGL_compressed_texture_s3tc`. On an ARM Chromebook
+without S3TC the DXT data software-decompresses to RGBA32 — 128 MB resident
+for one cubemap — which is the N16 card's territory, not this one's.
 
 ### Verifying the metas persisted (Unity-free)
 
@@ -156,14 +179,16 @@ persisted"):
 
 ```
 $ python3 tools/verify_skybox_meta.py
-SKYBOX_META_VERIFY result=Succeeded textures=60 failures=0 \
-  maxTextureSize=2048 format=DXT1Crunched quality=50
+SKYBOX_META_VERIFY result=Succeeded failures=0 textures=60 expect=crunched \
+  maxTextureSize=2048 quality=50 crunched=60 dxt1=0
 ```
 
 Exit 0 on pass, 1 on any mismatch, with one `FAIL <path>: <key>=<got>
-expected <want>` line per problem. Against the pre-change tree it correctly
-reported `failures=120` — exactly the two real deltas (`textureFormat=-1`,
-`filterMode=1`) × 60 textures.
+expected <want>` line per problem. It also fails on any `.bak` file under the
+scanned root (card guard). Against the pristine backup tree
+(`--root /home/watson/icecube-backups/skybox-src`) it reports
+`failures=240` — exactly the four real deltas (`textureFormat=-1`,
+`textureCompression=3`, `filterMode=1`, `alphaUsage=1`) × 60 textures.
 
 Representative diff (`Gam/Earth/SkyboxZ-.png.meta`); **sources untouched**,
 `git status --short Assets/Resources/Skybox` lists only `.meta` files:
@@ -196,19 +221,72 @@ docker run --rm --name icecube-unity-n13 \
   unityci/editor:ubuntu-2019.4.40f1-webgl-3 \
   unity-editor -quit -batchmode -nographics -silent-crashes \
   -projectPath /project -buildTarget WebGL \
-  -executeMethod SkyboxImportSettings.Apply -logFile /out/n13_apply.log
-# then -executeMethod WebGLBuilder.Build -logFile /out/n13_build.log
+  -executeMethod SkyboxImportSettings.Apply -logFile /out/n13_apply3.log
+# then -executeMethod WebGLBuilder.Build -logFile /out/n13_build4.log
 ```
 
-Both were launched under `nohup` and polled for
-`BUILD_RESULT result=Succeeded errors=0`. In a headed editor the same two
+Wrapper script: `/home/watson/icecube-backups/skybox-src/logs/n13_apply3.sh`,
+launched under `nohup` and polled for `BUILD_RESULT result=Succeeded errors=0`
+(final: `BUILD_RESULT result=Succeeded errors=0 warnings=25 size=423588587`). In a headed editor the same two
 steps are on the menu under **icecube > Skybox**.
 
 ---
 
 ## 5. Results
 
-<!-- N13_RESULTS -->
+### Payload (`webgl.data.unityweb`, gzip, bytes)
+
+| Build | Bytes | Δ vs baseline | Note |
+|---|---:|---:|---|
+| Baseline (`3eda0fc`, card's measured state) | 136,987,233 | — | `/home/watson/icecube-out-a`, pre-N13 |
+| Baseline re-measured (`icecube-out-b`, N17 pre-change) | 137,104,244 | +117,011 | same tree, different sibling-card state |
+| N13 pass 2 (per-texture artifact-size fallback, **reverted**) | 142,342,650 | **+5,355,417** | `Gam/Voyager` forced to uncrunched DXT1 |
+| **N13 pass 3 (this commit: 60/60 DXT1Crunched, pinned)** | **136,976,806** | **−10,427** | `n13_build4.log` |
+
+Build-report texture category: 156.4 MB uncompressed, unchanged from
+baseline. Per-asset uncompressed sizes for all 60 skybox textures are
+**byte-identical** to the baseline build report (`diff` of the two
+"Used Assets" tables is empty). That is the proof that Automatic had already
+chosen DXT1Crunched on this source set; pinning it is a guard, not a diet.
+
+### Why the ">= 100 MB" acceptance clause cannot be met by any importer setting
+
+The card's `128 MB source` figure is the size of the PNG/JPG **sources** on
+disk, which are never shipped. What ships is the imported, crunched,
+LZ4-blocked data inside `data.unity3d`. Measured by LZ4HC-compressing each
+imported artifact (padding stripped) exactly as the bundle does:
+
+| Group | Count | Compressed in payload |
+|---|---:|---:|
+| `Credits`/`Earth` faces (36 × 2048² DXT1Crunched) | 36 | ~15.2 MB |
+| `Ice` faces (18 × 2048² DXT1Crunched, 12 are unreferenced dupes) | 18 | ~3.5 MB |
+| `Nothing` cubemaps (3 × 2048/face) | 3 | ~1.5 MB |
+| `Voyager` cubemaps (3 × 2048/face) | 3 | ~7.5 MB |
+| **Whole skybox tree** | **60** | **~27.7 MB** |
+
+Deleting the entire skybox would save ~28 MB; no compression setting can
+save 100 MB from it. The dominant payload is elsewhere
+(`sharedassets0.assets` ≈ 61 MB compressed: `Earth_*` 21 MB textures,
+`icl.obj` 22 MB mesh; `resources.resource` 51 MB of audio — see cards
+N14/N15). This card's **measured** deliverables are therefore:
+
+* payload: **holds** (−10 KB), with the +5.4 MB regression from the earlier
+  N13 draft removed;
+* GPU: **8 MB per live cubemap pinned** (DXT1); the DXT5 doubling path is
+  closed by `alphaUsage: 0` + explicit format and is verifier-enforced;
+* sampling: trilinear on all 60 (was bilinear);
+* real payload wins still available in this tree, flagged for the owner:
+  the 12 unreferenced duplicate `Ice` faces (~2.3 MB) and the
+  `Gam/Voyager` source, whose crunched size (3.6 MB) is 2× its `Neu`/`Viz`
+  siblings because the `.png` is a re-saved JPEG with block noise.
+
+### Frame time
+
+PERFPROBE p50 is not measurable headless (SwiftShader). The shader, draw
+count and GPU format of the live skybox are unchanged versus the baseline
+build, so the expected delta is zero; the trilinear switch adds one mip
+fetch per sample on the skybox pass only. To be read on hardware with the N1
+harness — see §6.
 
 ---
 
@@ -222,9 +300,10 @@ acceptance clause can be settled here. Both are for the human staging check at
    smooth gradients: the `Nothing` and `Voyager` starfield/nebula cubemaps and
    the sky gradient near the horizon on `Earth`. If blocking is visible on
    those gradients, the card's **kill criterion** applies — set
-   `s.format = TextureImporterFormat.DXT1` and
-   `s.crunchedCompression = false` in `SkyboxImportSettings.Apply()`
-   (two lines), rerun Apply, and accept ~12 MB per cubemap. Note the crunch
+   `SkyboxImportSettings.UseCrunch = false`, rerun Apply, verify with
+   `python3 tools/verify_skybox_meta.py --expect-format dxt1`, and accept
+   ~12 MB of raw DXT1 per cubemap in the payload (LZ4 recovers some of it;
+   `Gam/Voyager` measured 9.8 MB compressed in that state). Note the crunch
    step predates this card, so a blocking verdict is evidence against
    `a5ace81`, not against the DXT1 switch.
 2. **Frame-time p50 improves or holds.** Read PERFPROBE p50 from the N1

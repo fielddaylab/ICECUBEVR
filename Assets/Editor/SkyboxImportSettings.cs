@@ -5,29 +5,29 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-/// N13 - cap every skybox face at 2048 and force RGB Crunched DXT1 on WebGL,
-/// falling back to plain DXT1 on any texture where crunch makes it BIGGER.
+/// N13 - cap every skybox face at 2048 and pin RGB Crunched DXT1 on WebGL.
 ///
 /// Context: commit a5ace81 already set "CompressedLQ + crunched + max 2048"
-/// on all of Assets/Resources with `textureFormat` left on Automatic. All 36
-/// six-sided PNG faces here are RGBA sources, but every alpha channel is
-/// uniformly 255, and Unity's automatic picker treats a fully-opaque alpha as
-/// "no alpha" - so Automatic already resolved to DXT1Crunched. Forcing the
-/// format therefore changes no bytes today; it pins the choice so a future
-/// source edit with a stray non-opaque pixel cannot silently double the
-/// footprint by flipping to DXT5Crunched. Trilinear + alphaSource=None are
-/// the other two gaps the card asks for.
+/// on all of Assets/Resources with `textureFormat` left on Automatic. The 36
+/// six-sided PNG faces are RGBA sources whose alpha is uniformly 255, and the
+/// automatic picker treats fully-opaque alpha as "no alpha", so it already
+/// resolved to DXT1Crunched. Pinning the format therefore changes no bytes
+/// today; it guarantees a future source edit with one stray non-opaque pixel
+/// cannot silently double the GPU footprint by flipping to DXT5Crunched.
+/// Trilinear filtering and alphaSource=None are the other two gaps the card
+/// asks for; both are asserted here and in tools/verify_skybox_meta.py.
 ///
-/// The measurable win is the crunch fallback: crunch is entropy-coded on top
-/// of DXT1 and usually shrinks it 3-5x, but on a very noisy source (a
-/// JPEG-artefacted starfield) its codebooks can exceed the raw DXT1 size.
-/// After the first import this script compares each imported artifact against
-/// the theoretical DXT1+mips size and, where crunch lost, reimports that one
-/// texture as uncrunched DXT1 (the card's kill-criterion format), which is
-/// both smaller and lossless relative to the crunched version.
+/// Kill criterion (card N13): if crunch shows visible blocking on gradients
+/// at 1366x768 on hardware, flip UseCrunch to false and rerun Apply. Every
+/// texture then imports as plain DXT1 (~12 MB per 2048 cubemap) and Verify /
+/// verify_skybox_meta.py --expect-format dxt1 accept that state instead.
+/// There is deliberately NO automatic per-texture fallback: the Library
+/// artifact size is padded to the uncompressed DXT size and cannot be used
+/// to judge whether crunch helped (an earlier draft did exactly that and
+/// grew the payload by 5 MB on Gam/Voyager).
 ///
-/// The source image files are never touched; only importer settings change,
-/// and Unity downsamples on import. Nothing here changes textureQuality or
+/// Source image files are never touched; only importer settings change and
+/// Unity downsamples on import. Nothing here changes textureQuality or
 /// masterTextureLimit (explicitly out of scope for N13).
 public static class SkyboxImportSettings
 {
@@ -37,6 +37,12 @@ public static class SkyboxImportSettings
     /// Owner decision C5 is resolved to 2048 per face (binding default #5).
     public const int MaxFaceSize = 2048;
     public const int CrunchQuality = 50;
+
+    /// Default per the card. Set to false ONLY under the kill criterion.
+    public const bool UseCrunch = true;
+
+    public static TextureImporterFormat TargetFormat =>
+        UseCrunch ? TextureImporterFormat.DXT1Crunched : TextureImporterFormat.DXT1;
 
     static readonly string[] ImageExtensions =
     {
@@ -57,6 +63,7 @@ public static class SkyboxImportSettings
             return;
         }
 
+        var dirtyPaths = new List<string>();
         try
         {
             AssetDatabase.StartAssetEditing();
@@ -100,9 +107,9 @@ public static class SkyboxImportSettings
                 {
                     s.overridden = true;
                     s.maxTextureSize = MaxFaceSize;
-                    s.format = TextureImporterFormat.DXT1Crunched;
+                    s.format = TargetFormat;
                     s.textureCompression = TextureImporterCompression.Compressed;
-                    s.crunchedCompression = true;
+                    s.crunchedCompression = UseCrunch;
                     s.compressionQuality = CrunchQuality;
                     ti.SetPlatformTextureSettings(s);
                     dirty = true;
@@ -111,6 +118,7 @@ public static class SkyboxImportSettings
                 if (dirty)
                 {
                     EditorUtility.SetDirty(ti);
+                    dirtyPaths.Add(path);
                     changed++;
                 }
                 else
@@ -124,20 +132,17 @@ public static class SkyboxImportSettings
             AssetDatabase.StopAssetEditing();
         }
 
-        // Reimport outside the batch so each .meta is flushed to disk.
-        foreach (var path in paths)
+        // Reimport outside the batch so each touched .meta is flushed to disk.
+        foreach (var path in dirtyPaths)
         {
             AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
         }
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
 
-        int fallbacks = ApplyCrunchFallback(paths);
-
         Debug.Log("SKYBOX_IMPORT result=Applied textures=" + paths.Count
                   + " changed=" + changed + " unchanged=" + already
-                  + " crunchFallbacks=" + fallbacks
-                  + " maxSize=" + MaxFaceSize + " format=DXT1Crunched"
+                  + " maxSize=" + MaxFaceSize + " format=" + TargetFormat
                   + " quality=" + CrunchQuality);
 
         Verify();
@@ -150,8 +155,8 @@ public static class SkyboxImportSettings
     {
         var paths = FindSkyboxTextures();
         var failures = new List<string>();
-        long gpuBytes = 0, artifactBytes = 0;
-        int crunchedCount = 0, uncrunchedCount = 0;
+        long gpuBytes = 0;
+        int cubemaps = 0, faces = 0;
 
         foreach (var path in paths)
         {
@@ -164,30 +169,33 @@ public static class SkyboxImportSettings
                 failures.Add(path + " maxTextureSize=" + s.maxTextureSize);
             if (s.compressionQuality != CrunchQuality)
                 failures.Add(path + " compressionQuality=" + s.compressionQuality);
-            bool crunched = s.format == TextureImporterFormat.DXT1Crunched && s.crunchedCompression;
-            bool plain = s.format == TextureImporterFormat.DXT1 && !s.crunchedCompression;
-            if (crunched) crunchedCount++;
-            else if (plain) uncrunchedCount++;
-            else failures.Add(path + " format=" + s.format + " crunched=" + s.crunchedCompression);
+            if (s.textureCompression != TextureImporterCompression.Compressed)
+                failures.Add(path + " textureCompression=" + s.textureCompression);
+            if (s.format != TargetFormat || s.crunchedCompression != UseCrunch)
+                failures.Add(path + " format=" + s.format + " crunched=" + s.crunchedCompression
+                             + " expected " + TargetFormat + " crunched=" + UseCrunch);
             if (!ti.mipmapEnabled) failures.Add(path + " mipmapEnabled=false");
             if (ti.filterMode != FilterMode.Trilinear)
                 failures.Add(path + " filterMode=" + ti.filterMode);
+            if (ti.alphaSource != TextureImporterAlphaSource.None)
+                failures.Add(path + " alphaSource=" + ti.alphaSource);
 
             var tex = AssetDatabase.LoadAssetAtPath<Texture>(path);
             if (tex != null)
             {
                 int w = Mathf.Min(tex.width, MaxFaceSize);
                 int h = Mathf.Min(tex.height, MaxFaceSize);
-                // DXT1 = 0.5 byte/px, +1/3 for the full mip chain.
+                if (w > MaxFaceSize || h > MaxFaceSize || tex.width > MaxFaceSize || tex.height > MaxFaceSize)
+                    failures.Add(path + " imported=" + tex.width + "x" + tex.height + " exceeds cap");
+                bool cube = tex is Cubemap;
+                if (cube) cubemaps++; else faces++;
                 long dxt1 = TheoreticalDxt1MippedBytes(tex);
-                long artifact = ImportedArtifactBytes(path);
                 gpuBytes += dxt1;
-                artifactBytes += artifact;
                 Debug.Log("SKYBOX_TEX path=" + path + " src=" + tex.width + "x" + tex.height
                           + " capped=" + w + "x" + h
-                          + " shape=" + (tex is Cubemap ? "Cube" : "2D")
+                          + " shape=" + (cube ? "Cube" : "2D")
                           + " format=" + s.format
-                          + " dxt1_bytes=" + dxt1 + " artifact_bytes=" + artifact);
+                          + " gpu_dxt1_mipped_bytes=" + dxt1);
             }
         }
 
@@ -201,77 +209,32 @@ public static class SkyboxImportSettings
         }
 
         Debug.Log("SKYBOX_VERIFY result=Succeeded textures=" + paths.Count
-                  + " failures=0 crunched=" + crunchedCount + " uncrunched=" + uncrunchedCount
+                  + " failures=0 format=" + TargetFormat
+                  + " cubemaps=" + cubemaps + " faces=" + faces
                   + " gpu_dxt1_mipped_bytes=" + gpuBytes
-                  + " gpu_mb=" + (gpuBytes / (1024f * 1024f)).ToString("F1")
-                  + " imported_artifact_bytes=" + artifactBytes
-                  + " artifact_mb=" + (artifactBytes / (1024f * 1024f)).ToString("F1"));
+                  + " gpu_mb=" + (gpuBytes / (1024f * 1024f)).ToString("F1"));
         Exit(0);
     }
 
-    // ------------------------------------------------------- crunch fallback
+    // --------------------------------------------------------------- helpers
 
-    /// True when the platform block is already in one of the two accepted end
-    /// states: the default DXT1Crunched, or the deliberate DXT1-uncrunched
-    /// fallback chosen by ApplyCrunchFallback on a previous run. Treating the
-    /// fallback as a valid state is what makes Apply idempotent.
+    /// True when the WebGL block is already exactly the configured end state,
+    /// which is what makes Apply idempotent (second run: changed=0).
     static bool IsTargetState(TextureImporterPlatformSettings s)
     {
-        if (!s.overridden) return false;
-        if (s.maxTextureSize != MaxFaceSize) return false;
-        if (s.compressionQuality != CrunchQuality) return false;
-        if (s.textureCompression != TextureImporterCompression.Compressed) return false;
-        bool crunched = s.format == TextureImporterFormat.DXT1Crunched && s.crunchedCompression;
-        bool plain = s.format == TextureImporterFormat.DXT1 && !s.crunchedCompression;
-        return crunched || plain;
+        return s.overridden
+            && s.maxTextureSize == MaxFaceSize
+            && s.compressionQuality == CrunchQuality
+            && s.textureCompression == TextureImporterCompression.Compressed
+            && s.format == TargetFormat
+            && s.crunchedCompression == UseCrunch;
     }
 
-    /// For every texture currently imported as DXT1Crunched, compare the size
-    /// of the imported artifact in Library/ against the theoretical size of the
-    /// same texture as plain DXT1 with a full mip chain. Where crunch came out
-    /// larger it is strictly worse (bigger AND lossier), so switch that texture
-    /// to uncrunched DXT1 - the card's kill-criterion format - and reimport.
-    /// Returns the number of textures switched on this run.
-    static int ApplyCrunchFallback(List<string> paths)
-    {
-        int switched = 0;
-        foreach (var path in paths)
-        {
-            var ti = AssetImporter.GetAtPath(path) as TextureImporter;
-            if (ti == null) continue;
-            var s = ti.GetPlatformTextureSettings(Platform);
-            if (s.format != TextureImporterFormat.DXT1Crunched || !s.crunchedCompression) continue;
-
-            var tex = AssetDatabase.LoadAssetAtPath<Texture>(path);
-            if (tex == null) continue;
-            long dxt1 = TheoreticalDxt1MippedBytes(tex);
-            long artifact = ImportedArtifactBytes(path);
-            if (artifact <= 0 || dxt1 <= 0) continue; // cannot measure - leave crunched
-
-            if (artifact > dxt1)
-            {
-                s.format = TextureImporterFormat.DXT1;
-                s.crunchedCompression = false;
-                ti.SetPlatformTextureSettings(s);
-                EditorUtility.SetDirty(ti);
-                AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
-                long after = ImportedArtifactBytes(path);
-                Debug.Log("SKYBOX_CRUNCH_FALLBACK path=" + path
-                          + " crunched_bytes=" + artifact + " dxt1_bytes=" + dxt1
-                          + " after_bytes=" + after + " reason=crunch-expands");
-                switched++;
-            }
-        }
-        if (switched > 0)
-        {
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
-        }
-        return switched;
-    }
-
-    /// DXT1 = 0.5 byte/px, +1/3 for the full mip chain, x6 faces for a cubemap,
-    /// at the imported (already capped) resolution.
+    /// GPU-resident size on an S3TC-capable device: DXT1 = 0.5 byte/px, +1/3
+    /// for the full mip chain, x6 faces for a cubemap, at the imported
+    /// (already capped) resolution. Crunch is a transport format only - it is
+    /// transcoded to plain DXT1 before upload, so this number is the same for
+    /// both accepted formats.
     static long TheoreticalDxt1MippedBytes(Texture tex)
     {
         int w = Mathf.Min(tex.width, MaxFaceSize);
@@ -279,23 +242,6 @@ public static class SkyboxImportSettings
         long faces = (tex is Cubemap) ? 6 : 1;
         return (long)(w * h * 0.5 * 4.0 / 3.0) * faces;
     }
-
-    /// Size on disk of the imported texture artifact. On the 2019.4 asset
-    /// database (v1) this is Library/metadata/<guid[0..1]>/<guid>; the file
-    /// holds the serialized Texture2D/Cubemap including its (crunched or raw)
-    /// image data, so its size tracks what the build will carry. Returns -1
-    /// when the artifact cannot be located so callers can skip the decision.
-    static long ImportedArtifactBytes(string assetPath)
-    {
-        var guid = AssetDatabase.AssetPathToGUID(assetPath);
-        if (string.IsNullOrEmpty(guid) || guid.Length < 2) return -1;
-        var projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
-        var candidate = Path.Combine(projectRoot, "Library", "metadata", guid.Substring(0, 2), guid);
-        if (File.Exists(candidate)) return new FileInfo(candidate).Length;
-        return -1;
-    }
-
-    // --------------------------------------------------------------- helpers
 
     static List<string> FindSkyboxTextures()
     {
