@@ -36,3 +36,7 @@ sysinfo.txt
 .DS_Store
 *.swp
 
+
+# python bytecode from tools/
+__pycache__/
+*.pyc
