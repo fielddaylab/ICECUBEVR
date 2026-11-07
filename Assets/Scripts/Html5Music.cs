@@ -15,11 +15,15 @@ using UnityEngine.Networking;
 /// (Editor, standalone) they fall back to a plain AudioSource playing an AudioClip,
 /// so existing editor workflows keep working untouched.
 ///
-/// Browser autoplay rules: the first Play() may be deferred by the browser until the
-/// user interacts with the page. The jslib queues it and retries on the next gesture,
-/// so callers do not need to care -- but audio will not be heard before a click.
-///
-/// NOTE: nothing wires this into Main.cs yet; that is card N15.
+/// Browser autoplay rules are handled in two layers:
+///  1. C# gate (this file). Nothing is handed to the browser until <see cref="Unlock"/>
+///     is called from the first user gesture that starts the experience (the BEGIN
+///     gaze/click confirm in Main.cs). A Play() before that is remembered as a single
+///     pending request (latest wins); Stop() before that clears it. Unlock() then
+///     fires the pending request. This is what guarantees the *first* play happens
+///     after a gesture rather than relying on the browser rejecting it.
+///  2. jslib retry (html5audio.jslib). If a play() is still rejected with
+///     NotAllowedError it is queued there and retried on the next DOM gesture.
 /// </summary>
 public static class Html5Music
 {
@@ -42,6 +46,18 @@ public static class Html5Music
   private static bool   initialized;
   private static float  masterVolume = 1f;
   private static string currentTrack;
+
+  // ---- autoplay gate ------------------------------------------------------------
+  // No browser call happens before Unlock(). Exactly one request is remembered while
+  // locked, because music is a single channel: the latest cue is the only one that
+  // would still be audible once audio is allowed.
+  private static float trackVolume = 1f;
+  private static bool  unlocked;
+  private static bool  hasPending;
+  private static string pendingTrack;
+  private static bool  pendingLoop;
+  private static float pendingVolume;
+  private static float pendingStartTime;
 
   // ---- non-WebGL fallback state -------------------------------------------------
 #if !UNITY_WEBGL || UNITY_EDITOR
@@ -93,27 +109,110 @@ public static class Html5Music
   /// <param name="volume">Track volume 0..1, multiplied by the master volume.</param>
   public static void Play(string name, bool loop = true, float volume = 1f)
   {
+    Play(name, loop, volume, 0f);
+  }
+
+  /// <summary>
+  /// Starts a track at <paramref name="startTime"/> seconds in. Used for the
+  /// spec-switch continuity in Main.cs, which carries the playhead across the swap.
+  /// </summary>
+  public static void Play(string name, bool loop, float volume, float startTime)
+  {
     if (string.IsNullOrEmpty(name)) return;
-    Init();
     volume = Mathf.Clamp01(volume);
+    if (startTime < 0f) startTime = 0f;
+
+    if (!unlocked)
+    {
+      // Autoplay gate: remember it, touch nothing in the browser.
+      hasPending       = true;
+      trackVolume      = volume;
+      pendingTrack     = name;
+      pendingLoop      = loop;
+      pendingVolume    = volume;
+      pendingStartTime = startTime;
+      currentTrack     = name;
+      return;
+    }
+
+    Init();
     currentTrack = name;
+    trackVolume  = volume;
 #if UNITY_WEBGL && !UNITY_EDITOR
-    Music_Play(name, loop ? 1 : 0, volume);
+    // The element's own gain stays at 1 and the effective level is pushed through
+    // Music_SetVolume, so SetVolume/SetTrackVolume afterwards are a single multiply.
+    Music_Play(name, loop ? 1 : 0, 1f);
+    Music_SetVolume(Mathf.Clamp01(trackVolume * masterVolume));
+    if (startTime > 0f) Music_SetTime(startTime);
 #else
-    PlayFallback(name, loop, volume);
+    PlayFallback(name, loop, volume, startTime);
 #endif
   }
 
   /// <summary>Stops the current track, optionally fading out over fadeMs milliseconds.</summary>
   public static void Stop(int fadeMs = 0)
   {
-    Init();
     currentTrack = null;
+    ClearPending();
+    if (!unlocked) return;   // nothing was ever handed to the browser
+    Init();
 #if UNITY_WEBGL && !UNITY_EDITOR
     Music_Stop(fadeMs);
 #else
     StopFallback();
 #endif
+  }
+
+  /// <summary>True once <see cref="Unlock"/> has run, i.e. music may reach the browser.</summary>
+  public static bool IsUnlocked
+  {
+    get { return unlocked; }
+  }
+
+  /// <summary>True while a cue is waiting behind the autoplay gate.</summary>
+  public static bool HasPending
+  {
+    get { return hasPending; }
+  }
+
+  /// <summary>Track remembered behind the gate, or null.</summary>
+  public static string PendingTrack
+  {
+    get { return hasPending ? pendingTrack : null; }
+  }
+
+  /// <summary>
+  /// Opens the gate. Call this from the first user gesture that starts the experience
+  /// (the BEGIN confirm in Main.cs) so the browser's autoplay policy is already
+  /// satisfied, then flush whatever cue was waiting. Idempotent.
+  /// </summary>
+  public static void Unlock()
+  {
+    if (unlocked) return;
+    unlocked = true;
+    // Evidence line for the autoplay-gate check: this must appear in the console
+    // before the first "MUSICCUE ... unlocked=True", never after a cue that reached JS.
+    Debug.Log("MUSICGATE unlocked pending=" + (hasPending ? pendingTrack : "none") +
+              " t=" + Time.realtimeSinceStartup.ToString("F1"));
+    Init();
+    // Push the volume that was only recorded in C# while the gate was shut, so the
+    // flushed cue starts at the level its caller asked for.
+    SetVolume(masterVolume);
+    if (!hasPending) return;
+
+    string name  = pendingTrack;
+    bool   loop  = pendingLoop;
+    float  vol   = pendingVolume;
+    float  start = pendingStartTime;
+    ClearPending();
+    Play(name, loop, vol, start);
+  }
+
+  private static void ClearPending()
+  {
+    hasPending       = false;
+    pendingTrack     = null;
+    pendingStartTime = 0f;
   }
 
   /// <summary>Master music volume 0..1, applied on top of each track's own volume.</summary>
@@ -126,12 +225,38 @@ public static class Html5Music
   /// <summary>Sets the master music volume (0..1).</summary>
   public static void SetVolume(float v)
   {
-    Init();
     masterVolume = Mathf.Clamp01(v);
+    ApplyVolume();
+  }
+
+  /// <summary>
+  /// Volume of the current track (0..1), the direct replacement for setting
+  /// <c>AudioSource.volume</c> on the old music source. Multiplied by the master
+  /// volume. Also applies to the cue queued behind the autoplay gate.
+  /// </summary>
+  public static void SetTrackVolume(float v)
+  {
+    trackVolume = Mathf.Clamp01(v);
+    if (hasPending) pendingVolume = trackVolume;
+    ApplyVolume();
+  }
+
+  /// <summary>Volume of the current/queued track, before the master multiply.</summary>
+  public static float TrackVolume
+  {
+    get { return trackVolume; }
+  }
+
+  private static void ApplyVolume()
+  {
+    if (!unlocked) return;   // pushed for real by Unlock() -> Play()
+    Init();
+    float effective = Mathf.Clamp01(trackVolume * masterVolume);
 #if UNITY_WEBGL && !UNITY_EDITOR
-    Music_SetVolume(masterVolume);
+    Music_SetVolume(effective);
 #else
-    if (fallbackSource != null) fallbackSource.volume = fallbackTrackVolume * masterVolume;
+    fallbackTrackVolume = trackVolume;
+    if (fallbackSource != null) fallbackSource.volume = effective;
 #endif
   }
 
@@ -141,6 +266,7 @@ public static class Html5Music
   /// </summary>
   public static bool IsPlaying()
   {
+    if (!unlocked) return hasPending;   // a gated cue counts as "will be playing"
     Init();
 #if UNITY_WEBGL && !UNITY_EDITOR
     return Music_IsPlaying() != 0;
@@ -154,6 +280,7 @@ public static class Html5Music
   {
     get
     {
+      if (!unlocked) return hasPending ? pendingStartTime : 0f;
       Init();
 #if UNITY_WEBGL && !UNITY_EDITOR
       return Music_GetTime();
@@ -163,6 +290,11 @@ public static class Html5Music
     }
     set
     {
+      if (!unlocked)
+      {
+        if (hasPending) pendingStartTime = value < 0f ? 0f : value;
+        return;
+      }
       Init();
 #if UNITY_WEBGL && !UNITY_EDITOR
       Music_SetTime(value < 0f ? 0f : value);
@@ -193,7 +325,7 @@ public static class Html5Music
     fallbackRunner = go.AddComponent<FallbackRunner>();
   }
 
-  private static void PlayFallback(string name, bool loop, float volume)
+  private static void PlayFallback(string name, bool loop, float volume, float startTime)
   {
     EnsureFallbackSource();
 
@@ -207,7 +339,7 @@ public static class Html5Music
     AudioClip cached;
     if (fallbackClips.TryGetValue(name, out cached) && cached != null)
     {
-      StartFallbackClip(cached, name, loop, volume);
+      StartFallbackClip(cached, name, loop, volume, startTime);
       return;
     }
 
@@ -218,26 +350,30 @@ public static class Html5Music
     if (res != null)
     {
       fallbackClips[name] = res;
-      StartFallbackClip(res, name, loop, volume);
+      StartFallbackClip(res, name, loop, volume, startTime);
       return;
     }
 
     // Otherwise decode the same OGG the browser would stream.
-    fallbackRunner.StartCoroutine(LoadAndPlayFallback(name, loop, volume));
+    fallbackRunner.StartCoroutine(LoadAndPlayFallback(name, loop, volume, startTime));
   }
 
-  private static void StartFallbackClip(AudioClip clip, string name, bool loop, float volume)
+  private static void StartFallbackClip(AudioClip clip, string name, bool loop,
+                                        float volume, float startTime)
   {
     // A newer Play() may have superseded this request while a load was in flight.
     if (currentTrack != name) return;
     fallbackSource.clip   = clip;
     fallbackSource.loop   = loop;
     fallbackSource.volume = volume * masterVolume;
-    fallbackSource.time   = 0f;
+    // Carrying the playhead across a spec switch can land past a shorter track.
+    if (startTime > 0f && clip.length > 0f) startTime %= clip.length;
+    fallbackSource.time   = startTime > 0f ? startTime : 0f;
     fallbackSource.Play();
   }
 
-  private static IEnumerator LoadAndPlayFallback(string name, bool loop, float volume)
+  private static IEnumerator LoadAndPlayFallback(string name, bool loop, float volume,
+                                                 float startTime)
   {
     string url = UrlFor(name);
     if (url.IndexOf("://") < 0) url = "file://" + url;
@@ -267,7 +403,7 @@ public static class Html5Music
       }
       clip.name = name;
       fallbackClips[name] = clip;
-      StartFallbackClip(clip, name, loop, volume);
+      StartFallbackClip(clip, name, loop, volume, startTime);
     }
   }
 
