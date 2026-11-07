@@ -5838,7 +5838,7 @@ Light:
   m_Cookie: {fileID: 0}
   m_DrawHalo: 1
   m_Flare: {fileID: 0}
-  m_RenderMode: 0
+  m_RenderMode: 2
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 2048
@@ -6214,6 +6214,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_ReceiveShadows
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 108304473541883658, guid: 8520e9289f03c194592d7c0e643c0ed5,
+        type: 3}
+      propertyPath: m_RenderMode
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 108304473541883658, guid: 8520e9289f03c194592d7c0e643c0ed5,
         type: 3}
@@ -7506,7 +7511,7 @@ Light:
   m_Cookie: {fileID: 0}
   m_DrawHalo: 1
   m_Flare: {fileID: 0}
-  m_RenderMode: 0
+  m_RenderMode: 2
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 2048
@@ -14400,6 +14405,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 108304473541883658, guid: 8520e9289f03c194592d7c0e643c0ed5,
         type: 3}
+      propertyPath: m_RenderMode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 108304473541883658, guid: 8520e9289f03c194592d7c0e643c0ed5,
+        type: 3}
       propertyPath: m_CullingMask.m_Bits
       value: 512
       objectReference: {fileID: 0}
@@ -14484,7 +14494,7 @@ Light:
   m_Cookie: {fileID: 0}
   m_DrawHalo: 0
   m_Flare: {fileID: 0}
-  m_RenderMode: 0
+  m_RenderMode: 2
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 16384
@@ -25154,7 +25164,7 @@ Light:
   m_Cookie: {fileID: 0}
   m_DrawHalo: 0
   m_Flare: {fileID: 0}
-  m_RenderMode: 0
+  m_RenderMode: 2
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 2097152
@@ -35350,7 +35360,7 @@ Light:
   m_Cookie: {fileID: 0}
   m_DrawHalo: 0
   m_Flare: {fileID: 0}
-  m_RenderMode: 0
+  m_RenderMode: 2
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 256
@@ -35579,7 +35589,7 @@ Light:
   m_Cookie: {fileID: 0}
   m_DrawHalo: 1
   m_Flare: {fileID: 0}
-  m_RenderMode: 0
+  m_RenderMode: 2
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 8388608
@@ -36608,7 +36618,7 @@ Light:
   m_Cookie: {fileID: 0}
   m_DrawHalo: 1
   m_Flare: {fileID: 0}
-  m_RenderMode: 0
+  m_RenderMode: 2
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 8388608
@@ -42947,7 +42957,7 @@ Light:
   m_Cookie: {fileID: 0}
   m_DrawHalo: 1
   m_Flare: {fileID: 0}
-  m_RenderMode: 0
+  m_RenderMode: 2
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 2048
@@ -44170,8 +44180,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 108376481360589872, guid: 3969414c1f263446fa5e87ca6eb9cba3,
         type: 3}
+      propertyPath: m_RenderMode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 108376481360589872, guid: 3969414c1f263446fa5e87ca6eb9cba3,
+        type: 3}
       propertyPath: m_CullingMask.m_Bits
       value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 108533047963714420, guid: 3969414c1f263446fa5e87ca6eb9cba3,
+        type: 3}
+      propertyPath: m_RenderMode
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 108533047963714420, guid: 3969414c1f263446fa5e87ca6eb9cba3,
         type: 3}
@@ -44187,6 +44207,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_CullingMask.m_Bits
       value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 108848839614429268, guid: 3969414c1f263446fa5e87ca6eb9cba3,
+        type: 3}
+      propertyPath: m_RenderMode
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 108848839614429268, guid: 3969414c1f263446fa5e87ca6eb9cba3,
         type: 3}
@@ -45033,7 +45058,7 @@ Light:
   m_Cookie: {fileID: 0}
   m_DrawHalo: 0
   m_Flare: {fileID: 0}
-  m_RenderMode: 0
+  m_RenderMode: 2
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 32768
@@ -56095,7 +56120,7 @@ Light:
   m_Cookie: {fileID: 0}
   m_DrawHalo: 1
   m_Flare: {fileID: 0}
-  m_RenderMode: 0
+  m_RenderMode: 2
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 8388608
