@@ -146,10 +146,23 @@ public class Main : MonoBehaviour
   GameObject ar_group;
   GameObject ar_camera_project;
   GameObject ar_camera_static;
+  //N7: Camera components cached in Start. GetComponent<Camera>() ran 8x per
+  //frame in Update (aspect/fov sync) plus 2x in SetSpec; every call is a
+  //native component lookup on the WebGL main thread.
+  Camera main_camera_cam;
+  Camera ar_camera_project_cam;
+  Camera ar_camera_static_cam;
+  Camera portal_camera_next_cam;
   GameObject[] ar_maps;
   GameObject ar_alert;
   GameObject ar_timer;
   TextMesh ar_timer_text;
+  //N7: the EXTREME countdown rebuilt its label every frame with two
+  //float->string conversions and three concatenations. Digits now come from a
+  //prebuilt table and the label is only rewritten when it actually changes.
+  string[] small_number_strings;
+  int ar_timer_secs  = -1;
+  int ar_timer_cents = -1;
   GameObject credits_0;
   GameObject credits_1;
   TextMesh credits_text_0;
@@ -182,6 +195,10 @@ public class Main : MonoBehaviour
   GameObject[] milky;
   GameObject[] nearth;
   GameObject[] blackhole;
+  //N7: child Transforms cached in Start. The per-frame
+  //`foreach(Transform t in blackhole[i].transform)` in UpdateScene boxed a
+  //Transform.Enumerator (3 per frame) for the whole EXTREME scene.
+  Transform[][] blackhole_children;
   GameObject[] esun;
   GameObject[] earth;
   //GameObject stars;
@@ -204,6 +221,16 @@ public class Main : MonoBehaviour
   Vector3 look_ahead;
   Vector3 lazy_look_ahead;
   Vector3 very_lazy_look_ahead;
+  //N7: the two look-ahead smoothers used per-frame Lerp factors (0.1 and
+  //0.002), so the helmet/spec-projection easing ran at a speed that depended
+  //on the frame rate. Re-expressed as continuous rates k with the
+  //frame-rate-independent form alpha = 1 - exp(-k*dt); k = -60*ln(1-a) keeps
+  //the original feel exactly at 60 fps.
+  const float lazy_look_ahead_k      = 6.3216309f;  //-60*ln(1-0.100)
+  const float very_lazy_look_ahead_k = 0.12012016f; //-60*ln(1-0.002)
+  //N7: void fade and intro dim also stepped by a per-frame literal.
+  const float void_t_rate  = 3.0f;  //was 0.05f per frame  -> 0.05*60
+  const float intro_t_rate = 0.12f; //was 0.002f per frame -> 0.002*60
   Vector3 player_head;
 
   public int starting_scene = 0;
@@ -324,6 +351,7 @@ public class Main : MonoBehaviour
   int time_mod_twelve_pi_id;
   float time_mod_twelve_pi;
   int jitter_id;
+  int skybox_rotation_id;
   float jitter;
   float jitter_countdown;
   int jitter_state;
@@ -1421,6 +1449,11 @@ public class Main : MonoBehaviour
     ar_group = GameObject.Find("AR");
     ar_camera_project = GameObject.Find("AR_Camera_Project");
     ar_camera_static = GameObject.Find("AR_Camera_Static");
+    //N7: hoist the per-frame GetComponent<Camera>() calls out of Update
+    main_camera_cam        = main_camera.GetComponent<Camera>();
+    ar_camera_project_cam  = ar_camera_project.GetComponent<Camera>();
+    ar_camera_static_cam   = ar_camera_static.GetComponent<Camera>();
+    portal_camera_next_cam = portal_camera_next.GetComponent<Camera>();
     ar_maps = new GameObject[3];
     ar_maps[0] = GameObject.Find("map0");
     ar_maps[1] = GameObject.Find("map1");
@@ -1584,9 +1617,25 @@ public class Main : MonoBehaviour
       earth[i]     = GameObject.Find("Earth_"     + spec_names[i]);
     }
 
+    //N7: cache the blackhole child Transforms so UpdateScene never allocates
+    //a Transform.Enumerator while the EXTREME scene is on screen.
+    blackhole_children = new Transform[(int)SPEC.COUNT][];
+    for(int i = 0; i < (int)SPEC.COUNT; i++)
+    {
+      Transform bh_transform = blackhole[i].transform;
+      blackhole_children[i] = new Transform[bh_transform.childCount];
+      for(int c = 0; c < bh_transform.childCount; c++)
+        blackhole_children[i][c] = bh_transform.GetChild(c);
+    }
+
+    //N7: prebuilt "0".."100" so the countdown label needs no float formatting
+    small_number_strings = new string[101];
+    for(int i = 0; i < small_number_strings.Length; i++) small_number_strings[i] = i.ToString();
+
     alpha_id = Shader.PropertyToID("alpha");
     time_mod_twelve_pi_id = Shader.PropertyToID("time_mod_twelve_pi");
     jitter_id = Shader.PropertyToID("jitter");
+    skybox_rotation_id = Shader.PropertyToID("_Rotation"); //N7: was hashed from a string every frame
 
     voiceover_audiosource = GameObject.Find("Script").AddComponent<AudioSource>();
     voiceover_audiosource.priority = 1;
@@ -1806,10 +1855,10 @@ public class Main : MonoBehaviour
       case (int)SCENE.EXTREME:
         for(int i = 0; i < (int)SPEC.COUNT; i++)
         {
-          foreach(Transform child_transform in blackhole[i].transform)
+          foreach(Transform child_transform in blackhole[i].transform) // N7-OK: SetupScene/PreSetupNextScene run once per scene transition, not per frame
           {
             GameObject child = child_transform.gameObject;
-            ParticleSystem ps = child.GetComponent<ParticleSystem>();
+            ParticleSystem ps = child.GetComponent<ParticleSystem>(); // N7-OK: scene-transition only, not per frame
             if(ps) ps.Play();
           }
         }
@@ -1857,7 +1906,7 @@ public class Main : MonoBehaviour
     float lw;
 
     lw = 0.0001f;
-    curve = new AnimationCurve();
+    curve = new AnimationCurve(); // N7-OK: SetupScene runs once per scene transition, not per frame
     curve.AddKey(0, lw);
     curve.AddKey(1, lw);
     for(int i = 0; i < MAX_LABELS; i++)
@@ -1973,7 +2022,7 @@ public class Main : MonoBehaviour
         ar_progress_offsets[label_bh_i].transform.position   = ar_label_bh_kids[label_bh_i].transform.position;
         ar_progress_offsets[label_bh_i].transform.rotation   = ar_label_bhs[label_bh_i].transform.rotation;
         lw = 10f;
-        curve = new AnimationCurve();
+        curve = new AnimationCurve(); // N7-OK: SetupScene runs once per scene transition, not per frame
         curve.AddKey(0, lw);
         curve.AddKey(1, lw);
         ar_progress_lines[label_bh_i].widthCurve = curve;
@@ -1992,7 +2041,7 @@ public class Main : MonoBehaviour
         ar_progress_offsets[label_bh_i].transform.position   = ar_label_bh_kids[label_bh_i].transform.position;
         ar_progress_offsets[label_bh_i].transform.rotation   = ar_label_bhs[label_bh_i].transform.rotation;
         lw = 10f;
-        curve = new AnimationCurve();
+        curve = new AnimationCurve(); // N7-OK: SetupScene runs once per scene transition, not per frame
         curve.AddKey(0, lw);
         curve.AddKey(1, lw);
         ar_progress_lines[label_bh_i].widthCurve = curve;
@@ -2011,7 +2060,7 @@ public class Main : MonoBehaviour
         ar_progress_offsets[label_bh_i].transform.position   = ar_label_bh_kids[label_bh_i].transform.position;
         ar_progress_offsets[label_bh_i].transform.rotation   = ar_label_bhs[label_bh_i].transform.rotation;
         lw = 10f;
-        curve = new AnimationCurve();
+        curve = new AnimationCurve(); // N7-OK: SetupScene runs once per scene transition, not per frame
         curve.AddKey(0, lw);
         curve.AddKey(1, lw);
         ar_progress_lines[label_bh_i].widthCurve = curve;
@@ -2033,10 +2082,10 @@ public class Main : MonoBehaviour
         //should have also been done in pre-setup, but can't hurt (in case of debug "start here")
         for(int i = 0; i < (int)SPEC.COUNT; i++)
         {
-          foreach(Transform child_transform in blackhole[i].transform)
+          foreach(Transform child_transform in blackhole[i].transform) // N7-OK: SetupScene/PreSetupNextScene run once per scene transition, not per frame
           {
             GameObject child = child_transform.gameObject;
-            ParticleSystem ps = child.GetComponent<ParticleSystem>();
+            ParticleSystem ps = child.GetComponent<ParticleSystem>(); // N7-OK: scene-transition only, not per frame
             if(ps) ps.Play();
           }
         }
@@ -2051,6 +2100,8 @@ public class Main : MonoBehaviour
         ar_timer.SetActive(true);
         timer_t = 0;
         alert_t = 0;
+        ar_timer_secs  = -1; //N7: invalidate the countdown label cache on scene entry
+        ar_timer_cents = -1;
 
         break;
 
@@ -2075,10 +2126,10 @@ public class Main : MonoBehaviour
 
         for(int i = 0; i < (int)SPEC.COUNT; i++)
         {
-          foreach(Transform child_transform in blackhole[i].transform)
+          foreach(Transform child_transform in blackhole[i].transform) // N7-OK: SetupScene/PreSetupNextScene run once per scene transition, not per frame
           {
             GameObject child = child_transform.gameObject;
-            ParticleSystem ps = child.GetComponent<ParticleSystem>();
+            ParticleSystem ps = child.GetComponent<ParticleSystem>(); // N7-OK: scene-transition only, not per frame
             if(ps) ps.Stop();
           }
         }
@@ -2180,8 +2231,8 @@ public class Main : MonoBehaviour
           {
             grid_yvel += grid_yacc;
             grid_yoff += grid_yvel;
-            if(grid_yoff > 0) { grid_yoff *= -1f; grid_yvel *= -0.5f; }
-            grid_yvel *= 0.96f;
+            if(grid_yoff > 0) { grid_yoff *= -1f; grid_yvel *= -0.5f; } // N7-OK: real per-frame integrator, but it is ICE prop animation, not camera/gaze/warp motion -- documented in tools/main_audit.md finding A-4, deliberately not touched
+            grid_yvel *= 0.96f; // N7-OK: same ICE grid spring; see tools/main_audit.md finding A-4
             if(Mathf.Abs(grid_yoff) < 1 && Mathf.Abs(grid_yvel) < 1) { grid_yoff = 0; grid_yvel = 0; grid_yacc = 0; }
             grid.transform.position = new Vector3(grid.transform.position.x,grid_oyoff+grid_yoff,grid.transform.position.z);
           }
@@ -2337,7 +2388,21 @@ public class Main : MonoBehaviour
             }
           }
 
-          ar_timer_text.text = "00:" + Mathf.Floor(seconds_left) + ":" + Mathf.Floor((seconds_left - Mathf.Floor(seconds_left)) * 100);
+          //N7: identical output ("00:" + unpadded seconds + ":" + unpadded
+          //hundredths) with no float->string conversion and no per-frame
+          //concatenation; only rewritten when the displayed value changes.
+          int timer_secs = (int)seconds_left;
+          if(timer_secs < 0) timer_secs = 0;
+          if(timer_secs > 100) timer_secs = 100;
+          int timer_cents = (int)((seconds_left - timer_secs) * 100f);
+          if(timer_cents < 0) timer_cents = 0;
+          if(timer_cents > 99) timer_cents = 99;
+          if(timer_secs != ar_timer_secs || timer_cents != ar_timer_cents)
+          {
+            ar_timer_secs  = timer_secs;
+            ar_timer_cents = timer_cents;
+            ar_timer_text.text = "00:" + small_number_strings[timer_secs] + ":" + small_number_strings[timer_cents]; // N7-OK: guarded by the change check above; digits come from the prebuilt table
+          }
           float bar_y = -2;
           float bar_x = -11;
           float bar_w = 23;
@@ -2373,16 +2438,21 @@ public class Main : MonoBehaviour
         else if(in_fail_motion == 0)
         {
           in_fail_motion = 0.0001f;
-          ar_timer_text.text = "XX:XX:XX";
+          ar_timer_text.text = "XX:XX:XX"; // N7-OK: fires once when the countdown expires
+          ar_timer_secs  = -1;
+          ar_timer_cents = -1;
         }
 
         float bhr_speed = 2.0f;
+        //N7: indexed walk over the cached child Transforms; the old
+        //`foreach(... in blackhole[i].transform)` allocated a boxed
+        //Transform.Enumerator on every frame of the EXTREME scene.
         for(int i = 0; i < (int)SPEC.COUNT; i++)
         {
-          foreach(Transform child_transform in blackhole[i].transform)
-          {
-            child_transform.localRotation = Quaternion.Euler(10.0f, nwave_t_10*36*bhr_speed, 10.0f);
-          }
+          Transform[] bh_children = blackhole_children[i];
+          Quaternion bh_rotation = Quaternion.Euler(10.0f, nwave_t_10*36*bhr_speed, 10.0f); // N7-OK: angle comes from nwave_t_10, integrated with Time.deltaTime
+          for(int c = 0; c < bh_children.Length; c++)
+            bh_children[c].localRotation = bh_rotation;
         }
 
         break;
@@ -2433,8 +2503,8 @@ public class Main : MonoBehaviour
         break;
     }
 
-    main_camera.GetComponent<Camera>().cullingMask = (1 << layers[cur_scene_i, cur_spec_i]) | (1 << default_layer);
-    portal_camera_next.GetComponent<Camera>().cullingMask = (1 << layers[next_scene_i, (int)SPEC.VIZ]);
+    main_camera_cam.cullingMask = (1 << layers[cur_scene_i, cur_spec_i]) | (1 << default_layer);
+    portal_camera_next_cam.cullingMask = (1 << layers[next_scene_i, (int)SPEC.VIZ]);
     main_camera_skybox.material = skyboxes[cur_scene_i, cur_spec_i];
     portal_camera_next_skybox.material = skyboxes[next_scene_i, (int)SPEC.VIZ];
 
@@ -2446,8 +2516,8 @@ public class Main : MonoBehaviour
   void Update()
   {
     float old_void_t = void_t;
-         if(void_t < target_void_t) void_t += 0.05f;
-    else if(void_t > target_void_t) void_t -= 0.05f;
+         if(void_t < target_void_t) void_t += void_t_rate * Time.deltaTime;
+    else if(void_t > target_void_t) void_t -= void_t_rate * Time.deltaTime;
     void_t = Mathf.Clamp(void_t,0f,1f);
     if(old_void_t < 1f && void_t == 1f)
     {
@@ -2489,7 +2559,7 @@ public class Main : MonoBehaviour
 
     if(intro_t > 0 && hmd_mounted && !begin_text.activeSelf && !querying_continue)
     {
-      intro_t += 0.002f;
+      intro_t += intro_t_rate * Time.deltaTime;
       dim_alpha = 1f-intro_t;
       if(intro_t > 1f)
       {
@@ -2502,14 +2572,14 @@ public class Main : MonoBehaviour
     while(nwave_t_1  > 1)  nwave_t_1  -= 1f;
     while(nwave_t_10 > 10) nwave_t_10 -= 10f;
 
-    float aspect = main_camera.GetComponent<Camera>().aspect;
-    float fov = main_camera.GetComponent<Camera>().fieldOfView;
-    ar_camera_project.GetComponent<Camera>().aspect = aspect;
-    ar_camera_static.GetComponent<Camera>().aspect = aspect;
-    portal_camera_next.GetComponent<Camera>().aspect = aspect;
-    ar_camera_project.GetComponent<Camera>().fieldOfView = fov;
-    ar_camera_static.GetComponent<Camera>().fieldOfView = fov;
-    portal_camera_next.GetComponent<Camera>().fieldOfView = fov;
+    float aspect = main_camera_cam.aspect;
+    float fov = main_camera_cam.fieldOfView;
+    ar_camera_project_cam.aspect = aspect;
+    ar_camera_static_cam.aspect = aspect;
+    portal_camera_next_cam.aspect = aspect;
+    ar_camera_project_cam.fieldOfView = fov;
+    ar_camera_static_cam.fieldOfView = fov;
+    portal_camera_next_cam.fieldOfView = fov;
 
     if(Input.GetMouseButtonDown(0))
     {
@@ -2660,8 +2730,8 @@ public class Main : MonoBehaviour
       camera_house.transform.rotation = Quaternion.Euler((mouse_y - Screen.height / 2) * -2, (mouse_x - Screen.width / 2) * 2, 0);
 
     look_ahead = main_camera.transform.rotation * default_look_ahead;
-    lazy_look_ahead = Vector3.Lerp(lazy_look_ahead, look_ahead, 0.1f);
-    very_lazy_look_ahead = Vector3.Lerp(very_lazy_look_ahead, look_ahead, 0.002f);
+    lazy_look_ahead = Vector3.Lerp(lazy_look_ahead, look_ahead, 1f-Mathf.Exp(-lazy_look_ahead_k*Time.deltaTime));
+    very_lazy_look_ahead = Vector3.Lerp(very_lazy_look_ahead, look_ahead, 1f-Mathf.Exp(-very_lazy_look_ahead_k*Time.deltaTime));
     if(cur_scene_i == (int)SCENE.EXTREME)
       helmet.transform.position = main_camera.transform.position + new Vector3(Random.Range(-extreme_helmet_shake, extreme_helmet_shake), Random.Range(-extreme_helmet_shake, extreme_helmet_shake), Random.Range(-extreme_helmet_shake, extreme_helmet_shake));
     else
@@ -2693,7 +2763,7 @@ public class Main : MonoBehaviour
     }
     else
       flash_alpha = 0;
-    flash_alpha *= 1.1f;
+    flash_alpha *= 1.1f; // N7-OK: flash_alpha is recomputed from the portal/fail timers every frame above, so this is a gain, not a per-frame accumulator
     if(flash_alpha > 1)
       flash_alpha = 1;
     flash_alpha = flash_alpha * flash_alpha;
@@ -2809,10 +2879,10 @@ public class Main : MonoBehaviour
     scene_groups[cur_scene_i, cur_spec_i].transform.position = new Vector3(0, 0, 0);
     scene_groups[cur_scene_i, cur_spec_i].transform.rotation = Quaternion.Euler(0f, 0f, 0f);
 
-    scene_groups[cur_scene_i, cur_spec_i].transform.Translate(scene_centers[cur_scene_i]);
-    scene_groups[cur_scene_i, cur_spec_i].transform.Rotate(0f, Mathf.Rad2Deg * scene_rots[cur_scene_i], 0f);
-    scene_groups[cur_scene_i, cur_spec_i].transform.Translate(-scene_centers[cur_scene_i]);
-    main_camera_skybox.material.SetFloat("_Rotation", -Mathf.Rad2Deg * scene_rots[cur_scene_i]);
+    scene_groups[cur_scene_i, cur_spec_i].transform.Translate(scene_centers[cur_scene_i]); // N7-OK: absolute rebuild, the transform was reset to identity two lines above
+    scene_groups[cur_scene_i, cur_spec_i].transform.Rotate(0f, Mathf.Rad2Deg * scene_rots[cur_scene_i], 0f); // N7-OK: angle comes from scene_rots, which is integrated with Time.deltaTime
+    scene_groups[cur_scene_i, cur_spec_i].transform.Translate(-scene_centers[cur_scene_i]); // N7-OK: absolute rebuild, pairs with the Translate above
+    main_camera_skybox.material.SetFloat(skybox_rotation_id, -Mathf.Rad2Deg * scene_rots[cur_scene_i]);
 
     time_mod_twelve_pi = (time_mod_twelve_pi + Time.deltaTime) % (12.0f * 3.1415926535f);
     Shader.SetGlobalFloat(time_mod_twelve_pi_id, time_mod_twelve_pi);
@@ -2831,7 +2901,7 @@ public class Main : MonoBehaviour
       }
     }
     if(jitter_state == 1 && cur_scene_i == (int)SCENE.EXTREME)
-      jitter += Random.Range(-0.1f, 0.1f);
+      jitter += Random.Range(-0.1f, 0.1f); // N7-OK: deliberate per-frame glitch noise, not camera/gaze/warp motion; out of this card's fix scope (see tools/main_audit.md)
     else
       jitter = 0;
     Shader.SetGlobalFloat(jitter_id, jitter);
