@@ -2,27 +2,33 @@ using UnityEngine;
 
 /// Runtime performance governor for the WebGL/Chromebook build.
 ///
-/// Why adaptive and not just "set low settings": we cannot know the target
-/// Chromebook's GPU. Fixed settings either leave performance on the table or
-/// still miss 30fps on a weak Mali/UHD part. So this measures actual frame time
-/// and scales render resolution to hit the target, which is the one lever that
-/// reliably buys frame rate on fill-bound integrated GPUs.
+/// N2 ("governor defuse"): the two mechanisms that guaranteed blur and
+/// judder are gone from the active path:
+///   1. Application.targetFrameRate=30 -- on WebGL a positive targetFrameRate
+///      makes Unity drive the main loop with setTimeout instead of
+///      requestAnimationFrame, which adds frame jitter. The active path now
+///      uses targetFrameRate=-1 (rAF, vsync-aligned).
+///   2. The one-way Screen.SetResolution ratchet to 1024x576 plus the
+///      maxWidth/maxHeight cap. The active path no longer touches the
+///      drawing buffer at all: Unity's default canvas matching sizes the
+///      buffer at round(clientWidth * devicePixelRatio), i.e. 1:1 with
+///      physical pixels.
 ///
-/// Also note the Awake-timing trap: Unity's canvas is often still at its
-/// default 300x150 during Awake, so reading Screen.width there and clamping
-/// once does nothing. We re-evaluate every interval instead.
+/// The old ratchet is retained ONLY behind `legacyResolutionScaling`
+/// (default false, no-op) so a regression can be A/B'd without archaeology.
+/// No new scaling/pacing scheme is introduced here (that is N5/N6).
 public class WebGLPerfGovernor : MonoBehaviour
 {
-    [Header("Target")]
-    public int targetFps = 30;
+    [Header("Active path")]
+    [Tooltip("Legacy resolution ratchet. Default false: Update is a no-op and no Screen.SetResolution is ever called.")]
+    public bool legacyResolutionScaling = false;
 
-    [Header("Resolution bounds")]
+    [Header("Legacy ratchet (only used when legacyResolutionScaling is on)")]
+    public int targetFps = 30;
     public int maxWidth = 1280;
     public int maxHeight = 720;
     public int minWidth = 640;
     public int minHeight = 360;
-
-    [Header("Adaptation")]
     [Tooltip("Seconds between resolution adjustments.")]
     public float interval = 2.0f;
     [Tooltip("Multiplicative step when scaling down/up.")]
@@ -40,9 +46,11 @@ public class WebGLPerfGovernor : MonoBehaviour
     {
         ApplyQuality();
         TrimParticles();
-        nextCheck = Time.realtimeSinceStartup + 4f;   // let it finish loading
-        Debug.Log("GOVERNOR init target=" + targetFps + "fps quality=" +
-                  QualitySettings.names[QualitySettings.GetQualityLevel()]);
+        Debug.Log($"[WebGLPerfGovernor] drawing buffer {Screen.width}x{Screen.height}");
+        if (legacyResolutionScaling)
+        {
+            nextCheck = Time.realtimeSinceStartup + 4f;   // let it finish loading
+        }
     }
 
     void ApplyQuality()
@@ -56,12 +64,17 @@ public class WebGLPerfGovernor : MonoBehaviour
         QualitySettings.antiAliasing = 0;
         QualitySettings.lodBias = 0.4f;
         QualitySettings.skinWeights = SkinWeights.OneBone;
-        QualitySettings.vSyncCount = 0;             // required for targetFrameRate
-        Application.targetFrameRate = targetFps;
+        // -1 on WebGL = requestAnimationFrame (vsync-aligned). Do NOT set a
+        // positive targetFrameRate: that switches the main loop to setTimeout.
+        // Do NOT set vSyncCount either: it only affects the platform's own
+        // vsync and is irrelevant on the rAF path.
+        Application.targetFrameRate = -1;
     }
 
     void Update()
     {
+        if (!legacyResolutionScaling) return;
+
         if (Time.realtimeSinceStartup < nextCheck) return;
         nextCheck = Time.realtimeSinceStartup + interval;
 
@@ -72,8 +85,6 @@ public class WebGLPerfGovernor : MonoBehaviour
             baseW = Screen.width;
             baseH = Screen.height;
             haveBase = true;
-            Debug.Log("GOVERNOR base resolution " + baseW + "x" + baseH +
-                      " dpr-adjusted cap " + maxWidth + "x" + maxHeight);
         }
 
         // smoothDeltaTime is already averaged, which is what we want here.
@@ -85,16 +96,16 @@ public class WebGLPerfGovernor : MonoBehaviour
         if (fps < target * 0.9f && scale > 0.34f)
         {
             scale *= stepDown;
-            Apply();
+            ApplyLegacy();
         }
         else if (fps > target * 1.25f && scale < 1.0f)
         {
             scale = Mathf.Min(1.0f, scale * stepUp);
-            Apply();
+            ApplyLegacy();
         }
     }
 
-    void Apply()
+    void ApplyLegacy()
     {
         int capW = Mathf.Min(baseW, maxWidth);
         int capH = Mathf.Min(baseH, maxHeight);
@@ -104,7 +115,7 @@ public class WebGLPerfGovernor : MonoBehaviour
         lastAppliedW = w;
         lastAppliedH = h;
         Screen.SetResolution(w, h, false);
-        Debug.Log("GOVERNOR scale=" + scale.ToString("0.00") + " -> " + w + "x" + h);
+        Debug.Log($"[WebGLPerfGovernor] applied {w}x{h}");
     }
 
     void TrimParticles()
@@ -123,6 +134,5 @@ public class WebGLPerfGovernor : MonoBehaviour
                 rend.receiveShadows = false;
             }
         }
-        Debug.Log("GOVERNOR particle systems trimmed=" + n);
     }
 }
