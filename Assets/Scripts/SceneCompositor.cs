@@ -53,6 +53,7 @@ using UnityEngine;
 /// the scene diff small and avoids fighting the other cards over per-camera
 /// properties. Cameras that already own a RenderTexture (portal / AR) are never
 /// touched.
+[DisallowMultipleComponent]
 public class SceneCompositor : MonoBehaviour
 {
   public const string GameObjectName = "SceneCompositor";
