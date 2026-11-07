@@ -1624,8 +1624,8 @@ public class Main : MonoBehaviour
     {
       Transform bh_transform = blackhole[i].transform;
       blackhole_children[i] = new Transform[bh_transform.childCount];
-      for(int c = 0; c < bh_transform.childCount; c++)
-        blackhole_children[i][c] = bh_transform.GetChild(c);
+      for(int ci = 0; ci < bh_transform.childCount; ci++)
+        blackhole_children[i][ci] = bh_transform.GetChild(ci);
     }
 
     //N7: prebuilt "0".."100" so the countdown label needs no float formatting
