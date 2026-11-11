@@ -553,6 +553,18 @@ public class Main : MonoBehaviour
   float mouse_x;
   float mouse_y;
 
+  // --- look controls (N21: slower mouse + keyboard look + HUD) -------------
+  // camera yaw is (mouse_x - Screen.width/2) * 2 degrees, so one unit of
+  // mouse_x == 2 degrees. The old code fed Input.GetAxis("Mouse X") * 10 in,
+  // i.e. ~20 deg per axis unit, which made the view unusable for reading.
+  float mouse_look_gain = 1.0f;          // 10x slower than the old 10f
+  float key_look_deg_per_sec = 60f;      // arrow / WASD turn rate
+  float key_look_fast_multiplier = 2.5f; // held SHIFT
+  bool  show_help_hud = true;            // toggled with H
+  GUIStyle hud_style;
+  GUIStyle hud_box_style;
+  Texture2D hud_bg;
+
   float in_portal_motion;
   float out_portal_motion;
   float max_portal_motion;
@@ -2513,6 +2525,62 @@ public class Main : MonoBehaviour
 
   float nwave_t_1 = 0;
   float nwave_t_10 = 0;
+  // Bottom-left keyboard-controls HUD. Screen-space IMGUI text is pixel
+  // aligned, so it stays legible where the world-space TextMesh captions blur.
+  void OnGUI()
+  {
+    if(hud_bg == null)
+    {
+      hud_bg = new Texture2D(1,1);
+      hud_bg.SetPixel(0,0,new Color(0f,0f,0f,0.62f));
+      hud_bg.Apply();
+    }
+    if(hud_box_style == null)
+    {
+      hud_box_style = new GUIStyle();
+      hud_box_style.normal.background = hud_bg;
+    }
+    if(hud_style == null)
+    {
+      hud_style = new GUIStyle(GUI.skin.label);
+      hud_style.alignment = TextAnchor.UpperLeft;
+      hud_style.wordWrap = false;
+      hud_style.richText = false;
+    }
+    // scale with viewport height so it is readable at 720p and 1080p alike
+    int fs = Mathf.Clamp(Mathf.RoundToInt(Screen.height * 0.0235f), 13, 30);
+    hud_style.fontSize = fs;
+    hud_style.normal.textColor = Color.white;
+
+    string body;
+    if(show_help_hud)
+      body =
+        "Arrows / WASD  look around\n" +
+        "SHIFT + look   turn faster\n" +
+        "C              recenter view\n" +
+        "SPACE          hold = remove headset\n" +
+        "CLICK          toggle mouse look\n" +
+        "H              hide this help";
+    else
+      body = "H  show controls";
+
+    float pad  = Mathf.Round(fs * 0.7f);
+    float lh   = fs * 1.42f;
+    int   lines = 1;
+    for(int i = 0; i < body.Length; i++) if(body[i] == '\n') lines++;
+    float boxH = lh * lines + pad * 2f;
+    float boxW = show_help_hud ? Mathf.Max(260f, fs * 17.5f) : Mathf.Max(120f, fs * 8.5f);
+    float margin = Mathf.Round(Screen.height * 0.022f);
+    float boxY = Screen.height - boxH - margin;
+
+    GUI.Box(new Rect(margin, boxY, boxW, boxH), GUIContent.none, hud_box_style);
+    // cheap 1px drop shadow for contrast over bright ice/sky
+    hud_style.normal.textColor = new Color(0f,0f,0f,0.85f);
+    GUI.Label(new Rect(margin + pad + 1f, boxY + pad + 1f, boxW, boxH), body, hud_style);
+    hud_style.normal.textColor = Color.white;
+    GUI.Label(new Rect(margin + pad, boxY + pad, boxW, boxH), body, hud_style);
+  }
+
   void Update()
   {
     float old_void_t = void_t;
@@ -2605,7 +2673,7 @@ public class Main : MonoBehaviour
     {
       HandleHMDMounted();
     }
-    if(Input.GetKeyDown("s"))
+    if(Input.GetKeyDown(KeyCode.F9))
     {
       ScreenCapture.CaptureScreenshot("screeny.png", 10);
     }
@@ -2705,8 +2773,8 @@ public class Main : MonoBehaviour
 
     if(mouse_captured)
     {
-      float in_x = Input.GetAxis("Mouse X") * 10;
-      float in_y = Input.GetAxis("Mouse Y") * 10;
+      float in_x = Input.GetAxis("Mouse X") * mouse_look_gain;
+      float in_y = Input.GetAxis("Mouse Y") * mouse_look_gain;
       if(!mouse_just_captured)
       {
         mouse_x += in_x;
@@ -2717,6 +2785,33 @@ public class Main : MonoBehaviour
         if(in_x != 0 || in_y != 0)
           mouse_just_captured = false;
       }
+    }
+
+    // keyboard look -- works whether or not the mouse is captured, so the
+    // scene can be read without fighting the pointer. 1 unit == 2 degrees.
+    {
+      float kx = 0f;
+      float ky = 0f;
+      if(Input.GetKey(KeyCode.LeftArrow)  || Input.GetKey(KeyCode.A)) kx -= 1f;
+      if(Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D)) kx += 1f;
+      if(Input.GetKey(KeyCode.UpArrow)    || Input.GetKey(KeyCode.W)) ky += 1f;
+      if(Input.GetKey(KeyCode.DownArrow)  || Input.GetKey(KeyCode.S)) ky -= 1f;
+      if(kx != 0f || ky != 0f)
+      {
+        float rate = key_look_deg_per_sec;
+        if(Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+          rate *= key_look_fast_multiplier;
+        float step = (rate * Time.unscaledDeltaTime) / 2f; // 2 deg per unit
+        mouse_x += kx * step;
+        mouse_y += ky * step;
+      }
+      if(Input.GetKeyDown(KeyCode.C))
+      {
+        mouse_x = Screen.width  / 2;
+        mouse_y = Screen.height / 2;
+      }
+      if(Input.GetKeyDown(KeyCode.H))
+        show_help_hud = !show_help_hud;
     }
 
     Vector3 offset = new Vector3(

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>%UNITY_WEB_NAME%</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <script src="%UNITY_WEBGL_LOADER_URL%"></script>
+    <style>
+      html, body { margin: 0; padding: 0; height: 100%; background: #000; overflow: hidden; }
+      /* The container must be sized in real CSS pixels BEFORE UnityLoader runs.
+         Unity's matchWebGLToCanvasSize then makes the drawing buffer
+         clientWidth x devicePixelRatio, i.e. 1:1 with physical pixels, so the
+         browser never bilinearly upscales the frame. The old built-in template
+         hardcoded 1280x720 and let the browser stretch it to the viewport,
+         which blurred every glyph (~1.25x at 1280 CSS px, ~2.5x on a DPR-2
+         Chromebook) -- no font atlas survives that. */
+      #unityContainer { width: 100vw; height: 100vh; }
+      #unityContainer canvas { display: block; width: 100%; height: 100%; }
+      /* Keep the backing store crisp if a scale ever is applied. */
+      #unityContainer canvas { image-rendering: pixelated; }
+    </style>
+  </head>
+  <body>
+    <div id="unityContainer"></div>
+    <script>
+      // Cap the device pixel ratio so a HiDPI Chromebook does not try to
+      // rasterize a 4x-area buffer and fall off the frame budget. 1.5 keeps
+      // text pixel-crisp while bounding fill cost.
+      var MAX_DPR = 1.5;
+      try {
+        if (window.devicePixelRatio > MAX_DPR) {
+          // Unity reads devicePixelRatio when sizing the backing store.
+          Object.defineProperty(window, "devicePixelRatio", {
+            get: function () { return MAX_DPR; }
+          });
+        }
+      } catch (e) { /* non-fatal: fall back to the real DPR */ }
+
+      var unityInstance = UnityLoader.instantiate(
+        "unityContainer", "%UNITY_WEBGL_BUILD_URL%");
+    </script>
+  </body>
+</html>
