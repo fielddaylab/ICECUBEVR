@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro; // N12: labels are TextMeshPro SDF now; TMP_Text covers both 3D and UGUI variants
 
 public class Main : MonoBehaviour
 {
@@ -149,27 +150,27 @@ public class Main : MonoBehaviour
   GameObject[] ar_maps;
   GameObject ar_alert;
   GameObject ar_timer;
-  TextMesh ar_timer_text;
+  TMP_Text ar_timer_text;
   GameObject credits_0;
   GameObject credits_1;
-  TextMesh credits_text_0;
-  TextMesh credits_text_1;
+  TMP_Text credits_text_0;
+  TMP_Text credits_text_1;
   GameObject subtitles;
-  TextMesh subtitles_text;
+  TMP_Text subtitles_text;
 
   int MAX_LABELS = 5;
   GameObject[] ar_label_lefts;
   GameObject[] ar_label_left_kids;
   GameObject[] ar_label_left_quads;
-  TextMesh[] ar_label_left_texts;
+  TMP_Text[] ar_label_left_texts;
   GameObject[] ar_label_rights;
   GameObject[] ar_label_right_kids;
   GameObject[] ar_label_right_quads;
-  TextMesh[] ar_label_right_texts;
+  TMP_Text[] ar_label_right_texts;
   GameObject[] ar_label_bhs;
   GameObject[] ar_label_bh_kids;
   GameObject[] ar_label_bh_quads;
-  TextMesh[] ar_label_bh_texts;
+  TMP_Text[] ar_label_bh_texts;
   GameObject[] ar_progresses;
   GameObject[] ar_progress_offsets;
   LineRenderer[] ar_progress_lines;
@@ -360,11 +361,15 @@ public class Main : MonoBehaviour
   bool advance_paused = false;
   bool hmd_mounted = false;
   bool[,] voiceovers_played;
-  AudioSource music_audiosource;
+  // Music streams through a browser <audio> element (Html5Music), not an AudioSource:
+  // Unity WebGL would otherwise decode all 16 tracks to float PCM up front. There is
+  // exactly one music channel, so Html5Music's single-track API maps 1:1 onto what
+  // music_audiosource used to do. SFX and voiceover are untouched AudioSources.
   bool music_was_playing;
-  string[,] music_files;
-  AudioClip[,] musics;
+  string[,] music_files;      //Html5Music track ids, e.g. "Viz/Ice"
   float[,] music_vols;
+  float music_restart_t;      //throttles the "track ended, start it again" check
+  const float music_restart_interval = 0.5f;
   AudioSource[] sfx_audiosource;
   AudioSource warp_audiosource_ptr; //<- PTR! DON'T ALLOCATE!
   int n_sfx_audiosources;
@@ -391,6 +396,26 @@ public class Main : MonoBehaviour
   };
   AudioClip[] sfxs;
   float[] sfx_vols;
+
+  //Single entry point for every music cue. Replaces the old
+  //  music_audiosource.Stop(); .clip = ...; .volume = ...; .Play();
+  //block at each call site. Html5Music streams the track from
+  //StreamingAssets/music/<id>.ogg through a browser <audio> element and holds the
+  //request back until Html5Music.Unlock() runs on the BEGIN confirm, so no music
+  //ever reaches the browser before the first user gesture.
+  void PlayMusic(int scene_i, int spec_i, float start_time)
+  {
+    string track = music_files[scene_i,spec_i];
+    if(track == null || track == "") return;
+    music_was_playing = true;
+    music_restart_t = 0f;
+    //evidence line for the cue walkthrough; cues are rare (scene/spec changes only)
+    Debug.Log("MUSICCUE track="+track+" vol="+music_vols[scene_i,spec_i]+
+              " t="+start_time+" unlocked="+Html5Music.IsUnlocked);
+    //loop:false -- the AudioSource did not loop either; UpdateScene restarts the
+    //track when it runs out, which is what keeps the credits/scene beds going.
+    Html5Music.Play(track, false, music_vols[scene_i,spec_i], start_time);
+  }
 
   AudioSource PlaySFX(SFX s)
   {
@@ -452,7 +477,7 @@ public class Main : MonoBehaviour
     if(voiceover_was_playing)
       voiceover_audiosource.volume = voiceover_vols[cur_scene_i,cur_spec_i];
     if(music_was_playing)
-      music_audiosource.volume = music_vols[cur_scene_i,cur_spec_i];
+      Html5Music.SetTrackVolume(music_vols[cur_scene_i,cur_spec_i]);
   }
 
   string[,] skybox_files;
@@ -590,8 +615,9 @@ public class Main : MonoBehaviour
     }
     voiceover_was_playing = false;
     music_was_playing = false;
+    music_restart_t = 0f;
     voiceover_audiosource.Stop();
-    music_audiosource.Stop();
+    Html5Music.Stop();
 
     subtitles_text.text = "";
     subtitle_i = 0;
@@ -1330,16 +1356,16 @@ public class Main : MonoBehaviour
     {
       for(int j = 0; j < (int)SPEC.COUNT; j++)
       {
-        music_files[i,j] = "Music/"+spec_names[j]+"/"+scene_names[i];
+        //Html5Music resolves this against StreamingAssets/music/<id>.ogg -- same
+        //Spec/Scene layout the Resources clips used, minus the "Music/" prefix.
+        music_files[i,j] = spec_names[j]+"/"+scene_names[i];
       }
     }
-    musics = new AudioClip[(int)SCENE.COUNT,(int)SPEC.COUNT];
     music_vols = new float[(int)SCENE.COUNT,(int)SPEC.COUNT];
     for(int i = 0; i < (int)SCENE.COUNT; i++)
     {
       for(int j = 0; j < (int)SPEC.COUNT; j++)
       {
-        musics[i,j] = Resources.Load<AudioClip>(music_files[i,j]);
         music_vols[i,j] = 1.0f;
       }
     }
@@ -1427,28 +1453,28 @@ public class Main : MonoBehaviour
     ar_maps[2] = GameObject.Find("map2");
     ar_alert = GameObject.Find("Alert");
     ar_timer = GameObject.Find("Timer");
-    ar_timer_text = ar_timer.GetComponent<TextMesh>();
+    ar_timer_text = ar_timer.GetComponent<TMP_Text>();
     credits_0 = GameObject.Find("Credits_0");
-    credits_text_0 = credits_0.GetComponent<TextMesh>();
+    credits_text_0 = credits_0.GetComponent<TMP_Text>();
     credits_1 = GameObject.Find("Credits_1");
-    credits_text_1 = credits_1.GetComponent<TextMesh>();
+    credits_text_1 = credits_1.GetComponent<TMP_Text>();
     subtitles = GameObject.Find("Subtitles");
-    subtitles_text = subtitles.GetComponent<TextMesh>();
+    subtitles_text = subtitles.GetComponent<TMP_Text>();
     //stars = GameObject.Find("Stars");
     //starsscale = GameObject.Find("StarsScale");
 
     ar_label_lefts      = new GameObject[MAX_LABELS];
     ar_label_left_kids  = new GameObject[MAX_LABELS];
     ar_label_left_quads = new GameObject[MAX_LABELS];
-    ar_label_left_texts = new TextMesh[MAX_LABELS];
+    ar_label_left_texts = new TMP_Text[MAX_LABELS];
     ar_label_rights      = new GameObject[MAX_LABELS];
     ar_label_right_kids  = new GameObject[MAX_LABELS];
     ar_label_right_quads = new GameObject[MAX_LABELS];
-    ar_label_right_texts = new TextMesh[MAX_LABELS];
+    ar_label_right_texts = new TMP_Text[MAX_LABELS];
     ar_label_bhs      = new GameObject[MAX_LABELS];
     ar_label_bh_kids  = new GameObject[MAX_LABELS];
     ar_label_bh_quads = new GameObject[MAX_LABELS];
-    ar_label_bh_texts = new TextMesh[MAX_LABELS];
+    ar_label_bh_texts = new TMP_Text[MAX_LABELS];
 
     //technically isn't connected to max labels, but as there's a label per line, it's at least upper bound
     ar_label_checks     = new GameObject[MAX_LABELS];
@@ -1485,7 +1511,7 @@ public class Main : MonoBehaviour
         switch(k)
         {
           case 0: ar_label_left_quads[i] = child; break;
-          case 1: ar_label_left_texts[i] = child.GetComponent<TextMesh>(); break;
+          case 1: ar_label_left_texts[i] = child.GetComponent<TMP_Text>(); break;
         }
         k++;
       }
@@ -1509,7 +1535,7 @@ public class Main : MonoBehaviour
         switch(k)
         {
           case 0: ar_label_right_quads[i] = child; break;
-          case 1: ar_label_right_texts[i] = child.GetComponent<TextMesh>(); break;
+          case 1: ar_label_right_texts[i] = child.GetComponent<TMP_Text>(); break;
         }
         k++;
       }
@@ -1533,7 +1559,7 @@ public class Main : MonoBehaviour
         switch(k)
         {
           case 0: ar_label_bh_quads[i] = child; break;
-          case 1: ar_label_bh_texts[i] = child.GetComponent<TextMesh>(); break;
+          case 1: ar_label_bh_texts[i] = child.GetComponent<TMP_Text>(); break;
         }
         k++;
       }
@@ -1591,9 +1617,11 @@ public class Main : MonoBehaviour
     voiceover_audiosource = GameObject.Find("Script").AddComponent<AudioSource>();
     voiceover_audiosource.priority = 1;
     voiceover_was_playing = false;
-    music_audiosource = GameObject.Find("Script").AddComponent<AudioSource>();
-    voiceover_audiosource.priority = 2;
+    voiceover_audiosource.priority = 2;   //unchanged: was set right after the
+                                          //deleted music AddComponent<AudioSource>()
+    //no music AudioSource: Html5Music owns the music channel (see field comment).
     music_was_playing = false;
+    music_restart_t = 0f;
 
     default_portal_scale = portal.transform.localScale;
     default_portal_position = portal.transform.position;
@@ -2117,11 +2145,9 @@ public class Main : MonoBehaviour
       subtitles_text.text = "";
       subtitle_spec = (int)SPEC.VIZ;
     }
-    if(music_audiosource.isPlaying) music_audiosource.Stop();
-    music_audiosource.clip = musics[cur_scene_i,(int)SPEC.VIZ];
-    music_audiosource.volume = music_vols[cur_scene_i,(int)SPEC.VIZ];
-    music_audiosource.Play();
-    music_was_playing = true;
+    //scene music cue. Before the BEGIN confirm this is only remembered by
+    //Html5Music (browser autoplay policy) and flushed by Html5Music.Unlock().
+    PlayMusic(cur_scene_i,(int)SPEC.VIZ,0f);
   }
 
   void UpdateScene()
@@ -2208,6 +2234,11 @@ public class Main : MonoBehaviour
               advance_passed_ice_0 = true;
               gaze_reticle.SetActive(false);
               begin_text.SetActive(false);
+              //BEGIN confirmed. This is the user gesture that starts the experience,
+              //so it is the one and only place that opens the music autoplay gate:
+              //any cue queued since load (the Ice bed from SetupScene) starts here,
+              //and every later cue goes straight through.
+              Html5Music.Unlock();
               SetSpec((int)SPEC.VIZ);
               gaze_projection.transform.rotation = rotationFromEuler(gaze_cam_euler);
             }
@@ -2786,17 +2817,10 @@ public class Main : MonoBehaviour
             subtitles_text.text = "";
             subtitle_spec = cur_spec_i;
           }
-          float old_time = music_audiosource.time;
-          if(music_audiosource.isPlaying)
-          {
-            old_time = music_audiosource.time;
-            music_audiosource.Stop();
-          }
-          music_audiosource.clip = musics[cur_scene_i,cur_spec_i];
-          music_audiosource.volume = music_vols[cur_scene_i,cur_spec_i];
-          music_audiosource.time = old_time;
-          music_audiosource.Play();
-          music_was_playing = true;
+          //swap the track but keep the playhead, as the AudioSource version did
+          float old_time = Html5Music.Time;
+          if(Html5Music.IsPlaying()) Html5Music.Stop();
+          PlayMusic(cur_scene_i,cur_spec_i,old_time);
         }
       }
     }
@@ -2881,14 +2905,16 @@ public class Main : MonoBehaviour
         }
       }
     }
+    //the music channel does not loop; when a track runs out it is started again.
+    //Throttled because the streamed element can report "not playing" while it is
+    //still buffering, and we must not spam play() at frame rate.
     if(music_was_playing)
     {
-      if(!music_audiosource.isPlaying)
+      music_restart_t += Time.deltaTime;
+      if(music_restart_t >= music_restart_interval)
       {
-        music_audiosource.clip = musics[cur_scene_i,cur_spec_i];
-        music_audiosource.volume = music_vols[cur_scene_i,cur_spec_i];
-        music_audiosource.Play();
-        music_was_playing = true;
+        music_restart_t = 0f;
+        if(!Html5Music.IsPlaying()) PlayMusic(cur_scene_i,cur_spec_i,0f);
       }
     }
 
