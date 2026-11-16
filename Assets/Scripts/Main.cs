@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro; // N12: labels are TextMeshPro SDF now; TMP_Text covers both 3D and UGUI variants
 
 public class Main : MonoBehaviour
 {
@@ -149,27 +150,27 @@ public class Main : MonoBehaviour
   GameObject[] ar_maps;
   GameObject ar_alert;
   GameObject ar_timer;
-  TextMesh ar_timer_text;
+  TMP_Text ar_timer_text;
   GameObject credits_0;
   GameObject credits_1;
-  TextMesh credits_text_0;
-  TextMesh credits_text_1;
+  TMP_Text credits_text_0;
+  TMP_Text credits_text_1;
   GameObject subtitles;
-  TextMesh subtitles_text;
+  TMP_Text subtitles_text;
 
   int MAX_LABELS = 5;
   GameObject[] ar_label_lefts;
   GameObject[] ar_label_left_kids;
   GameObject[] ar_label_left_quads;
-  TextMesh[] ar_label_left_texts;
+  TMP_Text[] ar_label_left_texts;
   GameObject[] ar_label_rights;
   GameObject[] ar_label_right_kids;
   GameObject[] ar_label_right_quads;
-  TextMesh[] ar_label_right_texts;
+  TMP_Text[] ar_label_right_texts;
   GameObject[] ar_label_bhs;
   GameObject[] ar_label_bh_kids;
   GameObject[] ar_label_bh_quads;
-  TextMesh[] ar_label_bh_texts;
+  TMP_Text[] ar_label_bh_texts;
   GameObject[] ar_progresses;
   GameObject[] ar_progress_offsets;
   LineRenderer[] ar_progress_lines;
@@ -1452,28 +1453,28 @@ public class Main : MonoBehaviour
     ar_maps[2] = GameObject.Find("map2");
     ar_alert = GameObject.Find("Alert");
     ar_timer = GameObject.Find("Timer");
-    ar_timer_text = ar_timer.GetComponent<TextMesh>();
+    ar_timer_text = ar_timer.GetComponent<TMP_Text>();
     credits_0 = GameObject.Find("Credits_0");
-    credits_text_0 = credits_0.GetComponent<TextMesh>();
+    credits_text_0 = credits_0.GetComponent<TMP_Text>();
     credits_1 = GameObject.Find("Credits_1");
-    credits_text_1 = credits_1.GetComponent<TextMesh>();
+    credits_text_1 = credits_1.GetComponent<TMP_Text>();
     subtitles = GameObject.Find("Subtitles");
-    subtitles_text = subtitles.GetComponent<TextMesh>();
+    subtitles_text = subtitles.GetComponent<TMP_Text>();
     //stars = GameObject.Find("Stars");
     //starsscale = GameObject.Find("StarsScale");
 
     ar_label_lefts      = new GameObject[MAX_LABELS];
     ar_label_left_kids  = new GameObject[MAX_LABELS];
     ar_label_left_quads = new GameObject[MAX_LABELS];
-    ar_label_left_texts = new TextMesh[MAX_LABELS];
+    ar_label_left_texts = new TMP_Text[MAX_LABELS];
     ar_label_rights      = new GameObject[MAX_LABELS];
     ar_label_right_kids  = new GameObject[MAX_LABELS];
     ar_label_right_quads = new GameObject[MAX_LABELS];
-    ar_label_right_texts = new TextMesh[MAX_LABELS];
+    ar_label_right_texts = new TMP_Text[MAX_LABELS];
     ar_label_bhs      = new GameObject[MAX_LABELS];
     ar_label_bh_kids  = new GameObject[MAX_LABELS];
     ar_label_bh_quads = new GameObject[MAX_LABELS];
-    ar_label_bh_texts = new TextMesh[MAX_LABELS];
+    ar_label_bh_texts = new TMP_Text[MAX_LABELS];
 
     //technically isn't connected to max labels, but as there's a label per line, it's at least upper bound
     ar_label_checks     = new GameObject[MAX_LABELS];
@@ -1510,7 +1511,7 @@ public class Main : MonoBehaviour
         switch(k)
         {
           case 0: ar_label_left_quads[i] = child; break;
-          case 1: ar_label_left_texts[i] = child.GetComponent<TextMesh>(); break;
+          case 1: ar_label_left_texts[i] = child.GetComponent<TMP_Text>(); break;
         }
         k++;
       }
@@ -1534,7 +1535,7 @@ public class Main : MonoBehaviour
         switch(k)
         {
           case 0: ar_label_right_quads[i] = child; break;
-          case 1: ar_label_right_texts[i] = child.GetComponent<TextMesh>(); break;
+          case 1: ar_label_right_texts[i] = child.GetComponent<TMP_Text>(); break;
         }
         k++;
       }
@@ -1558,7 +1559,7 @@ public class Main : MonoBehaviour
         switch(k)
         {
           case 0: ar_label_bh_quads[i] = child; break;
-          case 1: ar_label_bh_texts[i] = child.GetComponent<TextMesh>(); break;
+          case 1: ar_label_bh_texts[i] = child.GetComponent<TMP_Text>(); break;
         }
         k++;
       }
