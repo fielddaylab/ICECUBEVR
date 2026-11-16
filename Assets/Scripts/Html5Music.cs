@@ -193,7 +193,7 @@ public static class Html5Music
     // Evidence line for the autoplay-gate check: this must appear in the console
     // before the first "MUSICCUE ... unlocked=True", never after a cue that reached JS.
     Debug.Log("MUSICGATE unlocked pending=" + (hasPending ? pendingTrack : "none") +
-              " t=" + Time.realtimeSinceStartup.ToString("F1"));
+              " t=" + UnityEngine.Time.realtimeSinceStartup.ToString("F1"));
     Init();
     // Push the volume that was only recorded in C# while the gate was shut, so the
     // flushed cue starts at the level its caller asked for.
